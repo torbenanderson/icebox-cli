@@ -1,0 +1,18 @@
+{
+  "format": "icebox.vault",
+  "schemaVersion": 1,
+  "version": 1,
+  "seq": 3,
+  "hmac": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "entries": [
+    {
+      "entryId": "01J2F0S9K6JQ3GQCT3B3K5H0AA",
+      "service": "openai",
+      "sealedBlob": "c2VhbGVkLWJsb2ItZXhhbXBsZQ==",
+      "created": "2026-02-16T00:00:00Z",
+      "updated": null
+    }
+  ],
+  "createdByVersion": "0.1.1",
+  "lastMigratedByVersion": null
+}

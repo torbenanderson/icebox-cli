@@ -1,0 +1,17 @@
+# <type>(<scope>): <imperative summary>
+#
+# Why:
+# - <problem this change solves>
+# - <risk or context>
+#
+# What:
+# - <key change 1>
+# - <key change 2>
+#
+# Scope:
+# - <paths or modules touched>
+# - <non-goals>
+#
+# Validation:
+# - <tests/checks run>
+# - <not run + reason>

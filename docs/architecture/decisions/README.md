@@ -1,0 +1,29 @@
+# Architecture Decision Log
+
+Lightweight ADR log for new architecture decisions going forward.
+
+## Scope
+
+- Do not backfill historical decisions.
+- Add an ADR only when a change affects architecture contracts, schema shape, security boundaries, or compatibility policy.
+
+## Naming
+
+- `ADR-0001-short-title.md`
+- `ADR-0002-short-title.md`
+
+## Process
+
+1. Copy `ADR-TEMPLATE.md`.
+2. Fill context/decision/consequences.
+3. Link affected docs and backlog/test IDs.
+4. Mark status (`proposed`, `accepted`, `superseded`).
+
+## Index
+
+- None yet (forward-only log starts with next qualifying decision).
+
+
+---
+
+*Last updated: 2026-02-16*

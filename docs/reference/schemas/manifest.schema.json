@@ -1,0 +1,125 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://icebox.dev/schemas/manifest.schema.json",
+  "title": "Icebox Identity Manifest",
+  "type": "object",
+  "required": [
+    "format",
+    "schemaVersion",
+    "version",
+    "agentId",
+    "type",
+    "name",
+    "did",
+    "pubkeyFingerprint",
+    "enclaveKeyRef",
+    "created",
+    "createdByVersion",
+    "lastMigratedByVersion",
+    "capabilities"
+  ],
+  "properties": {
+    "format": {
+      "const": "icebox.manifest"
+    },
+    "schemaVersion": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "agentId": {
+      "type": "string",
+      "minLength": 8
+    },
+    "type": {
+      "type": "string",
+      "enum": ["agent", "human", "robot", "service", "algorithm"]
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "did": {
+      "type": "string",
+      "minLength": 1
+    },
+    "pubkeyFingerprint": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "enclaveKeyRef": {
+      "type": "string",
+      "minLength": 1
+    },
+    "parent": {
+      "type": ["string", "null"]
+    },
+    "created": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "derivationVersion": {
+      "type": ["string", "null"]
+    },
+    "keyAlgorithm": {
+      "type": ["string", "null"]
+    },
+    "curve": {
+      "type": ["string", "null"]
+    },
+    "didMethod": {
+      "type": ["string", "null"]
+    },
+    "derivationScheme": {
+      "type": ["string", "null"]
+    },
+    "coinType": {
+      "type": ["integer", "null"],
+      "minimum": 0
+    },
+    "network": {
+      "type": ["string", "null"]
+    },
+    "keyPurposes": {
+      "type": ["array", "null"],
+      "items": {
+        "type": "string"
+      }
+    },
+    "createdByVersion": {
+      "type": "string",
+      "minLength": 1
+    },
+    "lastMigratedByVersion": {
+      "type": ["string", "null"]
+    },
+    "capabilities": {
+      "type": "object",
+      "required": [
+        "canHoldSecrets",
+        "canRunCommands",
+        "canSign",
+        "hasEnclaveBinding"
+      ],
+      "properties": {
+        "canHoldSecrets": {
+          "type": "boolean"
+        },
+        "canRunCommands": {
+          "type": "boolean"
+        },
+        "canSign": {
+          "type": "boolean"
+        },
+        "hasEnclaveBinding": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

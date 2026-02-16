@@ -1,0 +1,24 @@
+{
+  "format": "icebox.bundle.manifest",
+  "schemaVersion": 1,
+  "bundleVersion": 1,
+  "agentId": "01J2F0M0B6K8Y8S7R3C1A9X2ZD",
+  "artifacts": [
+    {
+      "path": "manifest.json",
+      "sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "sizeBytes": 512
+    },
+    {
+      "path": "identity.pub",
+      "sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+      "sizeBytes": 34
+    },
+    {
+      "path": "vault.enc",
+      "sha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "sizeBytes": 1024
+    }
+  ],
+  "createdByVersion": "0.1.1"
+}

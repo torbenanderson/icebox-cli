@@ -1,0 +1,14 @@
+{
+  "format": "icebox.config",
+  "schemaVersion": 1,
+  "activeAgentId": "01J2F0M0B6K8Y8S7R3C1A9X2ZD",
+  "agents": [
+    {
+      "agentId": "01J2F0M0B6K8Y8S7R3C1A9X2ZD",
+      "name": "claw",
+      "did": "did:key:z6Mkexample"
+    }
+  ],
+  "createdByVersion": "0.1.1",
+  "lastMigratedByVersion": null
+}

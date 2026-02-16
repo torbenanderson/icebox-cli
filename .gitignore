@@ -1,0 +1,29 @@
+# Local-only files (internal planning, metrics, notes)
+/local/
+
+# Rust build artifacts
+/target/
+/icebox
+*.exe
+/dist/
+
+# Cargo vendor (offline builds)
+/vendor/
+
+# IDE / editor
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Test artifacts
+/coverage/
+*.coverprofile
+
+# Environment / secrets (should never be committed)
+.env
+.env.*
+*.pem
+*.key

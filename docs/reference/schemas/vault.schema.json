@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://icebox.dev/schemas/vault.schema.json",
+  "title": "Icebox Vault",
+  "type": "object",
+  "required": [
+    "format",
+    "schemaVersion",
+    "version",
+    "seq",
+    "entries",
+    "createdByVersion",
+    "lastMigratedByVersion"
+  ],
+  "properties": {
+    "format": {
+      "const": "icebox.vault"
+    },
+    "schemaVersion": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "seq": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "hmac": {
+      "type": ["string", "null"],
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "entries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["entryId", "service", "sealedBlob", "created"],
+        "properties": {
+          "entryId": {
+            "type": "string",
+            "minLength": 8
+          },
+          "service": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sealedBlob": {
+            "type": "string",
+            "minLength": 1
+          },
+          "created": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated": {
+            "oneOf": [
+              { "type": "string", "format": "date-time" },
+              { "type": "null" }
+            ]
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "createdByVersion": {
+      "type": "string",
+      "minLength": 1
+    },
+    "lastMigratedByVersion": {
+      "type": ["string", "null"]
+    }
+  },
+  "additionalProperties": true
+}

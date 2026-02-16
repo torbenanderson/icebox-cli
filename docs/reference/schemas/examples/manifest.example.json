@@ -1,0 +1,29 @@
+{
+  "format": "icebox.manifest",
+  "schemaVersion": 1,
+  "version": 1,
+  "agentId": "01J2F0M0B6K8Y8S7R3C1A9X2ZD",
+  "type": "agent",
+  "name": "claw",
+  "did": "did:key:z6Mkexample",
+  "pubkeyFingerprint": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "enclaveKeyRef": "keychain:icebox:claw",
+  "parent": null,
+  "created": "2026-02-16T00:00:00Z",
+  "derivationVersion": null,
+  "keyAlgorithm": null,
+  "curve": null,
+  "didMethod": null,
+  "derivationScheme": null,
+  "coinType": null,
+  "network": null,
+  "keyPurposes": null,
+  "createdByVersion": "0.1.1",
+  "lastMigratedByVersion": null,
+  "capabilities": {
+    "canHoldSecrets": true,
+    "canRunCommands": true,
+    "canSign": false,
+    "hasEnclaveBinding": true
+  }
+}

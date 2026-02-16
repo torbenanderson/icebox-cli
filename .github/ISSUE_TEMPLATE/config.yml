@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security Vulnerability Report (Private)
+    url: https://github.com/torbenanderson/icebox-cli/security/advisories/new
+    about: Report security issues privately. Do not file vulnerabilities in public issues.
+  - name: Security Policy
+    url: https://github.com/torbenanderson/icebox-cli/blob/main/SECURITY.md
+    about: Read responsible disclosure and reporting expectations.

@@ -1,0 +1,40 @@
+name: Docs Schemas
+
+on:
+  push:
+    paths:
+      - "docs/reference/schemas/**"
+      - ".github/workflows/docs-schemas.yml"
+  pull_request:
+    paths:
+      - "docs/reference/schemas/**"
+      - ".github/workflows/docs-schemas.yml"
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install check-jsonschema
+        run: pip install check-jsonschema==0.30.0
+
+      - name: Validate schemas against metaschema
+        run: |
+          check-jsonschema --check-metaschema docs/reference/schemas/manifest.schema.json
+          check-jsonschema --check-metaschema docs/reference/schemas/config.schema.json
+          check-jsonschema --check-metaschema docs/reference/schemas/vault.schema.json
+          check-jsonschema --check-metaschema docs/reference/schemas/bundle-manifest.schema.json
+
+      - name: Validate fixtures against schemas
+        run: |
+          check-jsonschema --schemafile docs/reference/schemas/manifest.schema.json docs/reference/schemas/examples/manifest.example.json
+          check-jsonschema --schemafile docs/reference/schemas/config.schema.json docs/reference/schemas/examples/config.example.json
+          check-jsonschema --schemafile docs/reference/schemas/vault.schema.json docs/reference/schemas/examples/vault.example.json
+          check-jsonschema --schemafile docs/reference/schemas/bundle-manifest.schema.json docs/reference/schemas/examples/bundle-manifest.example.json

@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://icebox.dev/schemas/bundle-manifest.schema.json",
+  "title": "Icebox Bundle Manifest",
+  "type": "object",
+  "required": [
+    "format",
+    "schemaVersion",
+    "bundleVersion",
+    "agentId",
+    "artifacts",
+    "createdByVersion"
+  ],
+  "properties": {
+    "format": {
+      "const": "icebox.bundle.manifest"
+    },
+    "schemaVersion": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "bundleVersion": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "agentId": {
+      "type": "string",
+      "minLength": 8
+    },
+    "artifacts": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["path", "sha256"],
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "sizeBytes": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "createdByVersion": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,66 @@
+{
+  "version": 1,
+  "updated": "2026-02-16",
+  "codes": [
+    {
+      "code": "ICE-101",
+      "category": "auth_crypto",
+      "message": "Authentication failed. Verify your agent identity."
+    },
+    {
+      "code": "ICE-201",
+      "category": "vault_corruption",
+      "message": "Vault parse failed. The vault JSON is corrupted or unreadable."
+    },
+    {
+      "code": "ICE-202",
+      "category": "vault_version",
+      "message": "Unsupported vault format. Update Icebox or check vault integrity."
+    },
+    {
+      "code": "ICE-203",
+      "category": "vault_rollback",
+      "message": "Vault sequence counter is stale. Possible rollback detected."
+    },
+    {
+      "code": "ICE-204",
+      "category": "vault_integrity",
+      "message": "Vault integrity check failed. The vault may have been tampered with or rolled back externally."
+    },
+    {
+      "code": "ICE-205",
+      "category": "vault_entry_validation",
+      "message": "Vault entry validation failed. Entry structure or uniqueness constraints are invalid."
+    },
+    {
+      "code": "ICE-301",
+      "category": "agent_not_found",
+      "message": "Agent not found. Run `icebox list-agents` to see registered agents."
+    },
+    {
+      "code": "ICE-401",
+      "category": "secret_not_found",
+      "message": "No secret stored for this service."
+    },
+    {
+      "code": "ICE-501",
+      "category": "exec_command",
+      "message": "Command execution failed."
+    },
+    {
+      "code": "ICE-601",
+      "category": "enclave_access",
+      "message": "Cannot access Secure Enclave. Check macOS permissions or biometric settings."
+    },
+    {
+      "code": "ICE-701",
+      "category": "input_validation",
+      "message": "Invalid input. See `--help` for usage."
+    },
+    {
+      "code": "ICE-702",
+      "category": "config_filesystem",
+      "message": "Data directory is on a non-local filesystem. See docs for requirements."
+    }
+  ]
+}

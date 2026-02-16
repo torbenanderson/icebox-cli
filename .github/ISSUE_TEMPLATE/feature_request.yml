@@ -1,0 +1,57 @@
+name: Feature Request
+description: Propose an enhancement or roadmap item.
+title: "feat: "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem Statement
+      description: What problem are you trying to solve?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed Solution
+      description: Describe your suggested behavior, flags, or workflow.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Any alternatives or tradeoffs you evaluated.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Architecture / docs
+        - CLI UX
+        - Vault / crypto
+        - Run / execution
+        - Platform support
+        - CI / testing
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: security
+    attributes:
+      label: Security Impact
+      description: Does this change alter threat model, key handling, integrity checks, or trust boundaries?
+      placeholder: "Yes/No + details"
+    validations:
+      required: true
+
+  - type: textarea
+    id: references
+    attributes:
+      label: Related Docs / Issues
+      description: Link affected docs or issues if known.

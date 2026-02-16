@@ -1,0 +1,66 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  rust-checks:
+    name: Rust Checks (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Detect Rust project
+        id: detect
+        shell: bash
+        run: |
+          if [ -f Cargo.toml ]; then
+            echo "has_cargo=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_cargo=false" >> "$GITHUB_OUTPUT"
+          fi
+          if find . -type f -name '*.rs' | grep -q .; then
+            echo "has_rust_sources=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_rust_sources=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Fail on inconsistent Rust scaffold
+        if: steps.detect.outputs.has_cargo != 'true' && steps.detect.outputs.has_rust_sources == 'true'
+        run: |
+          echo "Rust source files were found but Cargo.toml is missing."
+          echo "This is treated as a CI failure to avoid silent skips."
+          exit 1
+
+      - name: Setup Rust toolchain
+        if: steps.detect.outputs.has_cargo == 'true'
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: Cache Rust dependencies
+        if: steps.detect.outputs.has_cargo == 'true'
+        uses: Swatinem/rust-cache@v2
+
+      - name: cargo fmt --check
+        if: steps.detect.outputs.has_cargo == 'true'
+        run: cargo fmt --all --check
+
+      - name: cargo clippy
+        if: steps.detect.outputs.has_cargo == 'true'
+        run: cargo clippy --all-targets --all-features -- -D warnings
+
+      - name: cargo test
+        if: steps.detect.outputs.has_cargo == 'true'
+        run: cargo test --all-targets --all-features
+
+      - name: Skip (docs-only mode, no Cargo.toml)
+        if: steps.detect.outputs.has_cargo != 'true'
+        run: echo "No Cargo.toml found and no Rust source files detected. Rust CI checks are intentionally skipped in docs-only mode."
