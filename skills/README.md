@@ -1,6 +1,7 @@
 # Skills Index
 
 This directory contains repository-local skills used by Codex.
+These are structured workflow checklists used by the Icebox maintainers. They run as Cursor/Codex skills (auto-loaded via `AGENTS.md`) but are plain Markdown and can be used as manual checklists with any editor or AI tool.
 
 ## Skill List
 

@@ -1,3 +1,5 @@
+<!-- Cursor/Codex auto-discovery file. See skills/README.md for details. -->
+
 ## Skills
 A skill is a set of local instructions stored in a `SKILL.md` file.
 
