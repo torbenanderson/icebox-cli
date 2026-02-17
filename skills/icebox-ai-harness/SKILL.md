@@ -5,7 +5,7 @@ description: Enforce Icebox schema-contract propagation, CI workflow guardrails,
 
 # Icebox AI Harness
 
-Use this skill for contract and automation integrity. Do not duplicate generic docs standards or kickoff alignment gates; those are handled by `icebox-docs-standards` and `icebox-first-deliverable-alignment`.
+Use this skill for contract and automation integrity. Do not duplicate generic docs standards or kickoff alignment gates; those are handled by `icebox-docs-standards` and `icebox-execute`.
 
 1. Contract propagation for persisted artifact changes:
    - Update canonical architecture contract docs under `docs/architecture/` first.

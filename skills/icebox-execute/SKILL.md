@@ -1,11 +1,11 @@
 ---
-name: icebox-first-deliverable-alignment
-description: Align roadmap, backlog, spec, tests, and ADR expectations before coding a first deliverable or new CLI command. Use for kickoff requests like "start building", "new command", or "first vertical slice".
+name: icebox-execute
+description: Execute implementation with alignment gates across roadmap, backlog, spec, tests, ADR, and docs before coding. Use for kickoff requests like "execute", "start building", "build", or "execute backlog".
 ---
 
-# Icebox First Deliverable Alignment
+# Icebox Execute
 
-Use this skill before writing implementation code for a new CLI command or first vertical slice.
+Use this skill before writing implementation code for a new command, feature, or scoped backlog slice.
 
 ## Goal
 
