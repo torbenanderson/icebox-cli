@@ -13,9 +13,48 @@ Create a small, explicit delivery contract across planning artifacts so implemen
 
 ## Inputs
 
+- Canonical reference: `#<issue-number>` (preferred)
+- Fallback reference before issue exists: `PKT-<backlog-id>-<slug>`
 - Proposed deliverable name (for example: `icebox init`)
 - Thin-slice outcome statement
 - Any known constraints (platform, security, UX, timeline)
+
+## Reference Rule
+
+Execute against a single referenced packet:
+
+1. Preferred: `execute #<issue-number>`
+2. Fallback: `execute PKT-...` only when issue is not created yet
+3. If both are provided, issue ID is source of truth
+4. If no reference is provided, request one before starting implementation
+
+## Issue State Machine
+
+Execution must follow:
+
+1. `draft`
+2. `ready-for-review`
+3. `ready-to-execute`
+4. `in-progress`
+5. `done`
+
+Use forward-only transitions. `execute` begins at `ready-to-execute` and moves the item to `in-progress`.
+
+## Execute Refusal Rule
+
+`execute #<id>` must refuse to run unless both are true:
+
+1. Issue has `ready-to-execute` label.
+2. Required checklist boxes are complete:
+   - backlog mapped
+   - spec linked
+   - tests mapped
+   - ADR triaged
+   - docs impact listed
+
+Automation check command:
+
+- `skills/icebox-load/scripts/issue_packet.py validate-execute --issue <id>`
 
 ## Alignment Workflow (Run In Order)
 
@@ -43,6 +82,22 @@ Create a small, explicit delivery contract across planning artifacts so implemen
    - For any doc creation/update, load and apply `skills/icebox-docs-standards/SKILL.md`.
    - Ensure docs navigation/index entries are updated when pages are added/removed.
    - Ensure touched Markdown follows the repo footer policy from docs standards.
+8. Execution plan comment (before coding)
+   - Add one issue comment titled `Execution Plan`.
+   - Include commit split plan (required).
+9. Closeout evidence check (before done)
+   - Require evidence links/notes for:
+     - PR link
+     - tests run
+     - docs updated
+     - ADR link (if required)
+   - Validate with:
+     - `skills/icebox-load/scripts/issue_packet.py validate-closeout --issue <id>`
+10. State transitions
+   - Start execution:
+     - `skills/icebox-load/scripts/issue_packet.py transition --issue <id> --to in-progress`
+   - Complete execution:
+     - `skills/icebox-load/scripts/issue_packet.py transition --issue <id> --to done`
 
 ## Gate Policy
 
@@ -51,6 +106,9 @@ Hard gates before coding:
 - Backlog story exists with acceptance criteria.
 - Test cases for those criteria exist in `docs/plan/TESTING.md`.
 - Docs sync completed for the deliverable, applying `skills/icebox-docs-standards/SKILL.md` (including navigation and footer policy where applicable).
+- Referenced issue/packet is marked ready for execution (for GitHub issues: `ready-to-execute`).
+- Required checklist boxes are complete.
+- `Execution Plan` comment exists with commit split plan.
 
 Soft warnings (do not block first implementation pass):
 
@@ -63,6 +121,7 @@ Soft warnings (do not block first implementation pass):
 After running this skill, report:
 
 1. Alignment status table with `present`, `missing`, or `out-of-sync` for:
+   - reference
    - roadmap
    - backlog
    - spec
@@ -76,6 +135,9 @@ After running this skill, report:
 3. Next action:
    - either "ready to implement"
    - or a short closure list of missing hard gates
+4. State transition line:
+   - `Transition: ready-to-execute -> in-progress` (on start)
+   - `Transition: in-progress -> done` only after closeout evidence is complete
 
 ## ADR Trigger Rules
 

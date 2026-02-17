@@ -1,0 +1,139 @@
+name: Execution Packet
+description: Load a backlog item into a reviewable and executable packet.
+title: "packet: "
+body:
+  - type: input
+    id: backlog
+    attributes:
+      label: Backlog ID
+      description: Primary backlog reference (for example E1-02).
+      placeholder: E1-02
+    validations:
+      required: true
+
+  - type: input
+    id: packet_id
+    attributes:
+      label: Packet ID
+      description: Optional local fallback ID before issue references are shared broadly.
+      placeholder: PKT-E1-02-init-command
+
+  - type: input
+    id: spec_path
+    attributes:
+      label: Spec Path
+      description: Repository path to the packet/spec file.
+      placeholder: docs/specs/PKT-E1-02-init-command.md
+    validations:
+      required: true
+
+  - type: dropdown
+    id: state
+    attributes:
+      label: State
+      description: Use forward-only transitions.
+      options:
+        - draft
+        - ready-for-review
+        - ready-to-execute
+        - in-progress
+        - done
+    validations:
+      required: true
+
+  - type: textarea
+    id: objective
+    attributes:
+      label: Objective
+      description: Single-sentence outcome.
+    validations:
+      required: true
+
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+      description: In scope / out of scope.
+      placeholder: |
+        In scope:
+        - ...
+        Out of scope:
+        - ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance Criteria
+      description: Testable acceptance bullets.
+      placeholder: |
+        - AC1 ...
+        - AC2 ...
+        - AC3 ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: tests
+    attributes:
+      label: Tests Mapped
+      description: Include test IDs from docs/plan/TESTING.md and planned checks.
+      placeholder: |
+        Test IDs:
+        - T-...
+        Planned checks:
+        - ...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: adr_required
+    attributes:
+      label: ADR required?
+      options:
+        - "no"
+        - "yes"
+    validations:
+      required: true
+
+  - type: input
+    id: adr_link
+    attributes:
+      label: ADR link
+      description: Required if ADR required is yes.
+      placeholder: docs/architecture/decisions/ADR-XXXX.md
+
+  - type: checkboxes
+    id: loaded_checklist
+    attributes:
+      label: Definition Of Loaded (Required For ready-to-execute)
+      options:
+        - label: Backlog mapped
+        - label: Spec linked
+        - label: Tests mapped
+        - label: ADR triaged
+        - label: Docs impact listed
+
+  - type: textarea
+    id: execution_plan
+    attributes:
+      label: Execution Plan (Required Before Coding)
+      description: Include commit split plan.
+      placeholder: |
+        Commit split plan:
+        - ...
+        Planned validation commands:
+        - ...
+        Risk notes:
+        - ...
+
+  - type: textarea
+    id: closeout
+    attributes:
+      label: Closeout Evidence (Required For done)
+      placeholder: |
+        PR link:
+        Tests run (commands + result):
+        Docs updated (paths):
+        ADR link:

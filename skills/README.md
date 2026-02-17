@@ -8,15 +8,20 @@ This directory contains repository-local skills used by Codex.
    - Path: `skills/icebox-docs-standards/SKILL.md`
    - Purpose: global documentation standards (mdBook/rustdoc surfaces, docs nav/index hygiene, footer policy, publish-ready docs).
    - Trigger: every task in this repository.
-2. `icebox-execute`
+2. `icebox-load`
+   - Path: `skills/icebox-load/SKILL.md`
+   - Purpose: load backlog work into reviewable execution packets (issue + spec + tests + ADR triage + docs impact) before coding, using a strict issue state machine.
+   - Trigger: load/prep/review-packet requests before implementation; use GitHub issue `#<id>` as canonical reference.
+   - Automation: `skills/icebox-load/scripts/issue_packet.py` + `.github/ISSUE_TEMPLATE/execution_packet.yml`
+3. `icebox-execute`
    - Path: `skills/icebox-execute/SKILL.md`
-   - Purpose: kickoff alignment gates before coding (`roadmap -> backlog -> spec -> tests -> ADR -> docs`).
-   - Trigger: "execute", build-component requests, execute-backlog requests, and kickoff alignment requests.
-3. `icebox-ai-harness`
+   - Purpose: kickoff alignment gates before coding (`roadmap -> backlog -> spec -> tests -> ADR -> docs`) with execute refusal until `ready-to-execute` + required checklist completion.
+   - Trigger: "execute", build-component requests, execute-backlog requests, and kickoff alignment requests; prefer `execute #<id>`.
+4. `icebox-ai-harness`
    - Path: `skills/icebox-ai-harness/SKILL.md`
    - Purpose: schema contract propagation, CI workflow guardrails, and commit-splitting by concern.
    - Trigger: schema/examples updates, architecture contracts for persisted artifacts, `.github/workflows/*` edits, or explicit commit-splitting requests.
-4. `icebox-commit-merge-hygiene`
+5. `icebox-commit-merge-hygiene`
    - Path: `skills/icebox-commit-merge-hygiene/SKILL.md`
    - Purpose: consistent commit message format, merge/PR message structure, concern-based commit split planning, and default push-to-remote after commits.
    - Trigger: commit/PR/merge message requests with intent routing by trigger words; defaults to commit flow.
@@ -31,20 +36,26 @@ Use these phrases as quick routing hints.
    - "SUMMARY.md"
    - "docs footer"
    - "publish docs"
-2. `icebox-execute`
+2. `icebox-load`
+   - "load backlog item"
+   - "prepare issue"
+   - "preflight this feature"
+   - "stage for review"
+   - "ready this for execute"
+3. `icebox-execute`
    - "execute"
    - "start building"
    - "build component"
    - "execute backlog"
    - "new command"
    - "roadmap backlog spec tests ADR"
-3. `icebox-ai-harness`
+4. `icebox-ai-harness`
    - "schema change"
    - "update JSON schema"
    - "workflow change"
    - "GitHub Actions"
    - "split commits by concern"
-4. `icebox-commit-merge-hygiene`
+5. `icebox-commit-merge-hygiene`
    - commit flow: "commit", "commit message", "write commit", "message for commit"
    - PR flow: "pr", "pull request", "pr prompt", "pr body", "pr title"
    - merge flow: "merge", "merge message", "merge commit", "squash message"
@@ -55,13 +66,15 @@ Use these phrases as quick routing hints.
 If multiple skills apply, use:
 
 1. `icebox-docs-standards`
-2. `icebox-execute`
-3. `icebox-ai-harness`
-4. `icebox-commit-merge-hygiene`
+2. `icebox-load`
+3. `icebox-execute`
+4. `icebox-ai-harness`
+5. `icebox-commit-merge-hygiene`
 
 ## Boundary Notes
 
 - Do not duplicate docs standards checks in other skills; defer to `icebox-docs-standards`.
+- Do not duplicate load/preflight packet generation in other skills; defer to `icebox-load`.
 - Do not duplicate kickoff gating logic in `icebox-ai-harness`; defer to `icebox-execute`.
 - Do not duplicate commit/merge message policy in other skills; defer to `icebox-commit-merge-hygiene`.
 
