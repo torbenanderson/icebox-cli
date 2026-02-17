@@ -482,11 +482,12 @@ create_epic_pr_for_issue() {
   epic="$(epic_code_from_backlog "$backlog")"
   epic_name="$(roadmap_epic_name "$epic" || true)"
   if [[ -n "$epic_name" ]]; then
-    title="Epic ${epic}: ${epic_name}"
+    title="[PR] Epic ${epic}: ${epic_name}"
   else
-    title="Epic ${epic}: implementation"
+    title="[PR] Epic ${epic}: implementation"
   fi
   body="Epic: ${epic}
+Refs #${issue}
 Related issues:
 - #${issue}
 
@@ -494,6 +495,29 @@ This PR is maintained at epic level and can contain multiple issue-level commits
   out="$(gh_try pr create --draft --base main --head "$branch" --title "$title" --body "$body")"
   url="$(echo "$out" | grep -Eo 'https://github.com/[^ ]+/pull/[0-9]+' | tail -n1 || true)"
   [[ -n "$url" ]] && echo "$url" || echo "$out"
+}
+
+ensure_pr_references_issue() {
+  local pr_ref="$1"
+  local issue="$2"
+  local body number tmp marker
+  marker="Refs #${issue}"
+
+  body="$(gh_try pr view "$pr_ref" --json body --jq '.body' 2>/dev/null || true)"
+  [[ -z "$body" ]] && return 0
+  if echo "$body" | grep -Eq "(^|[[:space:]])#${issue}([[:space:]]|$)"; then
+    return 0
+  fi
+
+  number="$(gh_try pr view "$pr_ref" --json number --jq '.number' 2>/dev/null || true)"
+  [[ -z "$number" ]] && return 0
+  tmp="$(mktemp)"
+  {
+    printf "%s\n\n" "$body"
+    printf "%s\n" "$marker"
+  } > "$tmp"
+  gh_try pr edit "$number" --body-file "$tmp" >/dev/null 2>&1 || true
+  rm -f "$tmp"
 }
 
 ensure_pr_link_for_issue() {
@@ -512,6 +536,7 @@ ensure_pr_link_for_issue() {
   fi
   pr_url="$(current_branch_pr_url)"
   if [[ -n "$pr_url" ]]; then
+    ensure_pr_references_issue "$pr_url" "$issue"
     echo "$pr_url"
     return 0
   fi
@@ -521,6 +546,7 @@ ensure_pr_link_for_issue() {
     err "failed to create epic-level PR for branch ${branch}"
     return 1
   fi
+  ensure_pr_references_issue "$pr_url" "$issue"
   echo "$pr_url"
 }
 
