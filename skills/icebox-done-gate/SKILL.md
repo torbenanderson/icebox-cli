@@ -32,7 +32,7 @@ Use on requests like:
 2. Auto-build closeout evidence and post it to the issue:
    - `skills/icebox-load/scripts/issue_packet.sh closeout --issue <id>`
    - PR behavior:
-     - if branch is not `main`/`master`, push branch and reuse existing PR for branch or auto-create an epic-level PR.
+     - if branch is not `main`/`master`, push branch and reuse existing PR for branch or auto-create an epic-level draft PR.
      - if branch is `main`/`master`, auto-create/switch to packet branch (`pkt/<backlog-id>`) before push/PR.
    - Runs default validation commands:
      - `cargo check`
@@ -40,7 +40,7 @@ Use on requests like:
      - `cargo clippy -- -D warnings`
      - `cargo test`
    - Captures:
-     - `PR link:` (defaults to current commit link)
+     - `PR link:` (auto-created/reused PR URL)
      - `Tests run (commands + result):`
      - `Docs updated (paths):`
      - `Files added/changed (paths):`

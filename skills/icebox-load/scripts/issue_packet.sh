@@ -491,7 +491,7 @@ Related issues:
 - #${issue}
 
 This PR is maintained at epic level and can contain multiple issue-level commits."
-  out="$(gh_try pr create --base main --head "$branch" --title "$title" --body "$body")"
+  out="$(gh_try pr create --draft --base main --head "$branch" --title "$title" --body "$body")"
   url="$(echo "$out" | grep -Eo 'https://github.com/[^ ]+/pull/[0-9]+' | tail -n1 || true)"
   [[ -n "$url" ]] && echo "$url" || echo "$out"
 }
