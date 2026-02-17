@@ -1,0 +1,16 @@
+[book]
+title = "Icebox Documentation"
+authors = ["Icebox Maintainers"]
+language = "en"
+multilingual = false
+src = "docs"
+
+[build]
+build-dir = "book"
+create-missing = false
+
+[output.html]
+default-theme = "light"
+preferred-dark-theme = "navy"
+git-repository-url = "https://github.com/torbenanderson/icebox-cli"
+edit-url-template = "https://github.com/torbenanderson/icebox-cli/edit/main/{path}"

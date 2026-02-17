@@ -24,9 +24,22 @@ Use this file as the entrypoint for project docs.
 ## Reference
 
 - [Versioning Policy](reference/VERSIONING.md)
+- [API Documentation (Rustdoc)](reference/API_DOCS.md)
 - [Error Codes (JSON)](reference/error-codes.json)
 - [JSON Schemas](reference/schemas/README.md)
 - [Documentation Governance](reference/DOCS_GOVERNANCE.md)
+
+## Documentation Surfaces
+
+- Docs book (mdBook): built from `docs/` using `book.toml`
+- API docs (rustdoc): built from Rust `///` comments when `Cargo.toml` exists
+
+### Local Build Commands
+
+```bash
+mdbook build
+cargo doc --workspace --all-features --no-deps
+```
 
 ## Source Of Truth
 
@@ -39,4 +52,4 @@ Use this file as the entrypoint for project docs.
 
 ---
 
-*Last updated: 2026-02-16*
+*Last updated: 2026-02-17*

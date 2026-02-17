@@ -6,6 +6,8 @@
 /icebox
 *.exe
 /dist/
+/book/
+/site/
 
 # Cargo vendor (offline builds)
 /vendor/
