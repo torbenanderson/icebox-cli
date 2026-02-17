@@ -13,6 +13,7 @@ This directory contains repository-local skills used by Codex.
    - Purpose: load backlog work into reviewable execution packets (issue + spec + tests + ADR triage + docs impact) before coding, using a strict issue state machine.
    - Trigger: load/prep/review-packet requests before implementation; use GitHub issue `#<id>` as canonical reference.
    - Automation: `skills/icebox-load/scripts/issue_packet.sh` + `.github/ISSUE_TEMPLATE/execution_packet.yml`
+   - Can auto-create packet issue from backlog ID (`create --backlog <id>`).
 3. `icebox-execute`
    - Path: `skills/icebox-execute/SKILL.md`
    - Purpose: kickoff alignment gates before coding (`roadmap -> backlog -> spec -> tests -> ADR -> docs`) with execute refusal until `ready-to-execute` + required checklist completion.
@@ -77,6 +78,33 @@ If multiple skills apply, use:
 - Do not duplicate load/preflight packet generation in other skills; defer to `icebox-load`.
 - Do not duplicate kickoff gating logic in `icebox-ai-harness`; defer to `icebox-execute`.
 - Do not duplicate commit/merge message policy in other skills; defer to `icebox-commit-merge-hygiene`.
+
+## Quick Flow
+
+Use this minimal workflow:
+
+1. Load from backlog ID (auto-creates packet issue if needed):
+   - `load E1`
+2. Load from existing issue if already created:
+   - `load #<issue-id>`
+3. Fix packet until review-ready:
+   - `fix load #<issue-id>`
+4. Mark ready and execute:
+   - `execute #<issue-id>`
+5. Commit and push implementation:
+   - `commit`
+6. Close out packet:
+   - add PR/tests/docs/ADR evidence in issue
+   - transition to `done`
+
+Backlog ID standard:
+
+- Use `E*` IDs everywhere, defaulting to epic IDs (examples: `E1`, `E4`, `E7.5`).
+- Optional extended forms are allowed when needed (example: `E1-02`).
+
+State path:
+
+`draft -> ready-for-review -> ready-to-execute -> in-progress -> done`
 
 ## Geek Note
 

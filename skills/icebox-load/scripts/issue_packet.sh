@@ -246,11 +246,105 @@ usage() {
 usage: issue_packet.sh <command> [args]
 
 commands:
+  create --backlog <id> [--title <text>] [--packet-id <id>] [--spec-path <path>]
   ensure-labels
   transition --issue <id> --to <state> [--dry-run]
   validate-execute --issue <id>
   validate-closeout --issue <id>
 EOF
+}
+
+create_issue() {
+  local backlog="" title="" packet_id="" spec_path=""
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --backlog) backlog="$2"; shift 2 ;;
+      --title) title="$2"; shift 2 ;;
+      --packet-id) packet_id="$2"; shift 2 ;;
+      --spec-path) spec_path="$2"; shift 2 ;;
+      *) err "unknown arg: $1"; usage; return 1 ;;
+    esac
+  done
+
+  if [[ -z "$backlog" ]]; then
+    err "create requires --backlog"
+    usage
+    return 1
+  fi
+
+  if ! echo "$backlog" | grep -Eq '^E[0-9]+(\.[0-9]+)?(-[0-9]+[a-z]?)?$'; then
+    err "backlog ID must use E* format (examples: E1, E4, E7.5; optional suffixes like E1-02)"
+    return 1
+  fi
+
+  if [[ -z "$packet_id" ]]; then
+    packet_id="PKT-${backlog}-work-item"
+  fi
+  if [[ -z "$spec_path" ]]; then
+    spec_path="docs/plan/spec/${packet_id}.md"
+  fi
+  if [[ -z "$title" ]]; then
+    title="packet: ${backlog}"
+  fi
+
+  ensure_labels >/dev/null
+
+  local body
+  body="$(cat <<EOF
+Backlog ID: ${backlog}
+Packet ID: ${packet_id}
+Spec path: ${spec_path}
+Current state: draft
+
+## Objective
+- Define objective for ${backlog}.
+
+## Scope
+In scope:
+- TBD
+Out of scope:
+- TBD
+
+## Acceptance Criteria
+- AC1 TBD
+- AC2 TBD
+- AC3 TBD
+
+## Tests Mapped
+Test IDs:
+- TBD
+Planned checks:
+- TBD
+
+ADR required?: no
+ADR link:
+
+## Definition Of Loaded (Required For ready-to-execute)
+- [ ] Backlog mapped
+- [ ] Spec linked
+- [ ] Tests mapped
+- [ ] ADR triaged
+- [ ] Docs impact listed
+
+## Execution Plan (Required Before Coding)
+Commit split plan:
+- TBD
+Planned validation commands:
+- TBD
+Risk notes:
+- TBD
+
+## Closeout Evidence (Required For done)
+PR link:
+Tests run (commands + result):
+Docs updated (paths):
+ADR link:
+EOF
+)"
+
+  local out
+  out="$(gh issue create --title "$title" --body "$body" --label "draft")"
+  echo "ok: created issue $out"
 }
 
 main() {
@@ -259,6 +353,9 @@ main() {
   shift || true
 
   case "$cmd" in
+    create)
+      create_issue "$@"
+      ;;
     ensure-labels)
       ensure_labels
       ;;
