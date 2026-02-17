@@ -22,6 +22,26 @@ err() {
   echo "error: $*" >&2
 }
 
+gh_try() {
+  local attempt=1
+  local max_attempts="${GH_RETRY_MAX_ATTEMPTS:-4}"
+  local delay_seconds="${GH_RETRY_BASE_DELAY_SECONDS:-1}"
+  local rc=0
+
+  while true; do
+    if command gh "$@"; then
+      return 0
+    fi
+    rc=$?
+    if (( attempt >= max_attempts )); then
+      return "$rc"
+    fi
+    sleep "$delay_seconds"
+    delay_seconds=$((delay_seconds * 2))
+    attempt=$((attempt + 1))
+  done
+}
+
 need_gh() {
   if ! command -v gh >/dev/null 2>&1; then
     err "\`gh\` CLI is required but not found"
@@ -44,9 +64,13 @@ contains_state() {
   return 1
 }
 
+regex_escape() {
+  echo "$1" | sed -e 's/[][(){}.^$*+?|\\/]/\\&/g'
+}
+
 issue_labels() {
   local issue="$1"
-  gh issue view "$issue" --json labels --jq '.labels[].name'
+  gh_try issue view "$issue" --json labels --jq '.labels[].name'
 }
 
 current_state() {
@@ -68,12 +92,12 @@ current_state() {
 
 issue_body() {
   local issue="$1"
-  gh issue view "$issue" --json body --jq '.body'
+  gh_try issue view "$issue" --json body --jq '.body'
 }
 
 issue_comments() {
   local issue="$1"
-  gh issue view "$issue" --json comments --jq '.comments[].body'
+  gh_try issue view "$issue" --json comments --jq '.comments[].body'
 }
 
 epic_code_from_backlog() {
@@ -101,7 +125,7 @@ find_matching_milestone() {
   local epic="$1"
   local epic_name="$2"
   local titles
-  titles="$(gh api repos/{owner}/{repo}/milestones --paginate --jq '.[].title' 2>/dev/null || true)"
+  titles="$(gh_try api repos/{owner}/{repo}/milestones --paginate --jq '.[].title' 2>/dev/null || true)"
   [[ -z "$titles" ]] && return 1
 
   local t
@@ -143,22 +167,22 @@ ensure_milestone() {
     echo "$found"
     return 0
   fi
-  gh api repos/{owner}/{repo}/milestones -X POST -f title="$wanted" >/dev/null
+  gh_try api repos/{owner}/{repo}/milestones -X POST -f title="$wanted" >/dev/null
   echo "$wanted"
 }
 
 repo_owner() {
-  gh repo view --json owner --jq '.owner.login'
+  gh_try repo view --json owner --jq '.owner.login'
 }
 
 repo_name_with_owner() {
-  gh repo view --json nameWithOwner --jq '.nameWithOwner'
+  gh_try repo view --json nameWithOwner --jq '.nameWithOwner'
 }
 
 find_project_by_title() {
   local owner="$1"
   local title="$2"
-  gh project list --owner "$owner" --format json --jq '.projects[] | select(.title=="'"$title"'") | .title' 2>/dev/null | head -n1
+  gh_try project list --owner "$owner" --format json --jq '.projects[] | select(.title=="'"$title"'") | .title' 2>/dev/null | head -n1
 }
 
 ensure_project() {
@@ -169,16 +193,16 @@ ensure_project() {
   existing="$(find_project_by_title "$owner" "$title" || true)"
   if [[ -n "$existing" ]]; then
     if [[ -n "$repo_full" ]]; then
-      gh project link "$(gh project list --owner "$owner" --format json --jq '.projects[] | select(.title=="'"$title"'") | .number' | head -n1)" --owner "$owner" --repo "$repo_full" >/dev/null 2>&1 || true
+      gh_try project link "$(gh_try project list --owner "$owner" --format json --jq '.projects[] | select(.title=="'"$title"'") | .number' | head -n1)" --owner "$owner" --repo "$repo_full" >/dev/null 2>&1 || true
     fi
     echo "$existing"
     return 0
   fi
-  gh project create --owner "$owner" --title "$title" >/dev/null 2>&1 || return 1
+  gh_try project create --owner "$owner" --title "$title" >/dev/null 2>&1 || return 1
   local created
   created="$(find_project_by_title "$owner" "$title" || true)"
   if [[ -n "$repo_full" ]]; then
-    gh project link "$(gh project list --owner "$owner" --format json --jq '.projects[] | select(.title=="'"$title"'") | .number' | head -n1)" --owner "$owner" --repo "$repo_full" >/dev/null 2>&1 || true
+    gh_try project link "$(gh_try project list --owner "$owner" --format json --jq '.projects[] | select(.title=="'"$title"'") | .number' | head -n1)" --owner "$owner" --repo "$repo_full" >/dev/null 2>&1 || true
   fi
   echo "$created"
 }
@@ -186,7 +210,7 @@ ensure_project() {
 project_number_by_title() {
   local owner="$1"
   local title="$2"
-  gh project list --owner "$owner" --format json --jq '.projects[] | select(.title=="'"$title"'") | .number' 2>/dev/null | head -n1
+  gh_try project list --owner "$owner" --format json --jq '.projects[] | select(.title=="'"$title"'") | .number' 2>/dev/null | head -n1
 }
 
 attach_issue_to_project_v2() {
@@ -196,13 +220,15 @@ attach_issue_to_project_v2() {
   local pnum
   pnum="$(project_number_by_title "$owner" "$title" || true)"
   [[ -z "$pnum" ]] && return 1
-  gh project item-add "$pnum" --owner "$owner" --url "$issue_url" >/dev/null
+  gh_try project item-add "$pnum" --owner "$owner" --url "$issue_url" >/dev/null
 }
 
 checklist_checked() {
   local body="$1"
   local item="$2"
-  echo "$body" | grep -Eiq "^[[:space:]]*-[[:space:]]*\[[xX]\][[:space:]]*${item//\?/\\?}[[:space:]]*$"
+  local item_re
+  item_re="$(regex_escape "$item")"
+  echo "$body" | grep -Eiq "^[[:space:]]*-[[:space:]]*\[[xX]\][[:space:]]*${item_re}[[:space:]]*$"
 }
 
 has_execution_plan_comment() {
@@ -213,14 +239,18 @@ has_execution_plan_comment() {
 is_nonempty_field() {
   local content="$1"
   local prefix="$2"
+  local prefix_re
+  prefix_re="$(regex_escape "$prefix")"
   local line
-  line="$(echo "$content" | grep -Ei "^[[:space:]]*${prefix//\?/\\?}[[:space:]]*" | head -n1 || true)"
+  line="$(echo "$content" | grep -Ei "^[[:space:]]*${prefix_re}[[:space:]]*" | head -n1 || true)"
   if [[ -z "$line" ]]; then
     return 1
   fi
   local rhs
   rhs="$(echo "$line" | sed -E 's/^[^:]*:[[:space:]]*//')"
-  case "${rhs,,}" in
+  local rhs_lower
+  rhs_lower="$(echo "$rhs" | tr '[:upper:]' '[:lower:]')"
+  case "$rhs_lower" in
     ""|"n/a"|"na"|"tbd"|"none"|"-")
       return 1
       ;;
@@ -249,11 +279,11 @@ state_index() {
 }
 
 ensure_labels() {
-  gh label create "draft" --color "8B949E" --description "Execution packet state" --force >/dev/null
-  gh label create "ready-for-review" --color "1D76DB" --description "Execution packet state" --force >/dev/null
-  gh label create "ready-to-execute" --color "0E8A16" --description "Execution packet state" --force >/dev/null
-  gh label create "in-progress" --color "FBCA04" --description "Execution packet state" --force >/dev/null
-  gh label create "done" --color "5319E7" --description "Execution packet state" --force >/dev/null
+  gh_try label create "draft" --color "8B949E" --description "Execution packet state" --force >/dev/null
+  gh_try label create "ready-for-review" --color "1D76DB" --description "Execution packet state" --force >/dev/null
+  gh_try label create "ready-to-execute" --color "0E8A16" --description "Execution packet state" --force >/dev/null
+  gh_try label create "in-progress" --color "FBCA04" --description "Execution packet state" --force >/dev/null
+  gh_try label create "done" --color "5319E7" --description "Execution packet state" --force >/dev/null
   echo "ok: ensured state labels"
 }
 
@@ -288,7 +318,7 @@ transition() {
     return 0
   fi
 
-  local cmd=("gh" "issue" "edit" "$issue" "--add-label" "$target")
+  local cmd=("gh_try" "issue" "edit" "$issue" "--add-label" "$target")
   local s
   while IFS= read -r s; do
     [[ -z "$s" || "$s" == "$target" ]] && continue
@@ -365,6 +395,300 @@ validate_closeout() {
   echo "ok: closeout gate passed for #$issue"
 }
 
+to_https_repo_url() {
+  local remote="$1"
+  if echo "$remote" | grep -q '^git@github.com:'; then
+    echo "$remote" | sed -E 's#^git@github.com:#https://github.com/#; s#\.git$##'
+    return 0
+  fi
+  if echo "$remote" | grep -q '^https://github.com/'; then
+    echo "$remote" | sed -E 's#\.git$##'
+    return 0
+  fi
+  echo "$remote"
+}
+
+default_pr_link() {
+  local remote repo_url head
+  remote="$(git remote get-url origin 2>/dev/null || true)"
+  head="$(git rev-parse HEAD 2>/dev/null || true)"
+  repo_url="$(to_https_repo_url "$remote")"
+  if [[ -n "$repo_url" && -n "$head" ]]; then
+    echo "${repo_url}/commit/${head}"
+    return 0
+  fi
+  echo "https://github.com/<owner>/<repo>/commit/<hash>"
+}
+
+issue_backlog_id() {
+  local issue="$1"
+  issue_body "$issue" | sed -n 's/^Backlog ID:[[:space:]]*//p' | head -n1
+}
+
+current_branch() {
+  git rev-parse --abbrev-ref HEAD 2>/dev/null || true
+}
+
+ensure_branch_pushed() {
+  local branch="$1"
+  if git rev-parse --abbrev-ref --symbolic-full-name '@{u}' >/dev/null 2>&1; then
+    git push >/dev/null
+  else
+    git push -u origin "$branch" >/dev/null
+  fi
+}
+
+current_branch_pr_url() {
+  gh_try pr view --json url --jq '.url' 2>/dev/null || true
+}
+
+create_epic_pr_for_issue() {
+  local issue="$1"
+  local branch backlog epic epic_name title body out url
+  branch="$(current_branch)"
+  backlog="$(issue_backlog_id "$issue")"
+  epic="$(epic_code_from_backlog "$backlog")"
+  epic_name="$(roadmap_epic_name "$epic" || true)"
+  if [[ -n "$epic_name" ]]; then
+    title="Epic ${epic}: ${epic_name}"
+  else
+    title="Epic ${epic}: implementation"
+  fi
+  body="Epic: ${epic}
+Related issues:
+- #${issue}
+
+This PR is maintained at epic level and can contain multiple issue-level commits."
+  out="$(gh_try pr create --base main --head "$branch" --title "$title" --body "$body")"
+  url="$(echo "$out" | grep -Eo 'https://github.com/[^ ]+/pull/[0-9]+' | tail -n1 || true)"
+  [[ -n "$url" ]] && echo "$url" || echo "$out"
+}
+
+ensure_pr_link_for_issue() {
+  local issue="$1"
+  local branch pr_url
+  branch="$(current_branch)"
+  if [[ -z "$branch" ]]; then
+    err "unable to determine current git branch"
+    return 1
+  fi
+
+  if [[ "$branch" == "main" || "$branch" == "master" ]]; then
+    err "current branch is ${branch}; done/closeout requires PR-based flow from a non-main branch"
+    err "create/switch to a feature branch, push, and rerun done"
+    return 1
+  fi
+
+  ensure_branch_pushed "$branch"
+  pr_url="$(current_branch_pr_url)"
+  if [[ -n "$pr_url" ]]; then
+    echo "$pr_url"
+    return 0
+  fi
+
+  pr_url="$(create_epic_pr_for_issue "$issue" || true)"
+  if [[ -z "$pr_url" ]]; then
+    err "failed to create epic-level PR for branch ${branch}"
+    return 1
+  fi
+  echo "$pr_url"
+}
+
+changed_paths() {
+  {
+    git diff --name-only 2>/dev/null || true
+    git diff --cached --name-only 2>/dev/null || true
+    git ls-files --others --exclude-standard 2>/dev/null || true
+  } | awk 'NF{print}' | sort -u
+}
+
+run_default_closeout_tests() {
+  local tests_report=""
+  local failed=0
+  local cmd
+  local cmds=(
+    "cargo check"
+    "cargo fmt --check"
+    "cargo clippy -- -D warnings"
+    "cargo test"
+  )
+  for cmd in "${cmds[@]}"; do
+    if sh -c "$cmd" >/tmp/icebox-closeout.$$ 2>&1; then
+      tests_report="${tests_report}- ${cmd} (pass)\n"
+    else
+      tests_report="${tests_report}- ${cmd} (fail)\n"
+      failed=1
+    fi
+  done
+  rm -f /tmp/icebox-closeout.$$ >/dev/null 2>&1 || true
+  printf "%b" "$tests_report"
+  return "$failed"
+}
+
+post_closeout_comment() {
+  local issue="$1"
+  local pr_link="$2"
+  local tests_run="$3"
+  local docs_paths="$4"
+  local files_paths="$5"
+  local adr_link="$6"
+  local excluded_paths="${7:-}"
+
+  local tmp
+  tmp="$(mktemp)"
+  cat > "$tmp" <<EOF
+## Closeout Evidence
+
+### References
+PR link: ${pr_link}
+ADR link: ${adr_link}
+
+### Verification
+Tests run (commands + result):
+${tests_run}
+
+### Artifact Deltas
+Docs updated (paths):
+${docs_paths}
+Files added/changed (paths):
+${files_paths}
+EOF
+  if [[ -n "$excluded_paths" ]]; then
+    cat >> "$tmp" <<EOF
+Excluded as out-of-packet scope:
+${excluded_paths}
+EOF
+  fi
+
+  gh_try issue comment "$issue" --body-file "$tmp" >/dev/null
+  rm -f "$tmp"
+}
+
+sync_closeout_fields_to_body() {
+  local issue="$1"
+  local pr_link="$2"
+  local tests_summary="$3"
+  local docs_summary="$4"
+  local files_summary="$5"
+  local adr_link="$6"
+
+  local body tmp
+  body="$(issue_body "$issue")"
+  tmp="$(mktemp)"
+  echo "$body" | awk \
+    -v pr="PR link: ${pr_link}" \
+    -v tests="Tests run (commands + result): ${tests_summary}" \
+    -v docs="Docs updated (paths): ${docs_summary}" \
+    -v files="Files added/changed (paths): ${files_summary}" \
+    -v adr="ADR link: ${adr_link}" '
+    BEGIN {
+      done_pr=0; done_tests=0; done_docs=0; done_files=0; done_adr=0;
+    }
+    /^PR link:[[:space:]]*/ { print pr; done_pr=1; next }
+    /^Tests run \(commands \+ result\):[[:space:]]*/ { print tests; done_tests=1; next }
+    /^Docs updated \(paths\):[[:space:]]*/ { print docs; done_docs=1; next }
+    /^Files added\/changed \(paths\):[[:space:]]*/ { print files; done_files=1; next }
+    /^ADR link:[[:space:]]*/ { print adr; done_adr=1; next }
+    { print }
+    END {
+      if (!done_pr) print pr
+      if (!done_tests) print tests
+      if (!done_docs) print docs
+      if (!done_files) print files
+      if (!done_adr) print adr
+    }' > "$tmp"
+  gh_try issue edit "$issue" --body-file "$tmp" >/dev/null
+  rm -f "$tmp"
+}
+
+closeout_issue() {
+  local issue="" pr_link="" adr_link="" run_tests="yes"
+  local -a override_docs=()
+  local -a override_files=()
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --issue) issue="$(normalize_issue "$2")"; shift 2 ;;
+      --pr-link) pr_link="$2"; shift 2 ;;
+      --adr-link) adr_link="$2"; shift 2 ;;
+      --skip-tests) run_tests="no"; shift 1 ;;
+      --doc-path) override_docs+=("$2"); shift 2 ;;
+      --file-path) override_files+=("$2"); shift 2 ;;
+      *) err "unknown arg: $1"; usage; return 1 ;;
+    esac
+  done
+
+  [[ -z "$issue" ]] && { err "closeout requires --issue"; usage; return 1; }
+  if [[ -z "$pr_link" ]]; then
+    pr_link="$(ensure_pr_link_for_issue "$issue")" || return 1
+  fi
+  [[ -z "$adr_link" ]] && adr_link="n/a"
+
+  local tests_run
+  local tests_failed=0
+  if [[ "$run_tests" == "yes" ]]; then
+    tests_run="$(run_default_closeout_tests)" || tests_failed=1
+  else
+    tests_run="- skipped (manual override: --skip-tests)"
+  fi
+
+  local paths docs_paths files_paths excluded_paths
+  paths="$(changed_paths)"
+  docs_paths="$(echo "$paths" | grep -E '^docs/' || true)"
+  files_paths="$paths"
+
+  if [[ "${#override_docs[@]}" -gt 0 ]]; then
+    docs_paths="$(printf "%s\n" "${override_docs[@]}" | awk 'NF' | sort -u)"
+  fi
+  if [[ "${#override_files[@]}" -gt 0 ]]; then
+    files_paths="$(printf "%s\n" "${override_files[@]}" | awk 'NF' | sort -u)"
+    excluded_paths="$(comm -23 <(echo "$paths" | awk 'NF' | sort -u) <(echo "$files_paths" | awk 'NF' | sort -u) || true)"
+  fi
+
+  [[ -z "$docs_paths" ]] && docs_paths="- none"
+  [[ -z "$files_paths" ]] && files_paths="- none"
+  [[ -n "$excluded_paths" ]] && excluded_paths="$(echo "$excluded_paths" | sed 's/^/- /')"
+  docs_paths="$(echo "$docs_paths" | sed 's/^/- /')"
+  files_paths="$(echo "$files_paths" | sed 's/^/- /')"
+
+  post_closeout_comment "$issue" "$pr_link" "$tests_run" "$docs_paths" "$files_paths" "$adr_link" "$excluded_paths"
+  sync_closeout_fields_to_body \
+    "$issue" \
+    "$pr_link" \
+    "see latest Closeout Evidence comment" \
+    "see latest Closeout Evidence comment" \
+    "see latest Closeout Evidence comment" \
+    "$adr_link"
+  if [[ "$tests_failed" -ne 0 ]]; then
+    err "one or more closeout validation commands failed; evidence comment posted but done transition blocked"
+    return 1
+  fi
+  echo "ok: closeout evidence comment posted for #$issue"
+}
+
+done_issue() {
+  local issue="" pr_link="" adr_link="" run_tests="yes"
+  local -a passthrough_args=()
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --issue) issue="$(normalize_issue "$2")"; shift 2 ;;
+      --pr-link) pr_link="$2"; passthrough_args+=("--pr-link" "$2"); shift 2 ;;
+      --adr-link) adr_link="$2"; passthrough_args+=("--adr-link" "$2"); shift 2 ;;
+      --skip-tests) run_tests="no"; passthrough_args+=("--skip-tests"); shift 1 ;;
+      --doc-path|--file-path) passthrough_args+=("$1" "$2"); shift 2 ;;
+      *) err "unknown arg: $1"; usage; return 1 ;;
+    esac
+  done
+  [[ -z "$issue" ]] && { err "done requires --issue"; usage; return 1; }
+
+  if [[ "${#passthrough_args[@]}" -gt 0 ]]; then
+    closeout_issue --issue "$issue" "${passthrough_args[@]}"
+  else
+    closeout_issue --issue "$issue"
+  fi
+  validate_closeout "$issue"
+  transition "$issue" "done" "false"
+}
+
 usage() {
   cat <<'EOF'
 usage: issue_packet.sh <command> [args]
@@ -375,7 +699,9 @@ commands:
   ensure-labels
   transition --issue <id> --to <state> [--dry-run]
   validate-execute --issue <id>
+  closeout --issue <id> [--pr-link <url>] [--adr-link <path-or-url>] [--skip-tests] [--doc-path <path>]... [--file-path <path>]...
   validate-closeout --issue <id>
+  done --issue <id> [--pr-link <url>] [--adr-link <path-or-url>] [--skip-tests] [--doc-path <path>]... [--file-path <path>]...
 EOF
 }
 
@@ -718,7 +1044,7 @@ load_issue() {
     printf "ADR link:\n"
   } > "$tmp"
 
-  gh issue edit "$issue" --body-file "$tmp" >/dev/null
+  gh_try issue edit "$issue" --body-file "$tmp" >/dev/null
   rm -f "$tmp"
 
   local state
@@ -838,7 +1164,7 @@ EOF
 )"
 
   local out issue_url
-  local cmd=("gh" "issue" "create" "--title" "$title" "--body" "$body" "--label" "draft")
+  local cmd=("gh_try" "issue" "create" "--title" "$title" "--body" "$body" "--label" "draft")
   if [[ -n "$milestone" ]]; then
     cmd+=("--milestone" "$milestone")
   fi
@@ -908,6 +1234,12 @@ main() {
       done
       [[ -z "$issue" ]] && { err "validate-closeout requires --issue"; usage; return 1; }
       validate_closeout "$issue"
+      ;;
+    closeout)
+      closeout_issue "$@"
+      ;;
+    done)
+      done_issue "$@"
       ;;
     ""|-h|--help|help)
       usage

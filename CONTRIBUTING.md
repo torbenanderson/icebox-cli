@@ -22,6 +22,17 @@ Start here:
 - Add schemas, fixtures, and docs validation improvements.
 - Implement MVP backlog items once scoped in issues/PRs.
 
+## Contribution Workflow
+
+1. Fork the repo on GitHub
+2. Clone your fork locally
+3. Create a feature branch (`git checkout -b my-feature`)
+4. Make your changes and commit
+5. Push to your fork (`git push origin my-feature`)
+6. Open a Pull Request to `main`
+7. Address review feedback
+8. Maintainer merges
+
 ## Before You Open a PR
 
 1. Check the relevant architecture and planning docs first.

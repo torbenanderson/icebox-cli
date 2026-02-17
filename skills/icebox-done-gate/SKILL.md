@@ -29,17 +29,32 @@ Use on requests like:
 ## Workflow
 
 1. Confirm issue is in `in-progress`.
-2. Verify closeout evidence fields are present and non-empty:
-   - `PR link:`
-   - `Tests run (commands + result):`
-   - `Docs updated (paths):`
-   - `Files added/changed (paths):`
-   - `ADR link:` (required when ADR required is yes)
+2. Auto-build closeout evidence and post it to the issue:
+   - `skills/icebox-load/scripts/issue_packet.sh closeout --issue <id>`
+   - PR behavior:
+     - if branch is not `main`/`master`, push branch and reuse existing PR for branch or auto-create an epic-level PR.
+     - if branch is `main`/`master`, fail closeout/done (no direct-to-main fallback).
+   - Runs default validation commands:
+     - `cargo check`
+     - `cargo fmt --check`
+     - `cargo clippy -- -D warnings`
+     - `cargo test`
+   - Captures:
+     - `PR link:` (defaults to current commit link)
+     - `Tests run (commands + result):`
+     - `Docs updated (paths):`
+     - `Files added/changed (paths):`
+     - `ADR link:` (default `n/a`, must be real if ADR required is yes)
+   - Optional packet-scope override (recommended when workspace has unrelated changes):
+     - `--file-path <path>` (repeatable)
+     - `--doc-path <path>` (repeatable)
 3. Run hard validation:
    - `skills/icebox-load/scripts/issue_packet.sh validate-closeout --issue <id>`
 4. If validation passes, transition:
    - `skills/icebox-load/scripts/issue_packet.sh transition --issue <id> --to done`
-5. If validation fails, return a short blocker list and do not transition.
+5. Preferred one-shot command:
+   - `skills/icebox-load/scripts/issue_packet.sh done --issue <id> [--file-path <path>]... [--doc-path <path>]...`
+6. If validation fails, return a short blocker list and do not transition.
 
 ## Hard Gate
 
