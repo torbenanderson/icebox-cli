@@ -429,6 +429,31 @@ current_branch() {
   git rev-parse --abbrev-ref HEAD 2>/dev/null || true
 }
 
+sanitize_branch_component() {
+  echo "$1" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9._-]+/-/g'
+}
+
+ensure_packet_branch() {
+  local issue="$1"
+  local backlog branch target
+  branch="$(current_branch)"
+  if [[ "$branch" != "main" && "$branch" != "master" ]]; then
+    echo "$branch"
+    return 0
+  fi
+
+  backlog="$(issue_backlog_id "$issue")"
+  [[ -z "$backlog" ]] && backlog="issue-${issue}"
+  target="pkt/$(sanitize_branch_component "$backlog")"
+
+  if git rev-parse --verify "$target" >/dev/null 2>&1; then
+    git checkout "$target" >/dev/null
+  else
+    git checkout -b "$target" >/dev/null
+  fi
+  echo "$target"
+}
+
 ensure_branch_pushed() {
   local branch="$1"
   if git rev-parse --abbrev-ref --symbolic-full-name '@{u}' >/dev/null 2>&1; then
@@ -436,6 +461,13 @@ ensure_branch_pushed() {
   else
     git push -u origin "$branch" >/dev/null
   fi
+}
+
+branch_has_commits_ahead_main() {
+  local branch="$1"
+  local count
+  count="$(git rev-list --count "origin/main..${branch}" 2>/dev/null || echo 0)"
+  [[ "${count:-0}" -gt 0 ]]
 }
 
 current_branch_pr_url() {
@@ -467,19 +499,17 @@ This PR is maintained at epic level and can contain multiple issue-level commits
 ensure_pr_link_for_issue() {
   local issue="$1"
   local branch pr_url
-  branch="$(current_branch)"
+  branch="$(ensure_packet_branch "$issue")"
   if [[ -z "$branch" ]]; then
     err "unable to determine current git branch"
     return 1
   fi
 
-  if [[ "$branch" == "main" || "$branch" == "master" ]]; then
-    err "current branch is ${branch}; done/closeout requires PR-based flow from a non-main branch"
-    err "create/switch to a feature branch, push, and rerun done"
+  ensure_branch_pushed "$branch"
+  if ! branch_has_commits_ahead_main "$branch"; then
+    err "branch ${branch} has no commits ahead of origin/main; commit your changes before done"
     return 1
   fi
-
-  ensure_branch_pushed "$branch"
   pr_url="$(current_branch_pr_url)"
   if [[ -n "$pr_url" ]]; then
     echo "$pr_url"
