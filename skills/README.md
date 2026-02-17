@@ -87,6 +87,7 @@ Use this minimal workflow:
    - `load E1`
    - this also auto-builds load artifacts on the issue (backlog/spec/tests/ADR/docs impact)
    - and auto-adds epic/project context + matching milestone when available
+   - GitHub project attach requires: `gh auth refresh -s project`
 2. Load from existing issue if already created:
    - `load #<issue-id>`
 3. Fix packet until review-ready:

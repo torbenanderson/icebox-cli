@@ -54,6 +54,7 @@ Use `skills/icebox-load/scripts/issue_packet.sh`:
    - `skills/icebox-load/scripts/issue_packet.sh create --backlog <id>`
    - Auto-adds epic/project context from `docs/plan/ROADMAP.md`.
    - Auto-attaches matching GitHub milestone when available.
+   - Auto-attaches matching GitHub project when available (requires `gh auth refresh -s project`).
    - Optional:
      - `--title "packet: <id> <summary>"`
      - `--packet-id PKT-<id>-<slug>`

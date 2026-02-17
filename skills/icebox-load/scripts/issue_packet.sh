@@ -131,6 +131,57 @@ find_matching_milestone() {
   return 1
 }
 
+ensure_milestone() {
+  local epic="$1"
+  local epic_name="$2"
+  local wanted="$epic"
+  [[ -n "$epic_name" ]] && wanted="${epic} - ${epic_name}"
+  local found
+  found="$(find_matching_milestone "$epic" "$epic_name" || true)"
+  if [[ -n "$found" ]]; then
+    echo "$found"
+    return 0
+  fi
+  gh api repos/{owner}/{repo}/milestones -X POST -f title="$wanted" >/dev/null
+  echo "$wanted"
+}
+
+repo_owner() {
+  gh repo view --json owner --jq '.owner.login'
+}
+
+repo_name_with_owner() {
+  gh repo view --json nameWithOwner --jq '.nameWithOwner'
+}
+
+find_project_by_title() {
+  local owner="$1"
+  local title="$2"
+  gh project list --owner "$owner" --format json --jq '.projects[] | select(.title=="'"$title"'") | .title' 2>/dev/null | head -n1
+}
+
+ensure_project() {
+  local owner="$1"
+  local title="$2"
+  local repo_full="$3"
+  local existing
+  existing="$(find_project_by_title "$owner" "$title" || true)"
+  if [[ -n "$existing" ]]; then
+    if [[ -n "$repo_full" ]]; then
+      gh project link "$(gh project list --owner "$owner" --format json --jq '.projects[] | select(.title=="'"$title"'") | .number' | head -n1)" --owner "$owner" --repo "$repo_full" >/dev/null 2>&1 || true
+    fi
+    echo "$existing"
+    return 0
+  fi
+  gh project create --owner "$owner" --title "$title" >/dev/null 2>&1 || return 1
+  local created
+  created="$(find_project_by_title "$owner" "$title" || true)"
+  if [[ -n "$repo_full" ]]; then
+    gh project link "$(gh project list --owner "$owner" --format json --jq '.projects[] | select(.title=="'"$title"'") | .number' | head -n1)" --owner "$owner" --repo "$repo_full" >/dev/null 2>&1 || true
+  fi
+  echo "$created"
+}
+
 checklist_checked() {
   local body="$1"
   local item="$2"
@@ -601,7 +652,7 @@ create_issue() {
 
   ensure_labels >/dev/null
 
-  local epic epic_name project_name milestone
+  local epic epic_name project_name milestone project_title owner repo_full
   epic="$(epic_code_from_backlog "$backlog")"
   epic_name="$(roadmap_epic_name "$epic" || true)"
   if [[ -n "$epic_name" ]]; then
@@ -609,7 +660,13 @@ create_issue() {
   else
     project_name="${epic}"
   fi
-  milestone="$(find_matching_milestone "$epic" "$epic_name" || true)"
+  milestone="$(ensure_milestone "$epic" "$epic_name" || true)"
+  project_title="$project_name"
+  owner="$(repo_owner || true)"
+  repo_full="$(repo_name_with_owner || true)"
+  if [[ -n "$owner" ]]; then
+    ensure_project "$owner" "$project_title" "$repo_full" >/dev/null 2>&1 || true
+  fi
 
   local body
   body="$(cat <<EOF
@@ -671,12 +728,18 @@ EOF
   if [[ -n "$milestone" ]]; then
     cmd+=("--milestone" "$milestone")
   fi
+  if [[ -n "$project_title" ]]; then
+    cmd+=("--project" "$project_title")
+  fi
   out="$("${cmd[@]}")"
   echo "ok: created issue $out"
   if [[ -n "$milestone" ]]; then
     echo "ok: attached milestone '$milestone'"
   else
     echo "warn: no matching GitHub milestone found for ${epic} (${epic_name:-unknown epic name})"
+  fi
+  if [[ -n "$project_title" ]]; then
+    echo "ok: attempted project attach '$project_title' (requires gh project scope)"
   fi
 }
 
