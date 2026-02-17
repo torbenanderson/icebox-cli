@@ -90,6 +90,7 @@ Automation check command:
      - PR link
      - tests run
      - docs updated
+     - files added/changed (paths)
      - ADR link (if required)
    - Validate with:
      - `skills/icebox-load/scripts/issue_packet.sh validate-closeout --issue <id>`

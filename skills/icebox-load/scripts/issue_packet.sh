@@ -15,6 +15,7 @@ required_closeout_fields=(
   "PR link:"
   "Tests run"
   "Docs updated"
+  "Files added/changed (paths):"
 )
 
 err() {
@@ -180,6 +181,22 @@ ensure_project() {
     gh project link "$(gh project list --owner "$owner" --format json --jq '.projects[] | select(.title=="'"$title"'") | .number' | head -n1)" --owner "$owner" --repo "$repo_full" >/dev/null 2>&1 || true
   fi
   echo "$created"
+}
+
+project_number_by_title() {
+  local owner="$1"
+  local title="$2"
+  gh project list --owner "$owner" --format json --jq '.projects[] | select(.title=="'"$title"'") | .number' 2>/dev/null | head -n1
+}
+
+attach_issue_to_project_v2() {
+  local owner="$1"
+  local title="$2"
+  local issue_url="$3"
+  local pnum
+  pnum="$(project_number_by_title "$owner" "$title" || true)"
+  [[ -z "$pnum" ]] && return 1
+  gh project item-add "$pnum" --owner "$owner" --url "$issue_url" >/dev/null
 }
 
 checklist_checked() {
@@ -409,10 +426,67 @@ backlog_description() {
   ' docs/plan/BACKLOG.md
 }
 
+is_scaffold_only_backlog() {
+  local backlog="$1"
+  local use_case="$2"
+  local desc="$3"
+  if [[ "$backlog" == "E1-01" ]]; then
+    return 0
+  fi
+  local combined
+  combined="$(printf "%s %s" "$use_case" "$desc" | tr '[:upper:]' '[:lower:]')"
+  if echo "$combined" | grep -Eq 'cargo init|scaffold|bootstrap'; then
+    return 0
+  fi
+  return 1
+}
+
+default_execution_plan() {
+  local backlog="$1"
+  local spec_path="$2"
+  local scaffold_only="$3"
+  local tests_present="$4"
+  local commit_split validation risks
+
+  if [[ "$scaffold_only" == "true" ]]; then
+    commit_split="- commit 1: scaffold setup for ${backlog} (\`cargo init\`, crate metadata sanity)
+- commit 2: baseline validation/docs sync (spec + testing mapping updates)"
+    validation="- cargo check
+- cargo fmt --check
+- cargo clippy -- -D warnings"
+    risks="- risk: accidental scope creep into CLI behavior before E1-02
+- mitigation: limit changes to scaffold artifacts and planning docs"
+  else
+    commit_split="- commit 1: core implementation for ${backlog}
+- commit 2: tests and docs alignment updates"
+    validation="- cargo fmt --check
+- cargo clippy -- -D warnings
+- cargo test"
+    if [[ "$tests_present" == "true" ]]; then
+      risks="- risk: implementation diverges from mapped tests
+- mitigation: run mapped tests before closeout and update spec if contract changes"
+    else
+      risks="- risk: no mapped tests currently in docs/plan/TESTING.md for ${backlog}
+- mitigation: add or link test mapping before ready-to-execute"
+    fi
+  fi
+
+  cat <<EOF
+${commit_split}
+@@VALIDATION@@
+${validation}
+@@RISKS@@
+${risks}
+EOF
+}
+
 spec_needs_refresh() {
   local spec_path="$1"
   [[ ! -f "$spec_path" ]] && return 0
   if rg -q "^- AC1:$|^- AC2:$|^- AC3:$|Define and deliver .*\\.$" "$spec_path"; then
+    return 0
+  fi
+  if rg -q "AC1: .*implemented per backlog description|docs/SUMMARY\\.md|docs/plan/BACKLOG\\.md" "$spec_path"; then
     return 0
   fi
   if ! rg -q "^## Rust Implementation Plan" "$spec_path"; then
@@ -428,6 +502,9 @@ upsert_spec() {
   local desc="$4"
   local tests_block="$5"
   local adr_required="$6"
+  local docs_block="$7"
+  local ac1="$8"
+  local ac2="$9"
   mkdir -p "$(dirname "$spec_path")"
   if spec_needs_refresh "$spec_path"; then
     cat > "$spec_path" <<EOF
@@ -452,8 +529,8 @@ upsert_spec() {
 
 ## Acceptance Criteria
 
-- AC1: ${backlog} behavior is implemented per backlog description.
-- AC2: CLI output/errors are deterministic and user-safe.
+- AC1: ${ac1}
+- AC2: ${ac2}
 - AC3: Changes are validated with mapped tests.
 
 ## Rust Implementation Plan
@@ -491,10 +568,7 @@ ${tests_block}
 
 ## Docs Impact
 
-- [ ] docs/README.md
-- [ ] docs/SUMMARY.md
-- [ ] docs/plan/BACKLOG.md
-- [ ] docs/plan/TESTING.md
+${docs_block}
 
 ## Validation Commands
 
@@ -542,6 +616,10 @@ load_issue() {
 
   local tests
   tests="$(mapped_tests_for_backlog "$backlog" || true)"
+  local scaffold_only="false"
+  if is_scaffold_only_backlog "$backlog" "$use_case" "$desc"; then
+    scaffold_only="true"
+  fi
 
   local backlog_mark="x"
   local spec_mark="x"
@@ -554,12 +632,43 @@ load_issue() {
   if [[ -n "$tests" ]]; then
     tests_block="$(echo "$tests" | sed 's/^/- /')"
     tests_block_md="$(echo "$tests" | sed 's/^/- /')"
+  elif [[ "$scaffold_only" == "true" ]]; then
+    tests_mark="x"
+    tests_block="- scaffold-only validation mapping:
+- verify \`Cargo.toml\` exists and package name is \`icebox-cli\`
+- verify \`src/main.rs\` exists
+- run \`cargo check\`"
+    tests_block_md="- Scaffold-only validation mapping (no runtime feature code in scope):
+  - verify \`Cargo.toml\` exists and package name is \`icebox-cli\`
+  - verify \`src/main.rs\` exists
+  - run \`cargo check\`"
   else
     tests_block="- none found yet in docs/plan/TESTING.md for ${backlog}"
     tests_block_md="- none mapped yet for ${backlog}"
   fi
 
-  upsert_spec "$backlog" "$spec_path" "$use_case" "$desc" "$tests_block_md" "$adr_required"
+  local has_tests="false"
+  [[ -n "$tests" ]] && has_tests="true"
+  local plan_blob execution_commit_plan execution_validation execution_risks
+  plan_blob="$(default_execution_plan "$backlog" "$spec_path" "$scaffold_only" "$has_tests")"
+  execution_commit_plan="$(echo "$plan_blob" | awk '/^@@VALIDATION@@$/{exit} {print}')"
+  execution_validation="$(echo "$plan_blob" | awk 'seen&&$0!~/^@@RISKS@@$/{print} /^@@VALIDATION@@$/{seen=1} /^@@RISKS@@$/{exit}')"
+  execution_risks="$(echo "$plan_blob" | awk 'seen{print} /^@@RISKS@@$/{seen=1}' | sed '1d')"
+
+  local ac1 ac2 docs_block
+  if [[ "$scaffold_only" == "true" ]]; then
+    ac1="Running \`cargo init\` for \`icebox-cli\` yields a valid Rust binary crate scaffold with \`Cargo.toml\` and \`src/main.rs\`."
+    ac2="Scaffold creation is non-interactive and reproducible for the same inputs."
+  else
+    ac1="${backlog} behavior matches backlog description: ${desc}"
+    ac2="CLI output/errors are deterministic and user-safe."
+  fi
+  docs_block="- [x] ${spec_path}
+- [ ] docs/plan/TESTING.md (if test mappings are added/changed)
+- [ ] docs/architecture/decisions/ADR-*.md (if ADR required)
+- [ ] docs/README.md (if user-facing behavior changed)"
+
+  upsert_spec "$backlog" "$spec_path" "$use_case" "$desc" "$tests_block_md" "$adr_required" "$docs_block" "$ac1" "$ac2"
 
   local tmp
   tmp="$(mktemp)"
@@ -577,16 +686,17 @@ load_issue() {
     printf "Out of scope:\n"
     printf -- "- Other backlog items outside %s\n" "$backlog"
     printf "\n## Acceptance Criteria\n"
-    printf -- "- AC1: %s behavior implemented.\n" "$backlog"
-    printf -- "- AC2: command behavior is deterministic and safe.\n"
+    printf -- "- AC1: %s\n" "$ac1"
+    printf -- "- AC2: %s\n" "$ac2"
     printf -- "- AC3: mapped tests cover happy path and failure path.\n"
     printf "\n## Tests Mapped\n%s\n" "$tests_block"
     printf "\nADR required?: %s\n" "$adr_required"
     printf "ADR link:\n"
     printf "\n## Docs impact listed\n"
-    printf -- "- docs/plan/BACKLOG.md\n"
-    printf -- "- docs/plan/TESTING.md\n"
     printf -- "- %s\n" "$spec_path"
+    printf -- "- docs/plan/TESTING.md (if test mappings are added/changed)\n"
+    printf -- "- docs/architecture/decisions/ADR-*.md (if ADR required)\n"
+    printf -- "- docs/README.md (if user-facing behavior changed)\n"
     printf "\n## Definition Of Loaded (Required For ready-to-execute)\n"
     printf -- "- [%s] Backlog mapped\n" "$backlog_mark"
     printf -- "- [%s] Spec linked\n" "$spec_mark"
@@ -595,15 +705,16 @@ load_issue() {
     printf -- "- [%s] Docs impact listed\n" "$docs_mark"
     printf "\n## Execution Plan (Required Before Coding)\n"
     printf "Commit split plan:\n"
-    printf -- "- TBD\n"
+    printf "%s\n" "$execution_commit_plan"
     printf "Planned validation commands:\n"
-    printf -- "- TBD\n"
+    printf "%s\n" "$execution_validation"
     printf "Risk notes:\n"
-    printf -- "- TBD\n"
+    printf "%s\n" "$execution_risks"
     printf "\n## Closeout Evidence (Required For done)\n"
     printf "PR link:\n"
     printf "Tests run (commands + result):\n"
     printf "Docs updated (paths):\n"
+    printf "Files added/changed (paths):\n"
     printf "ADR link:\n"
   } > "$tmp"
 
@@ -617,7 +728,9 @@ load_issue() {
   fi
 
   echo "ok: load updated #$issue for ${backlog}"
-  [[ -n "$tests" ]] || echo "warn: no tests currently mapped for ${backlog} in docs/plan/TESTING.md"
+  if [[ -z "$tests" && "$scaffold_only" != "true" ]]; then
+    echo "warn: no tests currently mapped for ${backlog} in docs/plan/TESTING.md"
+  fi
 }
 
 create_issue() {
@@ -719,19 +832,18 @@ Risk notes:
 PR link:
 Tests run (commands + result):
 Docs updated (paths):
+Files added/changed (paths):
 ADR link:
 EOF
 )"
 
-  local out
+  local out issue_url
   local cmd=("gh" "issue" "create" "--title" "$title" "--body" "$body" "--label" "draft")
   if [[ -n "$milestone" ]]; then
     cmd+=("--milestone" "$milestone")
   fi
-  if [[ -n "$project_title" ]]; then
-    cmd+=("--project" "$project_title")
-  fi
   out="$("${cmd[@]}")"
+  issue_url="$out"
   echo "ok: created issue $out"
   if [[ -n "$milestone" ]]; then
     echo "ok: attached milestone '$milestone'"
@@ -739,7 +851,11 @@ EOF
     echo "warn: no matching GitHub milestone found for ${epic} (${epic_name:-unknown epic name})"
   fi
   if [[ -n "$project_title" ]]; then
-    echo "ok: attempted project attach '$project_title' (requires gh project scope)"
+    if [[ -n "$owner" ]] && attach_issue_to_project_v2 "$owner" "$project_title" "$issue_url" >/dev/null 2>&1; then
+      echo "ok: attached project '$project_title'"
+    else
+      echo "warn: project attach failed for '$project_title' (requires gh project scope and Projects v2 access)"
+    fi
   fi
 }
 

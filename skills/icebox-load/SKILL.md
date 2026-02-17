@@ -82,10 +82,12 @@ Use `skills/icebox-load/scripts/issue_packet.sh`:
    - Create/update spec using `references/execution-packet-template.md`.
 5. Map acceptance tests
    - Add/verify linked tests in `docs/plan/TESTING.md`.
+   - For scaffold/no-runtime items (for example `E1-01 Cargo init`), map deterministic validation checks (artifact existence + `cargo check`) as the test mapping instead of leaving tests blank.
 6. ADR triage
    - Mark whether ADR is required (`yes`/`no`) with rationale.
 7. Docs impact map
-   - List docs that must change (`docs/README.md`, `docs/SUMMARY.md`, command docs, architecture or reference docs as needed).
+   - List only docs plausibly impacted for this item; do not pre-check broad generic docs.
+   - Always include the packet spec path; add `docs/plan/TESTING.md` only when mappings change; add ADR path only when required.
 8. Issue packet output
    - Produce a ready-to-file issue body with:
      - objective
