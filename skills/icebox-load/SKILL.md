@@ -52,33 +52,40 @@ Use `skills/icebox-load/scripts/issue_packet.sh`:
 
 1. Create execution packet issue from backlog ID (internal helper for `load E*`):
    - `skills/icebox-load/scripts/issue_packet.sh create --backlog <id>`
+   - Auto-adds epic/project context from `docs/plan/ROADMAP.md`.
+   - Auto-attaches matching GitHub milestone when available.
    - Optional:
      - `--title "packet: <id> <summary>"`
-      - `--packet-id PKT-<id>-<slug>`
-      - `--spec-path docs/plan/spec/PKT-<id>-<slug>.md`
+     - `--packet-id PKT-<id>-<slug>`
+     - `--spec-path docs/plan/spec/PKT-<id>-<slug>.md`
 2. Ensure required state labels exist:
    - `skills/icebox-load/scripts/issue_packet.sh ensure-labels`
 3. Transition state safely:
    - `skills/icebox-load/scripts/issue_packet.sh transition --issue <id> --to ready-for-review`
 4. Use issue template:
    - `.github/ISSUE_TEMPLATE/execution_packet.yml`
+5. Build load artifacts directly on issue:
+   - `skills/icebox-load/scripts/issue_packet.sh load --issue <id> --backlog <E*> [--adr-required yes|no]`
 
 ## Workflow
 
 1. Resolve reference
    - If input is `load E*`: auto-create packet issue via `issue_packet.sh create --backlog <E*>`, then continue using created `#issue`.
    - If input is `load #<id>`: use existing issue directly.
-2. Identify canonical backlog source
+2. Build load artifacts on issue
+   - Populate/refresh backlog mapping, spec link, tests mapping, ADR triage, and docs impact.
+   - Update Definition Of Loaded checklist to checked/unchecked based on actual mapping state.
+3. Identify canonical backlog source
    - Locate item in `docs/plan/BACKLOG.md`.
-3. Build mini spec
+4. Build mini spec
    - Create/update spec using `references/execution-packet-template.md`.
-4. Map acceptance tests
+5. Map acceptance tests
    - Add/verify linked tests in `docs/plan/TESTING.md`.
-5. ADR triage
+6. ADR triage
    - Mark whether ADR is required (`yes`/`no`) with rationale.
-6. Docs impact map
+7. Docs impact map
    - List docs that must change (`docs/README.md`, `docs/SUMMARY.md`, command docs, architecture or reference docs as needed).
-7. Issue packet output
+8. Issue packet output
    - Produce a ready-to-file issue body with:
      - objective
      - scope
@@ -87,13 +94,13 @@ Use `skills/icebox-load/scripts/issue_packet.sh`:
      - ADR flag
      - docs checklist
      - out-of-scope list
-8. Bind references
+9. Bind references
    - Ensure the issue body includes:
      - `Issue ID`: `#<n>` (once created)
      - `Packet ID`: `PKT-...` (optional but recommended)
      - spec path (if created)
      - backlog ID mapping
-9. Set state
+10. Set state
    - New/updated packet state must be `draft` or `ready-for-review`.
    - Promote to `ready-to-execute` only after review approval and checklist completion.
 

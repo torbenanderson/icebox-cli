@@ -75,6 +75,62 @@ issue_comments() {
   gh issue view "$issue" --json comments --jq '.comments[].body'
 }
 
+epic_code_from_backlog() {
+  local backlog="$1"
+  if [[ "$backlog" == *-* ]]; then
+    echo "${backlog%%-*}"
+  else
+    echo "$backlog"
+  fi
+}
+
+roadmap_epic_name() {
+  local epic="$1"
+  awk -F'|' -v e="$epic" '
+    $0 ~ "\\| \\*\\*" e "\\*\\* \\|" {
+      name=$3
+      gsub(/^[ \t]+|[ \t]+$/, "", name)
+      print name
+      exit
+    }
+  ' docs/plan/ROADMAP.md
+}
+
+find_matching_milestone() {
+  local epic="$1"
+  local epic_name="$2"
+  local titles
+  titles="$(gh api repos/{owner}/{repo}/milestones --paginate --jq '.[].title' 2>/dev/null || true)"
+  [[ -z "$titles" ]] && return 1
+
+  local t
+  while IFS= read -r t; do
+    [[ -z "$t" ]] && continue
+    if [[ "$t" == "$epic" || "$t" == "$epic - $epic_name" || "$t" == "$epic: $epic_name" ]]; then
+      echo "$t"
+      return 0
+    fi
+  done <<< "$titles"
+
+  while IFS= read -r t; do
+    [[ -z "$t" ]] && continue
+    if echo "$t" | grep -Eq "(^|[[:space:]])${epic}([[:space:]]|:|-|$)"; then
+      echo "$t"
+      return 0
+    fi
+  done <<< "$titles"
+
+  while IFS= read -r t; do
+    [[ -z "$t" || -z "$epic_name" ]] && continue
+    if echo "$t" | grep -Fqi "$epic_name"; then
+      echo "$t"
+      return 0
+    fi
+  done <<< "$titles"
+
+  return 1
+}
+
 checklist_checked() {
   local body="$1"
   local item="$2"
@@ -247,11 +303,169 @@ usage: issue_packet.sh <command> [args]
 
 commands:
   create --backlog <id> [--title <text>] [--packet-id <id>] [--spec-path <path>]
+  load --issue <id> --backlog <id> [--adr-required yes|no] [--spec-path <path>]
   ensure-labels
   transition --issue <id> --to <state> [--dry-run]
   validate-execute --issue <id>
   validate-closeout --issue <id>
 EOF
+}
+
+validate_backlog_id() {
+  local backlog="$1"
+  if ! echo "$backlog" | grep -Eq '^E[0-9]+(\.[0-9]+)?(-[0-9]+[a-z]?)?$'; then
+    err "backlog ID must use E* format (examples: E1, E4, E7.5; optional suffixes like E1-02)"
+    return 1
+  fi
+}
+
+backlog_exists() {
+  local backlog="$1"
+  rg -q "^\|[[:space:]]*${backlog//./\\.}[[:space:]]*\|" docs/plan/BACKLOG.md
+}
+
+mapped_tests_for_backlog() {
+  local backlog="$1"
+  awk -F'|' -v b="$backlog" '
+    $0 ~ "\\|[[:space:]]*" b "[[:space:]]*\\|" {
+      gsub(/^[ \t]+|[ \t]+$/, "", $2);
+      if ($2 != "") print $2;
+    }
+  ' docs/plan/TESTING.md
+}
+
+create_spec_if_missing() {
+  local backlog="$1"
+  local spec_path="$2"
+  mkdir -p "$(dirname "$spec_path")"
+  if [[ ! -f "$spec_path" ]]; then
+    cat > "$spec_path" <<EOF
+# ${backlog} Execution Spec
+
+## Objective
+
+- Define and deliver ${backlog}.
+
+## Scope
+
+- In scope:
+- Out of scope:
+
+## Acceptance Criteria
+
+- AC1:
+- AC2:
+- AC3:
+
+## Test Mapping
+
+- Linked tests from \`docs/plan/TESTING.md\`:
+
+## ADR Triage
+
+- ADR required? (yes/no):
+- Rationale:
+
+## Docs Impact
+
+- [ ] docs/README.md
+- [ ] docs/SUMMARY.md
+- [ ] docs/plan/BACKLOG.md
+- [ ] docs/plan/TESTING.md
+EOF
+  fi
+}
+
+strip_load_auto_block() {
+  awk '
+    /<!-- LOAD-AUTO:BEGIN -->/ {skip=1; next}
+    /<!-- LOAD-AUTO:END -->/ {skip=0; next}
+    skip==0 {print}
+  '
+}
+
+load_issue() {
+  local issue="" backlog="" adr_required="no" spec_path=""
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --issue) issue="$(normalize_issue "$2")"; shift 2 ;;
+      --backlog) backlog="$2"; shift 2 ;;
+      --adr-required) adr_required="$(echo "$2" | tr '[:upper:]' '[:lower:]')"; shift 2 ;;
+      --spec-path) spec_path="$2"; shift 2 ;;
+      *) err "unknown arg: $1"; usage; return 1 ;;
+    esac
+  done
+
+  [[ -z "$issue" || -z "$backlog" ]] && { err "load requires --issue and --backlog"; usage; return 1; }
+  validate_backlog_id "$backlog" || return 1
+  [[ "$adr_required" != "yes" && "$adr_required" != "no" ]] && { err "--adr-required must be yes or no"; return 1; }
+
+  if ! backlog_exists "$backlog"; then
+    err "backlog item not found in docs/plan/BACKLOG.md: $backlog"
+    return 1
+  fi
+
+  local packet_id="PKT-${backlog}-work-item"
+  if [[ -z "$spec_path" ]]; then
+    spec_path="docs/plan/spec/${packet_id}.md"
+  fi
+  create_spec_if_missing "$backlog" "$spec_path"
+
+  local tests
+  tests="$(mapped_tests_for_backlog "$backlog" || true)"
+
+  local backlog_mark="x"
+  local spec_mark="x"
+  local tests_mark=" "
+  local adr_mark="x"
+  local docs_mark="x"
+  [[ -n "$tests" ]] && tests_mark="x"
+
+  local tests_block
+  if [[ -n "$tests" ]]; then
+    tests_block="$(echo "$tests" | sed 's/^/- /')"
+  else
+    tests_block="- none found yet in docs/plan/TESTING.md for ${backlog}"
+  fi
+
+  local body stripped
+  body="$(issue_body "$issue")"
+  stripped="$(printf "%s\n" "$body" | strip_load_auto_block)"
+
+  local tmp
+  tmp="$(mktemp)"
+  {
+    printf "%s\n" "$stripped"
+    printf "\n<!-- LOAD-AUTO:BEGIN -->\n"
+    printf "## Load Automation Output\n"
+    printf "Backlog mapped: %s (docs/plan/BACKLOG.md)\n" "$backlog"
+    printf "Spec linked: %s\n" "$spec_path"
+    printf "Tests mapped:\n%s\n" "$tests_block"
+    printf "ADR required?: %s\n" "$adr_required"
+    printf "Docs impact listed:\n"
+    printf -- "- docs/plan/BACKLOG.md\n"
+    printf -- "- docs/plan/TESTING.md\n"
+    printf -- "- %s\n" "$spec_path"
+    printf "\n## Definition Of Loaded (Required For ready-to-execute)\n"
+    printf -- "- [%s] Backlog mapped\n" "$backlog_mark"
+    printf -- "- [%s] Spec linked\n" "$spec_mark"
+    printf -- "- [%s] Tests mapped\n" "$tests_mark"
+    printf -- "- [%s] ADR triaged\n" "$adr_mark"
+    printf -- "- [%s] Docs impact listed\n" "$docs_mark"
+    printf "<!-- LOAD-AUTO:END -->\n"
+  } > "$tmp"
+
+  gh issue edit "$issue" --body-file "$tmp" >/dev/null
+  rm -f "$tmp"
+
+  local state
+  state="$(current_state "$issue")"
+  if [[ "$state" == "draft" ]]; then
+    transition "$issue" "ready-for-review" "false" >/dev/null
+  fi
+
+  echo "ok: load updated #$issue for ${backlog}"
+  [[ -n "$tests" ]] || echo "warn: no tests currently mapped for ${backlog} in docs/plan/TESTING.md"
 }
 
 create_issue() {
@@ -272,10 +486,7 @@ create_issue() {
     return 1
   fi
 
-  if ! echo "$backlog" | grep -Eq '^E[0-9]+(\.[0-9]+)?(-[0-9]+[a-z]?)?$'; then
-    err "backlog ID must use E* format (examples: E1, E4, E7.5; optional suffixes like E1-02)"
-    return 1
-  fi
+  validate_backlog_id "$backlog" || return 1
 
   if [[ -z "$packet_id" ]]; then
     packet_id="PKT-${backlog}-work-item"
@@ -289,9 +500,21 @@ create_issue() {
 
   ensure_labels >/dev/null
 
+  local epic epic_name project_name milestone
+  epic="$(epic_code_from_backlog "$backlog")"
+  epic_name="$(roadmap_epic_name "$epic" || true)"
+  if [[ -n "$epic_name" ]]; then
+    project_name="${epic} - ${epic_name}"
+  else
+    project_name="${epic}"
+  fi
+  milestone="$(find_matching_milestone "$epic" "$epic_name" || true)"
+
   local body
   body="$(cat <<EOF
 Backlog ID: ${backlog}
+Epic: ${epic}
+Project: ${project_name}
 Packet ID: ${packet_id}
 Spec path: ${spec_path}
 Current state: draft
@@ -343,8 +566,17 @@ EOF
 )"
 
   local out
-  out="$(gh issue create --title "$title" --body "$body" --label "draft")"
+  local cmd=("gh" "issue" "create" "--title" "$title" "--body" "$body" "--label" "draft")
+  if [[ -n "$milestone" ]]; then
+    cmd+=("--milestone" "$milestone")
+  fi
+  out="$("${cmd[@]}")"
   echo "ok: created issue $out"
+  if [[ -n "$milestone" ]]; then
+    echo "ok: attached milestone '$milestone'"
+  else
+    echo "warn: no matching GitHub milestone found for ${epic} (${epic_name:-unknown epic name})"
+  fi
 }
 
 main() {
@@ -355,6 +587,9 @@ main() {
   case "$cmd" in
     create)
       create_issue "$@"
+      ;;
+    load)
+      load_issue "$@"
       ;;
     ensure-labels)
       ensure_labels
