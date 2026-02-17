@@ -22,7 +22,11 @@ This directory contains repository-local skills used by Codex.
    - Path: `skills/icebox-ai-harness/SKILL.md`
    - Purpose: schema contract propagation, CI workflow guardrails, and commit-splitting by concern.
    - Trigger: schema/examples updates, architecture contracts for persisted artifacts, `.github/workflows/*` edits, or explicit commit-splitting requests.
-5. `icebox-commit-merge-hygiene`
+5. `icebox-done-gate`
+   - Path: `skills/icebox-done-gate/SKILL.md`
+   - Purpose: enforce closeout evidence and gate `in-progress -> done` transitions.
+   - Trigger: "done", "closeout", "mark done", "ship this", and finish-packet requests.
+6. `icebox-commit-merge-hygiene`
    - Path: `skills/icebox-commit-merge-hygiene/SKILL.md`
    - Purpose: consistent commit message format, merge/PR message structure, concern-based commit split planning, and default push-to-remote after commits.
    - Trigger: commit/PR/merge message requests with intent routing by trigger words; defaults to commit flow.
@@ -61,6 +65,12 @@ Use these phrases as quick routing hints.
    - PR flow: "pr", "pull request", "pr prompt", "pr body", "pr title"
    - merge flow: "merge", "merge message", "merge commit", "squash message"
    - default: if unclear, run commit flow
+6. `icebox-done-gate`
+   - "done"
+   - "closeout"
+   - "mark done"
+   - "ship this"
+   - "finish packet"
 
 ## Recommended Order
 
@@ -70,13 +80,15 @@ If multiple skills apply, use:
 2. `icebox-load`
 3. `icebox-execute`
 4. `icebox-ai-harness`
-5. `icebox-commit-merge-hygiene`
+5. `icebox-done-gate`
+6. `icebox-commit-merge-hygiene`
 
 ## Boundary Notes
 
 - Do not duplicate docs standards checks in other skills; defer to `icebox-docs-standards`.
 - Do not duplicate load/preflight packet generation in other skills; defer to `icebox-load`.
 - Do not duplicate kickoff gating logic in `icebox-ai-harness`; defer to `icebox-execute`.
+- Do not duplicate closeout evidence gating in other skills; defer to `icebox-done-gate`.
 - Do not duplicate commit/merge message policy in other skills; defer to `icebox-commit-merge-hygiene`.
 
 ## Quick Flow
@@ -97,8 +109,8 @@ Use this minimal workflow:
 5. Commit and push implementation:
    - `commit`
 6. Close out packet:
-   - add PR/tests/docs/ADR evidence in issue
-   - transition to `done`
+   - `done #<issue-id>`
+   - this validates closeout evidence (PR/tests/docs/files/ADR as needed) then transitions to `done`
 
 Backlog ID standard:
 
