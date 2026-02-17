@@ -334,37 +334,109 @@ mapped_tests_for_backlog() {
   ' docs/plan/TESTING.md
 }
 
-create_spec_if_missing() {
+backlog_use_case() {
+  local backlog="$1"
+  awk -F'|' -v b="$backlog" '
+    $0 ~ "^\\|[[:space:]]*" b "[[:space:]]*\\|" {
+      val=$3
+      gsub(/^[ \t]+|[ \t]+$/, "", val)
+      print val
+      exit
+    }
+  ' docs/plan/BACKLOG.md
+}
+
+backlog_description() {
+  local backlog="$1"
+  awk -F'|' -v b="$backlog" '
+    $0 ~ "^\\|[[:space:]]*" b "[[:space:]]*\\|" {
+      val=$4
+      gsub(/^[ \t]+|[ \t]+$/, "", val)
+      print val
+      exit
+    }
+  ' docs/plan/BACKLOG.md
+}
+
+spec_needs_refresh() {
+  local spec_path="$1"
+  [[ ! -f "$spec_path" ]] && return 0
+  if rg -q "^- AC1:$|^- AC2:$|^- AC3:$|Define and deliver .*\\.$" "$spec_path"; then
+    return 0
+  fi
+  if ! rg -q "^## Rust Implementation Plan" "$spec_path"; then
+    return 0
+  fi
+  return 1
+}
+
+upsert_spec() {
   local backlog="$1"
   local spec_path="$2"
+  local use_case="$3"
+  local desc="$4"
+  local tests_block="$5"
+  local adr_required="$6"
   mkdir -p "$(dirname "$spec_path")"
-  if [[ ! -f "$spec_path" ]]; then
+  if spec_needs_refresh "$spec_path"; then
     cat > "$spec_path" <<EOF
 # ${backlog} Execution Spec
 
 ## Objective
 
-- Define and deliver ${backlog}.
+- Deliver ${backlog} (${use_case}).
+- Backlog contract: ${desc}
+
+## Problem
+
+- Why this exists: implement the backlog contract in a way that is testable, deterministic, and easy to extend.
 
 ## Scope
 
 - In scope:
+  - ${desc}
 - Out of scope:
+  - Unrelated backlog items outside ${backlog}
+  - Cross-epic behavior changes not requested by ${backlog}
 
 ## Acceptance Criteria
 
-- AC1:
-- AC2:
-- AC3:
+- AC1: ${backlog} behavior is implemented per backlog description.
+- AC2: CLI output/errors are deterministic and user-safe.
+- AC3: Changes are validated with mapped tests.
+
+## Rust Implementation Plan
+
+- Crate/module touch points:
+  - \`src/main.rs\` (CLI wiring) and focused domain module(s) only.
+- Keep interfaces explicit:
+  - prefer small pure functions for parsing/validation paths.
+  - avoid hidden global state.
+- Error handling:
+  - return \`Result<T, E>\` from fallible logic.
+  - avoid \`unwrap()\` / \`expect()\` in non-test code paths.
+- I/O behavior:
+  - perform atomic/checked writes where files are modified.
+  - keep side effects localized and observable.
+
+## Security/Runtime Notes
+
+- Keep secret-handling boundaries unchanged unless explicitly in scope.
+- Preserve direct-exec/no-shell guarantees where relevant.
+- Preserve user-safe default errors (no sensitive internals in normal mode).
 
 ## Test Mapping
 
 - Linked tests from \`docs/plan/TESTING.md\`:
+${tests_block}
+- Add at least:
+  - one happy-path test
+  - one failure-path test
 
 ## ADR Triage
 
-- ADR required? (yes/no):
-- Rationale:
+- ADR required? (${adr_required}):
+- Rationale: keep in spec unless long-lived cross-feature decision exists.
 
 ## Docs Impact
 
@@ -372,16 +444,18 @@ create_spec_if_missing() {
 - [ ] docs/SUMMARY.md
 - [ ] docs/plan/BACKLOG.md
 - [ ] docs/plan/TESTING.md
+
+## Validation Commands
+
+- \`cargo fmt --check\`
+- \`cargo clippy -- -D warnings\`
+- \`cargo test\`
+
+## Execution Notes
+
+- Commit split plan will be finalized in the issue \`Execution Plan\` comment during \`execute\`.
 EOF
   fi
-}
-
-strip_load_auto_block() {
-  awk '
-    /<!-- LOAD-AUTO:BEGIN -->/ {skip=1; next}
-    /<!-- LOAD-AUTO:END -->/ {skip=0; next}
-    skip==0 {print}
-  '
 }
 
 load_issue() {
@@ -409,7 +483,11 @@ load_issue() {
   if [[ -z "$spec_path" ]]; then
     spec_path="docs/plan/spec/${packet_id}.md"
   fi
-  create_spec_if_missing "$backlog" "$spec_path"
+  local use_case desc
+  use_case="$(backlog_use_case "$backlog" || true)"
+  desc="$(backlog_description "$backlog" || true)"
+  [[ -z "$use_case" ]] && use_case="Work item"
+  [[ -z "$desc" ]] && desc="See backlog entry for details."
 
   local tests
   tests="$(mapped_tests_for_backlog "$backlog" || true)"
@@ -421,28 +499,40 @@ load_issue() {
   local docs_mark="x"
   [[ -n "$tests" ]] && tests_mark="x"
 
-  local tests_block
+  local tests_block tests_block_md
   if [[ -n "$tests" ]]; then
     tests_block="$(echo "$tests" | sed 's/^/- /')"
+    tests_block_md="$(echo "$tests" | sed 's/^/- /')"
   else
     tests_block="- none found yet in docs/plan/TESTING.md for ${backlog}"
+    tests_block_md="- none mapped yet for ${backlog}"
   fi
 
-  local body stripped
-  body="$(issue_body "$issue")"
-  stripped="$(printf "%s\n" "$body" | strip_load_auto_block)"
+  upsert_spec "$backlog" "$spec_path" "$use_case" "$desc" "$tests_block_md" "$adr_required"
 
   local tmp
   tmp="$(mktemp)"
   {
-    printf "%s\n" "$stripped"
-    printf "\n<!-- LOAD-AUTO:BEGIN -->\n"
-    printf "## Load Automation Output\n"
-    printf "Backlog mapped: %s (docs/plan/BACKLOG.md)\n" "$backlog"
-    printf "Spec linked: %s\n" "$spec_path"
-    printf "Tests mapped:\n%s\n" "$tests_block"
-    printf "ADR required?: %s\n" "$adr_required"
-    printf "Docs impact listed:\n"
+    printf "Backlog ID: %s\n" "$backlog"
+    printf "Use Case: %s\n" "$use_case"
+    printf "Description: %s\n" "$desc"
+    printf "Spec path: %s\n" "$spec_path"
+    printf "\n## Objective\n"
+    printf -- "- Deliver %s (%s).\n" "$backlog" "$use_case"
+    printf -- "- Implement backlog contract exactly as documented.\n"
+    printf "\n## Scope\n"
+    printf "In scope:\n"
+    printf -- "- %s\n" "$desc"
+    printf "Out of scope:\n"
+    printf -- "- Other backlog items outside %s\n" "$backlog"
+    printf "\n## Acceptance Criteria\n"
+    printf -- "- AC1: %s behavior implemented.\n" "$backlog"
+    printf -- "- AC2: command behavior is deterministic and safe.\n"
+    printf -- "- AC3: mapped tests cover happy path and failure path.\n"
+    printf "\n## Tests Mapped\n%s\n" "$tests_block"
+    printf "\nADR required?: %s\n" "$adr_required"
+    printf "ADR link:\n"
+    printf "\n## Docs impact listed\n"
     printf -- "- docs/plan/BACKLOG.md\n"
     printf -- "- docs/plan/TESTING.md\n"
     printf -- "- %s\n" "$spec_path"
@@ -452,7 +542,18 @@ load_issue() {
     printf -- "- [%s] Tests mapped\n" "$tests_mark"
     printf -- "- [%s] ADR triaged\n" "$adr_mark"
     printf -- "- [%s] Docs impact listed\n" "$docs_mark"
-    printf "<!-- LOAD-AUTO:END -->\n"
+    printf "\n## Execution Plan (Required Before Coding)\n"
+    printf "Commit split plan:\n"
+    printf -- "- TBD\n"
+    printf "Planned validation commands:\n"
+    printf -- "- TBD\n"
+    printf "Risk notes:\n"
+    printf -- "- TBD\n"
+    printf "\n## Closeout Evidence (Required For done)\n"
+    printf "PR link:\n"
+    printf "Tests run (commands + result):\n"
+    printf "Docs updated (paths):\n"
+    printf "ADR link:\n"
   } > "$tmp"
 
   gh issue edit "$issue" --body-file "$tmp" >/dev/null

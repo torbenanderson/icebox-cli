@@ -34,11 +34,26 @@
 - AC2:
 - AC3:
 
+## Rust Implementation Plan
+
+- Crate/module touch points:
+- Error handling (\`Result\` surface, no \`unwrap\` in runtime paths):
+- I/O and side-effect boundaries:
+
+## Security/Runtime Notes
+
+- Trust-boundary impact:
+- Secret/runtime handling impact:
+
 ## Test Plan
 
 - Test IDs in `docs/plan/TESTING.md`:
 - Happy path:
 - Failure path:
+- Validation commands:
+  - `cargo fmt --check`
+  - `cargo clippy -- -D warnings`
+  - `cargo test`
 
 ## ADR Triage
 
