@@ -12,7 +12,7 @@ This directory contains repository-local skills used by Codex.
    - Path: `skills/icebox-load/SKILL.md`
    - Purpose: load backlog work into reviewable execution packets (issue + spec + tests + ADR triage + docs impact) before coding, using a strict issue state machine.
    - Trigger: load/prep/review-packet requests before implementation; use GitHub issue `#<id>` as canonical reference.
-   - Automation: `skills/icebox-load/scripts/issue_packet.py` + `.github/ISSUE_TEMPLATE/execution_packet.yml`
+   - Automation: `skills/icebox-load/scripts/issue_packet.sh` + `.github/ISSUE_TEMPLATE/execution_packet.yml`
 3. `icebox-execute`
    - Path: `skills/icebox-execute/SKILL.md`
    - Purpose: kickoff alignment gates before coding (`roadmap -> backlog -> spec -> tests -> ADR -> docs`) with execute refusal until `ready-to-execute` + required checklist completion.

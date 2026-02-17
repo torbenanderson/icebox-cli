@@ -48,12 +48,12 @@ Allowed transitions are forward-only in this order.
 
 ## Automation Commands
 
-Use `skills/icebox-load/scripts/issue_packet.py`:
+Use `skills/icebox-load/scripts/issue_packet.sh`:
 
 1. Ensure required state labels exist:
-   - `skills/icebox-load/scripts/issue_packet.py ensure-labels`
+   - `skills/icebox-load/scripts/issue_packet.sh ensure-labels`
 2. Transition state safely:
-   - `skills/icebox-load/scripts/issue_packet.py transition --issue <id> --to ready-for-review`
+   - `skills/icebox-load/scripts/issue_packet.sh transition --issue <id> --to ready-for-review`
 3. Use issue template:
    - `.github/ISSUE_TEMPLATE/execution_packet.yml`
 

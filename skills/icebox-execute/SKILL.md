@@ -54,7 +54,7 @@ Use forward-only transitions. `execute` begins at `ready-to-execute` and moves t
 
 Automation check command:
 
-- `skills/icebox-load/scripts/issue_packet.py validate-execute --issue <id>`
+- `skills/icebox-load/scripts/issue_packet.sh validate-execute --issue <id>`
 
 ## Alignment Workflow (Run In Order)
 
@@ -92,12 +92,12 @@ Automation check command:
      - docs updated
      - ADR link (if required)
    - Validate with:
-     - `skills/icebox-load/scripts/issue_packet.py validate-closeout --issue <id>`
+     - `skills/icebox-load/scripts/issue_packet.sh validate-closeout --issue <id>`
 10. State transitions
    - Start execution:
-     - `skills/icebox-load/scripts/issue_packet.py transition --issue <id> --to in-progress`
+     - `skills/icebox-load/scripts/issue_packet.sh transition --issue <id> --to in-progress`
    - Complete execution:
-     - `skills/icebox-load/scripts/issue_packet.py transition --issue <id> --to done`
+     - `skills/icebox-load/scripts/issue_packet.sh transition --issue <id> --to done`
 
 ## Gate Policy
 
