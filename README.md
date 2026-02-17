@@ -2,7 +2,7 @@
 
 > Icebox gives AI agents powerful tools without storing secrets in agent state.
 
-Secure credential broker for AI agents. Never expose API keys or passwords to [OpenClaw](https://openclaw.dev) (or any agent) -- local Mac CLI using Secure Enclave + encrypted vault.
+Secure credential broker for AI agents. Never expose API keys or passwords to [OpenClaw](https://openclaw.ai) (or any agent) -- local Mac CLI using Secure Enclave + encrypted vault.
 
 > **WARNING -- ALPHA SOFTWARE**
 > Icebox is in early alpha. While it is designed to be a security product, it has **not yet been independently audited**. There may be bugs, incomplete implementations, or undiscovered vulnerabilities. **Do not rely on Icebox as your sole security layer for production secrets.** Use with caution, review the code, and report any issues you find.
