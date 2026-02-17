@@ -61,19 +61,18 @@ jobs:
             cp -R target/doc site/api
           else
             mkdir -p site/api
-            cat > site/api/index.html <<'HTML'
-            <!doctype html>
-            <html>
-              <head>
-                <meta charset="utf-8" />
-                <title>API Docs Unavailable</title>
-              </head>
-              <body>
-                <h1>API docs not generated</h1>
-                <p>No Cargo.toml was detected, so rustdoc output was skipped.</p>
-              </body>
-            </html>
-            HTML
+            printf '%s\n' \
+              '<!doctype html>' \
+              '<html>' \
+              '  <head>' \
+              '    <meta charset="utf-8" />' \
+              '    <title>API Docs Unavailable</title>' \
+              '  </head>' \
+              '  <body>' \
+              '    <h1>API docs not generated</h1>' \
+              '    <p>No Cargo.toml was detected, so rustdoc output was skipped.</p>' \
+              '  </body>' \
+              '</html>' > site/api/index.html
           fi
 
       - name: Upload docs artifact
