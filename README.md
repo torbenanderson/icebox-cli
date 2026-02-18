@@ -97,6 +97,25 @@ See `docs/architecture/platform-and-distribution.md` for the canonical platform 
 - Code of conduct: [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
 - OpenClaw community on-ramp: [.github/OPENCLAW_COMMUNITY_ONRAMP.md](.github/OPENCLAW_COMMUNITY_ONRAMP.md)
 
+### Local Docs Commands
+
+```bash
+# mdBook (guides/architecture/planning docs from docs/)
+mdbook build
+mdbook serve --open
+
+# Rust API docs (from source comments /// and //!)
+cargo doc --workspace --all-features --no-deps
+RUSTDOCFLAGS="-D warnings" cargo doc --workspace --all-features --no-deps
+
+# Optional: run rustdoc examples as doctests
+cargo test --doc
+```
+
+Rustdoc output path:
+
+- `target/doc/icebox_cli/index.html`
+
 ## Start Coding
 
 - Planning index: [docs/plan/README.md](docs/plan/README.md)
