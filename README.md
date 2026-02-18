@@ -116,6 +116,19 @@ Rustdoc output path:
 
 - `target/doc/icebox_cli/index.html`
 
+### Local CI Commands
+
+```bash
+# Rust checks (matches .github/workflows/ci.yml)
+cargo fmt --all --check
+cargo clippy --all-targets --all-features -- -D warnings
+cargo test --all-targets --all-features
+
+# Docs checks (matches .github/workflows/docs-site.yml)
+mdbook build
+cargo doc --workspace --all-features --no-deps
+```
+
 ## Start Coding
 
 - Planning index: [docs/plan/README.md](docs/plan/README.md)
