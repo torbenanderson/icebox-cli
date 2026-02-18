@@ -18,6 +18,8 @@
     - dependency update automation via Dependabot (weekly batched minor/patch)
     - non-blocking coverage trend signal via `cargo llvm-cov`
     - pull-request-only optional metadata checks (title/body/Refs linkage)
+  - Post-scope addition (tracked in packet issue closeout):
+    - Linux mutation testing via `cargo mutants` in a dedicated weekly workflow to cover Linux-only compiled paths (including `enclave_stub`).
 - Out of scope:
   - Unrelated backlog items outside E1-04
   - Cross-epic behavior changes not requested by E1-04
@@ -32,18 +34,21 @@
 - AC6 (enhancement): Coverage trend collection uses `cargo llvm-cov` and remains non-blocking in this initial pass.
 - AC7 (enhancement): Trigger policy is explicit: push + pull_request run merge-blocking quality gates; pull_request-only metadata checks are optional; schedule runs `cargo audit`.
 - AC8 (enhancement): CI artifacts/logs include quality outputs and coverage summary with a defined retention window.
+- AC9 (post-scope addition): Linux CI runs `cargo mutants` in a dedicated weekly (scheduled) job so mutation coverage includes Linux-only compiled paths such as `enclave_stub` without slowing per-PR gates.
 
 ## CI Trigger Policy
 
 - `push` + `pull_request`: run build/test/format/lint (`cargo check`, `cargo test`, `cargo fmt --check`, `cargo clippy -- -D warnings`) as merge-blocking checks.
 - `pull_request` only: run optional PR metadata checks (title/body/reference hygiene) as non-blocking informational checks.
 - `schedule` (weekly): run `cargo audit`; avoids blocking every push on advisory DB slowness while still surfacing dependency risk.
+- `schedule` (weekly): run dedicated Linux mutation testing via `cargo mutants` in separate workflow.
 
 ## Runner Boundaries
 
 - `macos-latest`: run full configured Rust quality/test suite, including macOS-gated code paths.
 - `ubuntu-latest`: run the same quality/test suite but with `#[cfg(target_os = "macos")]` paths excluded by compilation target.
 - Linux jobs must not attempt enclave-only runtime tests; macOS jobs are the canonical runner for enclave coverage.
+- Linux mutation testing is the canonical mutation gate for `enclave_stub` and other Linux-compiled paths.
 
 ## Artifacts And Retention
 
@@ -80,8 +85,8 @@
 - Linked tests from `docs/plan/TESTING.md`:
 - `T-E1-04`: CI workflows validate push/PR gates on macOS and Linux with pass/fail signaling.
 - Add at least:
-  - happy path: merge-blocking CI jobs pass (`check`, `fmt`, `clippy -D warnings`, `test`) on configured runners; scheduled `cargo audit` and non-blocking `llvm-cov` trend run as configured
-  - failure path: one merge-blocking quality gate turns workflow red and blocks merge; scheduled `cargo audit` failures are reported via scheduled run
+  - happy path: merge-blocking CI jobs pass (`check`, `fmt`, `clippy -D warnings`, `test`) on configured runners; scheduled Linux mutation testing (`cargo mutants`), scheduled `cargo audit`, and non-blocking `llvm-cov` trend run as configured
+  - failure path: one merge-blocking quality gate turns push/PR workflow red and blocks merge; scheduled mutation/audit failures are reported via their scheduled workflows
 
 ## ADR Triage
 
@@ -103,6 +108,7 @@
 - `cargo check`
 - `cargo audit` (scheduled workflow)
 - `cargo llvm-cov --workspace --all-features --summary-only` (non-blocking trend signal)
+- `cargo mutants --all-targets --all-features` (Linux CI mutation gate)
 - `cargo build` is optional as an explicit build-only gate; `cargo test` already compiles test targets.
 
 ## Execution Notes

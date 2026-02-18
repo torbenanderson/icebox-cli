@@ -8,6 +8,7 @@ This document defines the repository CI execution model for E1-04.
   - `push` + `pull_request` quality gates: `cargo check`, `cargo fmt --check`, `cargo clippy -- -D warnings`, `cargo test`
 - Enhancements (initially non-blocking)
   - Weekly scheduled `cargo audit`
+  - Weekly scheduled Linux mutation testing via `cargo mutants`
   - Dependabot updates for Rust + GitHub Actions (weekly, batched minor/patch)
   - Coverage trend reporting via `cargo llvm-cov --summary-only`
   - Optional pull-request metadata checks (title/body/reference hygiene)
@@ -25,6 +26,15 @@ This document defines the repository CI execution model for E1-04.
 - `schedule` (weekly)
   - Security audit:
     - `cargo audit`
+  - Mutation testing:
+    - `cargo mutants --all-targets --all-features`
+- `workflow_dispatch`
+  - Manual runs for scheduled workflows (`security-audit.yml`, `mutation-testing.yml`)
+
+## Weekly Schedule
+
+- `security-audit.yml` and `mutation-testing.yml` run at `cron: "0 1 * * 6"` (Saturday 01:00 UTC).
+- This aligns to Friday 5:00 PM Pacific during PST and Friday 6:00 PM Pacific during PDT (GitHub schedules are UTC-based).
 
 ## Runner Boundaries
 
@@ -33,11 +43,13 @@ This document defines the repository CI execution model for E1-04.
 - `ubuntu-latest`
   - Same merge-blocking quality/test suite with `#[cfg(target_os = "macos")]` code excluded by target compilation
 - Linux jobs must not attempt enclave-only runtime tests.
+- Linux mutation testing is the canonical mutation gate for Linux-compiled paths (including `enclave_stub`).
 
 ## Blocking Policy
 
 - Merge-blocking checks run on `push` and `pull_request`.
 - Scheduled security audit is reported separately and does not block `push`/`pull_request`.
+- Scheduled mutation testing is reported separately and does not block `push`/`pull_request`.
 - Coverage trend reporting is informational and non-blocking in this initial pass.
 
 ## Artifacts And Retention
@@ -50,6 +62,7 @@ This document defines the repository CI execution model for E1-04.
 
 - Merge-blocking job failure: fix or revert before merge.
 - Scheduled audit failure: triage advisory severity, create backlog follow-up, and patch/update dependency as needed.
+- Scheduled mutation failure: investigate surviving mutants, improve/extend tests, and rerun mutation workflow.
 - Coverage movement: track trend; do not fail pipeline solely on coverage in E1-04.
 
 ## Related Files
@@ -57,6 +70,7 @@ This document defines the repository CI execution model for E1-04.
 - `.github/workflows/ci.yml`
 - `.github/workflows/ci-enhancements.yml`
 - `.github/workflows/security-audit.yml`
+- `.github/workflows/mutation-testing.yml`
 - `.github/workflows/docs-site.yml`
 - `.github/workflows/docs-schemas.yml`
 - `.github/dependabot.yml`

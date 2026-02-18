@@ -77,6 +77,24 @@ For local development on macOS, `cargo test` runs everything. On Linux, the same
 - Security tests should verify *absence* of leaks, not just *presence* of features
 - Cryptographic interop tests (did:key vectors + sealed-box libsodium round-trips) are required merge gates in CI
 
+### Usage
+
+Common commands for local development and CI parity:
+
+| Command | Purpose |
+|---------|---------|
+| `cargo test` | Run all tests (unit, integration, E2E, system, security). On macOS includes enclave tests; on Linux runs non-enclave only. |
+| `cargo test -q` | Same as above, compact output (one character per test). |
+| `cargo test --lib` | Run only unit tests in `src/`. |
+| `cargo test --test <name>` | Run a single test crate (e.g. `integration`, `e2e`, `security`, `system`). |
+| `cargo fmt --check` | Verify code is formatted (CI gate). |
+| `cargo clippy -- -D warnings` | Lint with clippy, fail on warnings (CI gate). |
+| `cargo check` | Type-check without full build (CI gate). |
+| `cargo audit` | Check dependencies against RustSec advisory database. Install: `cargo install cargo-audit --locked`. |
+| `cargo llvm-cov --summary-only` | Code coverage summary (which lines ran during tests). Install: `cargo install cargo-llvm-cov --locked`. |
+| `cargo llvm-cov --html` | Generate HTML coverage report in `target/llvm-cov/html/index.html`. |
+| `cargo mutants` | Mutation testing: mutate code and verify tests catch changes. Install: `cargo install cargo-mutants --locked`. On macOS, `enclave_stub` is not compiled; run on Linux (or in CI) to cover stub mutations. |
+
 ### Phase 1 Vertical Slice Gate
 
 Before full Phase 1 hardening is complete, maintain an always-green thin end-to-end gate:
