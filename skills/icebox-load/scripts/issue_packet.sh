@@ -600,7 +600,6 @@ post_closeout_comment() {
   local docs_paths="$4"
   local files_paths="$5"
   local adr_link="$6"
-  local excluded_paths="${7:-}"
 
   local tmp
   tmp="$(mktemp)"
@@ -621,12 +620,6 @@ ${docs_paths}
 Files added/changed (paths):
 ${files_paths}
 EOF
-  if [[ -n "$excluded_paths" ]]; then
-    cat >> "$tmp" <<EOF
-Excluded as out-of-packet scope:
-${excluded_paths}
-EOF
-  fi
 
   gh_try issue comment "$issue" --body-file "$tmp" >/dev/null
   rm -f "$tmp"
@@ -699,7 +692,7 @@ closeout_issue() {
     tests_run="- skipped (manual override: --skip-tests)"
   fi
 
-  local paths docs_paths files_paths excluded_paths
+  local paths docs_paths files_paths
   paths="$(changed_paths)"
   docs_paths="$(echo "$paths" | grep -E '^docs/' || true)"
   files_paths="$paths"
@@ -709,16 +702,14 @@ closeout_issue() {
   fi
   if [[ "${#override_files[@]}" -gt 0 ]]; then
     files_paths="$(printf "%s\n" "${override_files[@]}" | awk 'NF' | sort -u)"
-    excluded_paths="$(comm -23 <(echo "$paths" | awk 'NF' | sort -u) <(echo "$files_paths" | awk 'NF' | sort -u) || true)"
   fi
 
   [[ -z "$docs_paths" ]] && docs_paths="- none"
   [[ -z "$files_paths" ]] && files_paths="- none"
-  [[ -n "$excluded_paths" ]] && excluded_paths="$(echo "$excluded_paths" | sed 's/^/- /')"
   docs_paths="$(echo "$docs_paths" | sed 's/^/- /')"
   files_paths="$(echo "$files_paths" | sed 's/^/- /')"
 
-  post_closeout_comment "$issue" "$pr_link" "$tests_run" "$docs_paths" "$files_paths" "$adr_link" "$excluded_paths"
+  post_closeout_comment "$issue" "$pr_link" "$tests_run" "$docs_paths" "$files_paths" "$adr_link"
   sync_closeout_fields_to_body \
     "$issue" \
     "$pr_link" \
