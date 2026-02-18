@@ -33,7 +33,7 @@ Use on requests like:
    - `skills/icebox-load/scripts/issue_packet.sh closeout --issue <id>`
    - PR behavior:
      - if branch is not `main`/`master`, push branch and reuse existing PR for branch or auto-create an epic-level draft PR.
-     - if branch is `main`/`master`, auto-create/switch to packet branch (`pkt/<backlog-id>`) before push/PR.
+     - if branch is `main`/`master`, auto-create/switch to epic branch (`pkt/<epic-id>`, for example `pkt/e1` for backlog `E1-01`) before push/PR.
    - Runs default validation commands:
      - `cargo check`
      - `cargo fmt --check`

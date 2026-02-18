@@ -435,7 +435,7 @@ sanitize_branch_component() {
 
 ensure_packet_branch() {
   local issue="$1"
-  local backlog branch target
+  local backlog epic branch target
   branch="$(current_branch)"
   if [[ "$branch" != "main" && "$branch" != "master" ]]; then
     echo "$branch"
@@ -444,7 +444,9 @@ ensure_packet_branch() {
 
   backlog="$(issue_backlog_id "$issue")"
   [[ -z "$backlog" ]] && backlog="issue-${issue}"
-  target="pkt/$(sanitize_branch_component "$backlog")"
+  epic="$(epic_code_from_backlog "$backlog")"
+  [[ -z "$epic" ]] && epic="$backlog"
+  target="pkt/$(sanitize_branch_component "$epic")"
 
   if git rev-parse --verify "$target" >/dev/null 2>&1; then
     git checkout "$target" >/dev/null
