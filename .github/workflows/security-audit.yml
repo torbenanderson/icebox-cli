@@ -2,7 +2,8 @@ name: Security Audit
 
 on:
   schedule:
-    - cron: "0 6 * * 1"
+    # GitHub cron uses UTC; 01:00 Saturday UTC maps to Friday 5:00 PM Pacific in standard time.
+    - cron: "0 1 * * 6"
   workflow_dispatch:
 
 jobs:

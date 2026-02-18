@@ -23,6 +23,8 @@
 # Test artifacts
 /coverage/
 *.coverprofile
+/mutants.out
+/mutants.out.*
 
 # Environment / secrets (should never be committed)
 .env
