@@ -109,6 +109,7 @@ These tests are public-release blockers and must pass on macOS CI before shippin
 |---|---|---|
 | T-E1-01 | E1-01 | Integration tests verify Cargo scaffold happy path (`Cargo.toml` + `src/main.rs` exist, package name is `icebox-cli`) and failure path (`cargo metadata` fails for missing manifest path) |
 | T-E1-02 | E1-02 | CLI scaffolding is wired with `clap`; E2E tests verify happy path (`--help` exits 0 with usage text) and failure path (unknown flag exits 2 with argument error) |
+| T-E1-03 | E1-03 | Project structure modules exist and compile (`agent`, `config`, `vault`, `runner`, `did`) including platform-gated enclave split (`enclave_darwin.rs` on macOS and `enclave_stub.rs` elsewhere) |
 | T-E1-06 | E1-06 | `icebox --version` outputs version string, commit hash, and build date |
 | T-E1-07 | E1-07 | Process `RLIMIT_CORE` is 0 after startup |
 | T-E1-10 | E1-10 | Default error messages contain no internal paths, key material, or crypto details |
