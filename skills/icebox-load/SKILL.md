@@ -107,6 +107,13 @@ Use `skills/icebox-load/scripts/issue_packet.sh`:
    - New/updated packet state must be `draft` or `ready-for-review`.
    - Promote to `ready-to-execute` only after review approval and checklist completion.
 
+## Branch Naming Standard
+
+Use epic-level packet branches for implementation and closeout automation:
+
+1. Format: `pkt/<epic-id>` (example: `pkt/e1` for `E1-03`).
+2. Avoid backlog-item branch names like `pkt/e1-03` as the default.
+
 ## Labels And Handoff
 
 Default labels:
