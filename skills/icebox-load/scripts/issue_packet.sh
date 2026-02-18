@@ -552,9 +552,19 @@ ensure_pr_link_for_issue() {
 
 changed_paths() {
   {
+    # Include local working-tree deltas.
     git diff --name-only 2>/dev/null || true
     git diff --cached --name-only 2>/dev/null || true
     git ls-files --others --exclude-standard 2>/dev/null || true
+
+    # Include committed branch deltas so closeout evidence still reports files
+    # when the branch is clean/already pushed.
+    if git rev-parse --verify origin/main >/dev/null 2>&1; then
+      git diff --name-only origin/main...HEAD 2>/dev/null || true
+    fi
+    if git rev-parse --abbrev-ref --symbolic-full-name '@{u}' >/dev/null 2>&1; then
+      git diff --name-only '@{u}'...HEAD 2>/dev/null || true
+    fi
   } | awk 'NF{print}' | sort -u
 }
 
