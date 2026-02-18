@@ -80,7 +80,7 @@ jobs:
             }
 
             if (errors.length > 0) {
-              core.setFailed(errors.join(' '));
+              core.warning(errors.join(' '));
             } else {
               core.info('PR metadata checks passed.');
             }

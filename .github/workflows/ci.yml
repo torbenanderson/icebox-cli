@@ -58,28 +58,28 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          cargo check --all-targets --all-features |& tee ci-logs/cargo-check.log
+          cargo check --all-targets --all-features 2>&1 | tee ci-logs/cargo-check.log
 
       - name: cargo fmt --check
         if: steps.detect.outputs.has_cargo == 'true'
         shell: bash
         run: |
           set -euo pipefail
-          cargo fmt --all --check |& tee ci-logs/cargo-fmt.log
+          cargo fmt --all --check 2>&1 | tee ci-logs/cargo-fmt.log
 
       - name: cargo clippy
         if: steps.detect.outputs.has_cargo == 'true'
         shell: bash
         run: |
           set -euo pipefail
-          cargo clippy --all-targets --all-features -- -D warnings |& tee ci-logs/cargo-clippy.log
+          cargo clippy --all-targets --all-features -- -D warnings 2>&1 | tee ci-logs/cargo-clippy.log
 
       - name: cargo test
         if: steps.detect.outputs.has_cargo == 'true'
         shell: bash
         run: |
           set -euo pipefail
-          cargo test --all-targets --all-features |& tee ci-logs/cargo-test.log
+          cargo test --all-targets --all-features 2>&1 | tee ci-logs/cargo-test.log
 
       - name: Upload failure diagnostics
         if: failure() && steps.detect.outputs.has_cargo == 'true'
