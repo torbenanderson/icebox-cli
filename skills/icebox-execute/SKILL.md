@@ -75,6 +75,7 @@ Automation check command:
 5. Test-plan check (`docs/plan/TESTING.md`)
    - Add acceptance tests mapped to the backlog item.
    - Define at least one happy-path and one failure-path test.
+   - Ensure at least one explicit `T-<backlog-id>` mapping row exists before implementation starts.
 6. ADR triage (`docs/architecture/decisions/`)
    - Use ADR only when the decision is long-lived and cross-feature.
    - If needed, add an ADR stub from `docs/architecture/decisions/ADR-TEMPLATE.md`.
@@ -106,6 +107,7 @@ Hard gates before coding:
 
 - Backlog story exists with acceptance criteria.
 - Test cases for those criteria exist in `docs/plan/TESTING.md`.
+- A `T-<backlog-id>` mapping exists for the referenced item (for example `T-E1-03`).
 - Docs sync completed for the deliverable, applying `skills/icebox-docs-standards/SKILL.md` (including navigation and footer policy where applicable).
 - Referenced issue/packet is marked ready for execution (for GitHub issues: `ready-to-execute`).
 - Required checklist boxes are complete.
