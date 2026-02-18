@@ -1,6 +1,6 @@
 # Icebox — Rust Design & Architecture
 
-> Design patterns and architecture decisions for the Rust implementation. Use this alongside [architecture docs](architecture/README.md) when implementing or converting the codebase.
+> Design patterns and architecture decisions for the Rust implementation. Use this alongside [architecture docs](./) when implementing or converting the codebase.
 
 > **Implementation status (February 15, 2026):** This is a design contract. The Rust source tree described below has not been fully implemented yet.
 
@@ -91,7 +91,7 @@ fn load_vault(path: &Path) -> anyhow::Result<Vault> {
 }
 ```
 
-**Error code mapping:** Map internal errors to `ICE-2xx` codes at the CLI boundary. See [Errors & Diagnostics](architecture/errors-and-diagnostics.md).
+**Error code mapping:** Map internal errors to `ICE-2xx` codes at the CLI boundary. See [Errors & Diagnostics](errors-and-diagnostics.md).
 
 ```mermaid
 flowchart LR
@@ -125,7 +125,7 @@ Use Rust traits for abstractions. Traits for anything that has multiple implemen
 
 ### VaultStore
 
-From [Vault & Integrity](architecture/vault-and-integrity.md):
+From [Vault & Integrity](vault-and-integrity.md):
 
 ```rust
 pub trait VaultStore: Send + Sync {
@@ -242,7 +242,7 @@ flowchart TB
 
 ## Vault Load Validation Pipeline
 
-Implement the [Vault Load Validation Pipeline](architecture/vault-and-integrity.md) as a **single function** in `vault/validation.rs`. Do not scatter checks across the codebase.
+Implement the [Vault Load Validation Pipeline](vault-and-integrity.md) as a **single function** in `vault/validation.rs`. Do not scatter checks across the codebase.
 
 ```rust
 /// Canonical vault load validation. Returns validated Vault or error.
@@ -393,4 +393,4 @@ sequenceDiagram
 
 ---
 
-*Last updated: 2026-02-16*
+*Last updated: 2026-02-18*
