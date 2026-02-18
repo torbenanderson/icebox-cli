@@ -10,7 +10,8 @@ use clap::{Parser, error::ErrorKind};
 #[command(
     name = "icebox",
     version,
-    about = "Secure credential broker for AI agents"
+    about = "Secure credential broker for AI agents",
+    after_help = "Repository: https://github.com/torbenanderson/icebox-cli"
 )]
 pub struct Cli {}
 

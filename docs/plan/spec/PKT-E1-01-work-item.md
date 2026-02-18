@@ -46,6 +46,7 @@
 ## Test Mapping
 
 - Linked tests from `docs/plan/TESTING.md`:
+- `T-E1-01`: Cargo scaffold validation for manifest/bin presence and invalid-manifest failure path.
 - Scaffold-only validation mapping (no runtime feature code in scope):
   - verify `Cargo.toml` exists and package name is `icebox-cli`
   - verify `src/main.rs` exists
@@ -62,7 +63,7 @@
 ## Docs Impact
 
 - [x] docs/plan/spec/PKT-E1-01-work-item.md
-- [ ] docs/plan/TESTING.md (if test mappings are added/changed)
+- [x] docs/plan/TESTING.md (if test mappings are added/changed)
 - [ ] docs/architecture/decisions/ADR-*.md (if ADR required)
 - [ ] docs/README.md (if user-facing behavior changed)
 

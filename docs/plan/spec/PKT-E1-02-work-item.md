@@ -21,7 +21,8 @@
 
 - AC1: `src/main.rs` is scaffolded to use `clap` for top-level CLI parsing.
 - AC2: Running `cargo run -- --help` succeeds and shows CLI help output.
-- AC3: Changes are validated with mapped tests.
+- AC3: CLI help includes standard project metadata (repository link).
+- AC4: Changes are validated with mapped tests.
 
 ## Rust Implementation Plan
 
@@ -46,7 +47,7 @@
 ## Test Mapping
 
 - Linked tests from `docs/plan/TESTING.md`:
-- `T-E1-02`: CLI scaffolding compiles with `clap` and `--help` output path is wired.
+- `T-E1-02`: CLI scaffolding compiles with `clap`, `--help` output path is wired, and help metadata includes repository information.
 - Scaffold-only validation mapping (no runtime feature code in scope):
   - verify `Cargo.toml` includes `clap` dependency and compiles
   - verify `src/main.rs` contains clap parser scaffolding
