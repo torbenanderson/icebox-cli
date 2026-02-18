@@ -15,6 +15,7 @@ Use this file as the entrypoint for project docs.
 - [Roadmap](plan/ROADMAP.md)
 - [Backlog](plan/BACKLOG.md)
 - [Implementation Bootstrap](plan/IMPLEMENTATION_BOOTSTRAP.md)
+- [CI Process](plan/CI.md)
 - [Testing Plan](plan/TESTING.md)
 
 ## Guides

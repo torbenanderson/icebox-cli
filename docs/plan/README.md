@@ -10,6 +10,7 @@ This folder contains execution planning and delivery sequencing documents.
 - [START_CODING_CHECKLIST.md](START_CODING_CHECKLIST.md)
 - [BOOTSTRAP_ISSUES.md](BOOTSTRAP_ISSUES.md)
 - [TESTING.md](TESTING.md)
+- [CI.md](CI.md)
 
 ## Notes
 
@@ -21,4 +22,4 @@ This folder contains execution planning and delivery sequencing documents.
 
 ---
 
-*Last updated: 2026-02-16*
+*Last updated: 2026-02-18*
