@@ -26,3 +26,12 @@ Use this skill on every task in this repository.
 6. Publish readiness:
    - Prefer stable Markdown and relative links suitable for wiki/site reuse.
    - Avoid one-off docs islands; integrate into existing indexes.
+7. Rust source documentation standards:
+   - Document stable public API items (`pub` structs, enums, traits, fns, type aliases, constants) with `///`.
+   - Document module/crate boundaries with `//!` where they define external behavior or usage.
+   - Keep `src/main.rs` thin; treat `src/lib.rs` as the primary API documentation surface.
+   - Prefer examples on high-impact public APIs; examples should compile when practical.
+8. Rustdoc validation expectations:
+   - Run `cargo doc --workspace --all-features --no-deps` for local/API docs validation.
+   - In CI, prefer strict rustdoc warnings once clean: `RUSTDOCFLAGS="-D warnings" cargo doc --workspace --all-features --no-deps`.
+   - If examples are intentionally non-runnable, mark them explicitly (`ignore`, `no_run`) rather than leaving ambiguous failures.
