@@ -29,6 +29,10 @@ Use this skill on every task in this repository.
 7. Rust source documentation standards:
    - Document stable public API items (`pub` structs, enums, traits, fns, type aliases, constants) with `///`.
    - Document module/crate boundaries with `//!` where they define external behavior or usage.
+   - Use comment layering consistently:
+     - `///` and `//!` for API/module contracts and user-facing behavior.
+     - `//` for selective implementation notes on non-obvious lines or blocks.
+     - Avoid line-by-line comments for obvious code.
    - Keep `src/main.rs` thin; treat `src/lib.rs` as the primary API documentation surface.
    - Prefer examples on high-impact public APIs; examples should compile when practical.
 8. Rustdoc validation expectations:
