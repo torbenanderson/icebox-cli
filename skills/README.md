@@ -18,6 +18,7 @@ flowchart LR
     A1["icebox-docs-standards<br/>always on"] -.-> I
     B1["icebox-load<br/>issue+spec+tests+ADR+docs map"] --> C
     D1["icebox-execute<br/>roadmap->backlog->spec->tests->ADR->docs"] --> E
+    E1["icebox-test<br/>runnable happy+failure tests"] --> F
     F1["icebox-ai-harness<br/>schemas/workflows/commit split by concern"] --> G
     H1["icebox-done-gate<br/>closeout evidence + transition"] --> I
     I1["icebox-commit-merge-hygiene<br/>commit/PR/merge quality + push policy"] --> I
@@ -41,11 +42,15 @@ flowchart LR
    - Path: `skills/icebox-ai-harness/SKILL.md`
    - Purpose: schema-contract propagation, workflow guardrails, governance hook, and concern-based commit split guidance.
    - Trigger: schema/examples changes, persisted artifact contract updates, `.github/workflows/*` edits, commit-splitting requests.
-5. `icebox-done-gate`
+5. `icebox-test`
+   - Path: `skills/icebox-test/SKILL.md`
+   - Purpose: require runnable test artifacts during execute, with at least one happy-path and one failure-path test.
+   - Trigger: loaded with `execute` and any request to implement backlog work; can also be invoked standalone via `build tests #<issue-id>` or `build tests E*`.
+6. `icebox-done-gate`
    - Path: `skills/icebox-done-gate/SKILL.md`
    - Purpose: hard closeout gate with evidence validation before `in-progress -> done`.
    - Trigger: done/closeout/ship/finish-packet requests.
-6. `icebox-commit-merge-hygiene`
+7. `icebox-commit-merge-hygiene`
    - Path: `skills/icebox-commit-merge-hygiene/SKILL.md`
    - Purpose: standardize commit, PR, and merge message quality with concern-aware structure and push policy.
    - Trigger: commit/PR/merge messaging requests.
@@ -60,19 +65,21 @@ flowchart LR
    - `execute`, `start building`, `build component`, `kickoff`
 4. `icebox-ai-harness`
    - `schema change`, `workflow change`, `contracts`, `split commits by concern`
-5. `icebox-done-gate`
+5. `icebox-test`
+   - `execute`, `build tests`, `write tests`, `add happy path and failure path tests`
+6. `icebox-done-gate`
    - `done`, `closeout`, `ship this`, `finish packet`
-6. `icebox-commit-merge-hygiene`
+7. `icebox-commit-merge-hygiene`
    - `commit`, `pr`, `pull request`, `merge`, `squash`
-
 ## Recommended Skill Order
 
 1. `icebox-docs-standards`
 2. `icebox-load`
 3. `icebox-execute`
-4. `icebox-ai-harness`
-5. `icebox-done-gate`
-6. `icebox-commit-merge-hygiene`
+4. `icebox-test`
+5. `icebox-ai-harness`
+6. `icebox-done-gate`
+7. `icebox-commit-merge-hygiene`
 
 ## Canonical Execution Path
 

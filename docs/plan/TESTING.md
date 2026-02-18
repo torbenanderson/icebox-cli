@@ -12,9 +12,32 @@
 
 - **Unit tests** live in `#[cfg(test)] mod tests { ... }` blocks alongside source in each module
 - **Integration tests** live in the `tests/` directory for cross-module flows
-- **Security tests** verify hardening guarantees and run in `tests/security.rs`
+- **CLI/E2E tests** run as user-facing binary flows under `tests/`
+- **System/security tests** verify hardening guarantees and run under `tests/`
 - **Enclave tests** are gated by `#[cfg(target_os = "macos")]` and require real Secure Enclave hardware (macOS only)
 - Tests run on every push via CI (E1-04)
+
+### Test Architecture (Rust-Conventional)
+
+| Level | Purpose | Typical Scope | Default Location |
+|---|---|---|---|
+| **Unit** | Validate pure logic and small APIs | function/module behavior | Inline in `src/**` with `#[cfg(test)]` |
+| **Integration** | Validate crate boundaries and module interaction | public API and domain flows | `tests/integration_*.rs` |
+| **CLI/E2E** | Validate user-visible CLI behavior | args, exit codes, stdout/stderr, error UX | `tests/e2e_*.rs` |
+| **System/Security** | Validate runtime hardening and OS contracts | permissions, env, platform gates, enclave boundaries | `tests/system_*.rs`, `tests/security_*.rs` |
+
+### Test File Layout Conventions
+
+- Keep unit tests inline in source modules.
+- Keep integration/E2E/system tests under `tests/` using clear prefixes:
+  - `integration_*.rs`
+  - `e2e_*.rs`
+  - `system_*.rs`
+  - `security_*.rs`
+- If the suite grows, use grouped top-level entry files plus shared modules:
+  - entry files remain top-level under `tests/` (Cargo test discovery)
+  - shared helpers can live in subfolders (for example `tests/common/`, `tests/fixtures/`)
+- Avoid deeply nested standalone test files without top-level entry points; Cargo runs top-level `tests/*.rs` crates directly.
 
 ### Platform Constraints
 
@@ -32,8 +55,9 @@ For local development on macOS, `cargo test` runs everything. On Linux, the same
 | Level | Scope | Location | When to run |
 |---|---|---|---|
 | **Unit** | Single function / module | `src/<module>/mod.rs` inline `#[cfg(test)]` | Every push, every PR |
-| **Integration** | Multi-module flows (register -> add -> run) | `tests/integration.rs` | Every push, every PR |
-| **Security** | Hardening verification (memory, env, no-log) | `tests/security.rs` | Every push + nightly |
+| **Integration** | Multi-module flows (register -> add -> run) | `tests/integration_*.rs` | Every push, every PR |
+| **CLI/E2E** | End-user command behavior and exit semantics | `tests/e2e_*.rs` | Every push, every PR |
+| **System/Security** | Hardening verification (memory, env, no-log, OS contracts) | `tests/system_*.rs`, `tests/security_*.rs` | Every push + nightly |
 
 ### Conventions
 
@@ -83,6 +107,7 @@ These tests are public-release blockers and must pass on macOS CI before shippin
 
 | Test ID | Backlog | Test Description |
 |---|---|---|
+| T-E1-02 | E1-02 | CLI scaffolding is wired with `clap`; `cargo check` passes and `cargo run -- --help` returns help output |
 | T-E1-06 | E1-06 | `icebox --version` outputs version string, commit hash, and build date |
 | T-E1-07 | E1-07 | Process `RLIMIT_CORE` is 0 after startup |
 | T-E1-10 | E1-10 | Default error messages contain no internal paths, key material, or crypto details |
@@ -298,4 +323,4 @@ Dedicated tests that verify hardening guarantees:
 
 ---
 
-*Last updated: 2026-02-16*
+*Last updated: 2026-02-18*
