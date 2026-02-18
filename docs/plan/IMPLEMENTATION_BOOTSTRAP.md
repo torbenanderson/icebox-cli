@@ -220,6 +220,26 @@ After the runnable slice gate is passing, apply hardening in this order:
 - Certain hardening controls are intentionally sequenced after MVP Core.
 - Track these as follow-up implementation issues tied to the first post-MVP hardening release.
 
+## Future CI/Process Enhancements (Deferred)
+
+> Optional improvements to consider when team size or workflow complexity grows. Not required for MVP.
+
+- **Conventional PR/commit guard** – CI check that fails a PR if workflow metadata is missing or inconsistent:
+  - PR title matches convention (e.g. `feat(scope): summary`)
+  - PR body contains `Refs #<issue>`
+  - Required labels present (e.g. `ready-for-review`)
+  - Keeps load/execute/closeout process enforceable; improves traceability from code → PR → issue/spec/tests.
+  - Useful when manual policing becomes costly; skip until then.
+
+- **Docs link checker** – Add markdown/mdBook link validation to catch broken links before merge. Consider as part of E1-15 (release pipeline) second pass. Tools: `lychee`, `markdown-link-check`, or `cargo deadlinks` for Rust doc links.
+
+- **Artifact/log expectations** – For CI debugging, specify required artifacts (test logs, coverage summary) and retention window. Document what is uploaded on failure, where it lives, and how long it is kept (e.g. GitHub Actions default 90 days; adjust if needed).
+
+- **Exact trigger policy** – Document which jobs run on `push` vs `pull_request` vs `schedule`:
+  - **push + pull_request:** build, test, fmt, clippy (block merge)
+  - **pull_request only:** optional PR metadata checks (conventional title, labels)
+  - **schedule (daily/weekly):** `cargo audit` (advisory DB changes; not blocking merge unless critical)
+  - Rationale: audit on schedule avoids blocking every push on transient advisory DB slowness; critical vulns can be surfaced via Dependabot or manual runs.
 
 ---
 
