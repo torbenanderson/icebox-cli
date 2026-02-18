@@ -1,81 +1,71 @@
 # Skills Index
 
-This directory contains repository-local skills used by Codex.
-These are structured workflow checklists used by the Icebox maintainers. They run as Cursor/Codex skills (auto-loaded via `AGENTS.md`) but are plain Markdown and can be used as manual checklists with any editor or AI tool.
+This directory contains repository-local Codex skills for Icebox workflow control.
 
-## Skill List
+## Enterprise Stage-Gate Flow
+
+```mermaid
+flowchart LR
+    A["Stage 0: Global Standards"] --> B["Stage 1: Intake / Packetize"]
+    B --> C["Gate 1: Review Ready"]
+    C --> D["Stage 2: Execute Alignment"]
+    D --> E["Gate 2: Ready To Execute"]
+    E --> F["Stage 3: Implementation + Contract Integrity"]
+    F --> G["Gate 3: Closeout Evidence Complete"]
+    G --> H["Stage 4: Done Transition"]
+    H --> I["Stage 5: Commit/PR/Merge Messaging"]
+
+    A1["icebox-docs-standards<br/>always on"] -.-> I
+    B1["icebox-load<br/>issue+spec+tests+ADR+docs map"] --> C
+    D1["icebox-execute<br/>roadmap->backlog->spec->tests->ADR->docs"] --> E
+    F1["icebox-ai-harness<br/>schemas/workflows/commit split by concern"] --> G
+    H1["icebox-done-gate<br/>closeout evidence + transition"] --> I
+    I1["icebox-commit-merge-hygiene<br/>commit/PR/merge quality + push policy"] --> I
+```
+
+## Skill Catalog
 
 1. `icebox-docs-standards`
    - Path: `skills/icebox-docs-standards/SKILL.md`
-   - Purpose: global documentation standards (mdBook/rustdoc surfaces, docs nav/index hygiene, footer policy, publish-ready docs).
+   - Purpose: docs governance across mdBook + rustdoc, nav hygiene, footer policy, publish readiness, and rust source-doc standards.
    - Trigger: every task in this repository.
 2. `icebox-load`
    - Path: `skills/icebox-load/SKILL.md`
-   - Purpose: load backlog work into reviewable execution packets (issue + spec + tests + ADR triage + docs impact) before coding, using a strict issue state machine.
-   - Trigger: load/prep/review-packet requests before implementation; use GitHub issue `#<id>` as canonical reference.
-   - Automation: `skills/icebox-load/scripts/issue_packet.sh` + `.github/ISSUE_TEMPLATE/execution_packet.yml`
-   - Can auto-create packet issue from backlog ID (`create --backlog <id>`).
+   - Purpose: prepare backlog work into a reviewable execution packet with canonical issue reference and state machine controls.
+   - Trigger: load/prep/stage-for-review requests before coding.
 3. `icebox-execute`
    - Path: `skills/icebox-execute/SKILL.md`
-   - Purpose: kickoff alignment gates before coding (`roadmap -> backlog -> spec -> tests -> ADR -> docs`) with execute refusal until `ready-to-execute` + required checklist completion.
-   - Trigger: "execute", build-component requests, execute-backlog requests, and kickoff alignment requests; prefer `execute #<id>`.
+   - Purpose: enforce pre-coding alignment gates and execute refusal until packet is truly ready.
+   - Trigger: `execute`, start-building, build-component, execute-backlog, kickoff alignment.
 4. `icebox-ai-harness`
    - Path: `skills/icebox-ai-harness/SKILL.md`
-   - Purpose: schema contract propagation, CI workflow guardrails, and commit-splitting by concern.
-   - Trigger: schema/examples updates, architecture contracts for persisted artifacts, `.github/workflows/*` edits, or explicit commit-splitting requests.
+   - Purpose: schema-contract propagation, workflow guardrails, governance hook, and concern-based commit split guidance.
+   - Trigger: schema/examples changes, persisted artifact contract updates, `.github/workflows/*` edits, commit-splitting requests.
 5. `icebox-done-gate`
    - Path: `skills/icebox-done-gate/SKILL.md`
-   - Purpose: enforce closeout evidence and gate `in-progress -> done` transitions.
-   - Trigger: "done", "closeout", "mark done", "ship this", and finish-packet requests.
+   - Purpose: hard closeout gate with evidence validation before `in-progress -> done`.
+   - Trigger: done/closeout/ship/finish-packet requests.
 6. `icebox-commit-merge-hygiene`
    - Path: `skills/icebox-commit-merge-hygiene/SKILL.md`
-   - Purpose: consistent commit message format, merge/PR message structure, concern-based commit split planning, and default push-to-remote after commits.
-   - Trigger: commit/PR/merge message requests with intent routing by trigger words; defaults to commit flow.
+   - Purpose: standardize commit, PR, and merge message quality with concern-aware structure and push policy.
+   - Trigger: commit/PR/merge messaging requests.
 
-## Trigger Words
-
-Use these phrases as quick routing hints.
+## Trigger Shortcuts
 
 1. `icebox-docs-standards`
-   - "update docs"
-   - "docs nav"
-   - "SUMMARY.md"
-   - "docs footer"
-   - "publish docs"
+   - `docs`, `SUMMARY.md`, `footer`, `rustdoc`, `api docs`
 2. `icebox-load`
-   - "load backlog item"
-   - "prepare issue"
-   - "preflight this feature"
-   - "stage for review"
-   - "ready this for execute"
+   - `load backlog`, `prepare issue`, `stage for review`, `packetize`
 3. `icebox-execute`
-   - "execute"
-   - "start building"
-   - "build component"
-   - "execute backlog"
-   - "new command"
-   - "roadmap backlog spec tests ADR"
+   - `execute`, `start building`, `build component`, `kickoff`
 4. `icebox-ai-harness`
-   - "schema change"
-   - "update JSON schema"
-   - "workflow change"
-   - "GitHub Actions"
-   - "split commits by concern"
-5. `icebox-commit-merge-hygiene`
-   - commit flow: "commit", "commit message", "write commit", "message for commit"
-   - PR flow: "pr", "pull request", "pr prompt", "pr body", "pr title"
-   - merge flow: "merge", "merge message", "merge commit", "squash message"
-   - default: if unclear, run commit flow
-6. `icebox-done-gate`
-   - "done"
-   - "closeout"
-   - "mark done"
-   - "ship this"
-   - "finish packet"
+   - `schema change`, `workflow change`, `contracts`, `split commits by concern`
+5. `icebox-done-gate`
+   - `done`, `closeout`, `ship this`, `finish packet`
+6. `icebox-commit-merge-hygiene`
+   - `commit`, `pr`, `pull request`, `merge`, `squash`
 
-## Recommended Order
-
-If multiple skills apply, use:
+## Recommended Skill Order
 
 1. `icebox-docs-standards`
 2. `icebox-load`
@@ -84,44 +74,15 @@ If multiple skills apply, use:
 5. `icebox-done-gate`
 6. `icebox-commit-merge-hygiene`
 
-## Boundary Notes
+## Canonical Execution Path
 
-- Do not duplicate docs standards checks in other skills; defer to `icebox-docs-standards`.
-- Do not duplicate load/preflight packet generation in other skills; defer to `icebox-load`.
-- Do not duplicate kickoff gating logic in `icebox-ai-harness`; defer to `icebox-execute`.
-- Do not duplicate closeout evidence gating in other skills; defer to `icebox-done-gate`.
-- Do not duplicate commit/merge message policy in other skills; defer to `icebox-commit-merge-hygiene`.
-
-## Quick Flow
-
-Use this minimal workflow:
-
-1. Load from backlog ID (auto-creates packet issue if needed):
-   - `load E1`
-   - this also auto-builds load artifacts on the issue (backlog/spec/tests/ADR/docs impact)
-   - and auto-adds epic/project context + matching milestone when available
-   - GitHub project attach requires: `gh auth refresh -s project`
-2. Load from existing issue if already created:
-   - `load #<issue-id>`
-3. Fix packet until review-ready:
-   - `fix load #<issue-id>`
-4. Mark ready and execute:
-   - `execute #<issue-id>`
-5. Commit and push implementation:
-   - `commit`
-6. Close out packet:
-   - `done #<issue-id>`
-   - this validates closeout evidence (PR/tests/docs/files/ADR as needed) then transitions to `done`
-
-Backlog ID standard:
-
-- Use `E*` IDs everywhere, defaulting to epic IDs (examples: `E1`, `E4`, `E7.5`).
-- Optional extended forms are allowed when needed (example: `E1-02`).
+1. `load E*` or `load #<issue-id>`
+2. `fix load #<issue-id>` until review ready
+3. `execute #<issue-id>`
+4. implement with concern-aware commit split as needed
+5. `done #<issue-id>` for closeout evidence + transition
+6. commit/PR/merge messaging via hygiene skill
 
 State path:
 
 `draft -> ready-for-review -> ready-to-execute -> in-progress -> done`
-
-## Geek Note
-
-If your team likes command-style kickoff words, define your own "engage command" aliases (yes, very Star Trek). Just map them to `icebox-execute` and keep one canonical skill as the source of truth.
