@@ -43,6 +43,10 @@ Behavior:
    - no real secrets
    - temp files/dirs only
 5. Update `docs/plan/TESTING.md` mappings when new test IDs or behaviors are introduced.
+6. Commit split default when both code and mapping docs change:
+   - `test(...)`: test artifacts (`src/**` tests and `tests/**`)
+   - `docs(...)`: mapping/spec updates (`docs/plan/**`)
+   - combine only if the user explicitly requests a single commit.
 
 ## Execute Coupling
 
