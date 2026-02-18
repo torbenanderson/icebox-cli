@@ -90,6 +90,10 @@ flowchart LR
 5. `done #<issue-id>` for closeout evidence + transition
 6. commit/PR/merge messaging via hygiene skill
 
+Branch convention:
+
+- use epic-level packet branches by default: `pkt/<epic-id>` (example: `pkt/e1`)
+
 State path:
 
 `draft -> ready-for-review -> ready-to-execute -> in-progress -> done`
