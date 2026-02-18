@@ -17,3 +17,25 @@ pub fn enclave_backend_name() -> &'static str {
         enclave_stub::backend_name()
     }
 }
+
+#[cfg(test)]
+#[cfg(not(target_os = "macos"))]
+mod non_macos_tests {
+    use super::*;
+
+    #[test]
+    fn enclave_stub_returns_stub() {
+        assert_eq!(enclave_backend_name(), "stub");
+    }
+}
+
+#[cfg(test)]
+#[cfg(target_os = "macos")]
+mod macos_tests {
+    use super::*;
+
+    #[test]
+    fn enclave_darwin_returns_secure_enclave() {
+        assert_eq!(enclave_backend_name(), "secure-enclave");
+    }
+}
