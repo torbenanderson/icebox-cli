@@ -55,6 +55,8 @@ This document defines the repository CI execution model for E1-04.
 ## Related Files
 
 - `.github/workflows/ci.yml`
+- `.github/workflows/ci-enhancements.yml`
+- `.github/workflows/security-audit.yml`
 - `.github/workflows/docs-site.yml`
 - `.github/workflows/docs-schemas.yml`
 - `.github/dependabot.yml`

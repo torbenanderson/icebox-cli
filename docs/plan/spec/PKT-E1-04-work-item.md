@@ -57,6 +57,8 @@
 
 - Workflow/config touch points:
   - `.github/workflows/ci.yml`
+  - `.github/workflows/ci-enhancements.yml`
+  - `.github/workflows/security-audit.yml`
   - `.github/workflows/docs-site.yml` (exists today; touch only if workflow coupling requires updates)
   - `.github/workflows/docs-schemas.yml` (exists today; touch only if workflow coupling requires updates)
   - `.github/dependabot.yml`
