@@ -108,6 +108,10 @@ Expected behavior:
 2. Group each commit around one coherent concern/outcome.
 3. Avoid mixing unrelated concerns in one commit unless explicitly requested.
 4. If splitting is appropriate, generate a commit prompt and commit message for each planned commit.
+5. Default split for test work:
+   - `test`: runnable test artifacts under `src/**` or `tests/**`
+   - `docs`: test-plan/spec mapping updates under `docs/plan/**`
+   - combine only when the user explicitly asks for a single commit.
 
 ## Output Requirements
 
