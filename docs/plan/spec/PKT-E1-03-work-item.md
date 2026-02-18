@@ -26,7 +26,10 @@
 ## Rust Implementation Plan
 
 - Crate/module touch points:
-  - `src/main.rs` (CLI wiring) and focused domain module(s) only.
+  - `src/main.rs` (thin binary entrypoint)
+  - `src/lib.rs` (CLI parsing/wiring + module exports)
+  - `src/agent.rs`, `src/config.rs`, `src/vault.rs`, `src/runner.rs`, `src/did.rs` (scaffold modules)
+  - `src/did/enclave_darwin.rs` and `src/did/enclave_stub.rs` for platform-gated enclave split
 - Keep interfaces explicit:
   - prefer small pure functions for parsing/validation paths.
   - avoid hidden global state.
@@ -48,13 +51,21 @@
 - Linked tests from `docs/plan/TESTING.md`:
 - `T-E1-03`: project structure modules and platform-gated enclave split compile and load as specified.
 - Add at least:
-  - one happy-path test
-  - one failure-path test
+  - happy path: modules compile and expose scaffold types/functions
+  - failure path: empty identity name validation rejects invalid input
 
 ## ADR Triage
 
 - ADR required? (no):
 - Rationale: keep in spec unless long-lived cross-feature decision exists.
+
+## Deferred Design Notes
+
+- Enclave backend placement is intentionally scoped under `did` for MVP (`src/did.rs` + platform-gated enclave files).
+- Trigger to split into shared `keystore`/`crypto` module:
+  - enclave-backed key operations are required by `vault` and/or `runner`, or
+  - enclave/policy logic starts duplicating across non-DID domains.
+- When triggered, keep `did` domain-focused (DID format/derivation/validation) and move platform key backend concerns to shared infrastructure.
 
 ## Docs Impact
 
