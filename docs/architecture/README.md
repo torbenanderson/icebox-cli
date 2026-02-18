@@ -16,7 +16,7 @@ This folder contains the canonical architecture reference for Icebox.
 - [Secret Management & Run](secret-management-and-run.md)
 - [Data Models & Layout](data-models-and-layout.md)
 - [Compatibility & Evolution](compatibility-and-evolution.md)
-- [Decision Log](decisions/README.md)
+- [Decision Log](decisions/)
 - [Security Model](security-model.md)
 - [Errors & Diagnostics](errors-and-diagnostics.md)
 - [Platform & Distribution](platform-and-distribution.md)
@@ -29,4 +29,4 @@ This folder contains the canonical architecture reference for Icebox.
 
 ---
 
-*Last updated: 2026-02-16*
+*Last updated: 2026-02-18*

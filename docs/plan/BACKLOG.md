@@ -226,7 +226,7 @@
 | E7.5-07 | Import agent | `icebox import claw.icebox-agent --seed "..."` verifies `bundle.manifest.json` checksums before processing, then imports the archive, re-derives the keypair from seed, and creates new enclave wrapping key |
 | E7.5-08 | Deterministic import validation | Import fails fast on checksum mismatch, unsupported required fields/algorithms, duplicate IDs (`agentId`, `entryId`), or conflicting agent records unless explicit recovery mode is selected |
 
-**Prerequisite:** File SLIP-44 registration now so it is approved by Phase 1.5. See [Architecture Overview](../architecture/README.md).
+**Prerequisite:** File SLIP-44 registration now so it is approved by Phase 1.5. See [Architecture Overview](../architecture/).
 
 ## E8 -- Socket Server
 
@@ -243,4 +243,4 @@
 
 ---
 
-*Last updated: 2026-02-16*
+*Last updated: 2026-02-18*

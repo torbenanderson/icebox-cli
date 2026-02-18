@@ -4,14 +4,14 @@ Use this file as the entrypoint for project docs.
 
 ## Architecture
 
-- [Architecture Index](architecture/README.md)
+- [Architecture Index](architecture/)
 - [Compatibility & Evolution](architecture/compatibility-and-evolution.md)
-- [Architecture Decision Log](architecture/decisions/README.md)
+- [Architecture Decision Log](architecture/decisions/)
 - [Rust Implementation Notes](architecture/rust-implementation.md)
 
 ## Planning
 
-- [Planning Index](plan/README.md)
+- [Planning Index](plan/)
 - [Roadmap](plan/ROADMAP.md)
 - [Backlog](plan/BACKLOG.md)
 - [Implementation Bootstrap](plan/IMPLEMENTATION_BOOTSTRAP.md)
@@ -26,7 +26,7 @@ Use this file as the entrypoint for project docs.
 - [Versioning Policy](reference/VERSIONING.md)
 - [API Documentation (Rustdoc)](reference/API_DOCS.md)
 - [Error Codes (JSON)](reference/error-codes.json)
-- [JSON Schemas](reference/schemas/README.md)
+- [JSON Schemas](reference/schemas/)
 - [Documentation Governance](reference/DOCS_GOVERNANCE.md)
 
 ## Documentation Surfaces
@@ -52,4 +52,4 @@ cargo doc --workspace --all-features --no-deps
 
 ---
 
-*Last updated: 2026-02-17*
+*Last updated: 2026-02-18*
