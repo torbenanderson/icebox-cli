@@ -435,7 +435,7 @@ sanitize_branch_component() {
 
 ensure_packet_branch() {
   local issue="$1"
-  local backlog branch target
+  local backlog epic branch target
   branch="$(current_branch)"
   if [[ "$branch" != "main" && "$branch" != "master" ]]; then
     echo "$branch"
@@ -444,7 +444,9 @@ ensure_packet_branch() {
 
   backlog="$(issue_backlog_id "$issue")"
   [[ -z "$backlog" ]] && backlog="issue-${issue}"
-  target="pkt/$(sanitize_branch_component "$backlog")"
+  epic="$(epic_code_from_backlog "$backlog")"
+  [[ -z "$epic" ]] && epic="$backlog"
+  target="pkt/$(sanitize_branch_component "$epic")"
 
   if git rev-parse --verify "$target" >/dev/null 2>&1; then
     git checkout "$target" >/dev/null
@@ -552,9 +554,19 @@ ensure_pr_link_for_issue() {
 
 changed_paths() {
   {
+    # Include local working-tree deltas.
     git diff --name-only 2>/dev/null || true
     git diff --cached --name-only 2>/dev/null || true
     git ls-files --others --exclude-standard 2>/dev/null || true
+
+    # Include committed branch deltas so closeout evidence still reports files
+    # when the branch is clean/already pushed.
+    if git rev-parse --verify origin/main >/dev/null 2>&1; then
+      git diff --name-only origin/main...HEAD 2>/dev/null || true
+    fi
+    if git rev-parse --abbrev-ref --symbolic-full-name '@{u}' >/dev/null 2>&1; then
+      git diff --name-only '@{u}'...HEAD 2>/dev/null || true
+    fi
   } | awk 'NF{print}' | sort -u
 }
 
