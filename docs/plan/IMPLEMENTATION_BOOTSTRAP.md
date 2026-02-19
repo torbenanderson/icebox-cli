@@ -68,7 +68,7 @@ To avoid early over-engineering, keep one command path runnable at all times.
   - [ ] `copy-services --from --to` (stub in M1; full decrypt→re-seal impl after M4 crypto)
   - [ ] `migrate-enclave <agent>` (stub in M1; full impl after enclave handling)
 - [ ] Implement structured ICE error mapping at CLI boundary
-- [ ] Wire `docs/reference/error-codes.json` validation test
+- [ ] When `docs/reference/error-codes.json` is introduced for external consumers, add a sync test that validates registry <-> runtime code mapping before any code generation is introduced
 
 ## Compatibility Guardrails (Cross-Cutting)
 
@@ -243,4 +243,4 @@ After the runnable slice gate is passing, apply hardening in this order:
 
 ---
 
-*Last updated: 2026-02-16*
+*Last updated: 2026-02-19*
