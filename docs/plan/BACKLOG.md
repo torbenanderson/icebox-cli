@@ -7,6 +7,7 @@
 ## Phase 1 Vertical Slice Milestone (Sequencing Only)
 
 > Early milestone for implementation velocity. This is a delivery order marker only; it does not add/remove scope or change phase ownership.
+> Backlog IDs are stable references and may be non-contiguous; gaps do not imply missing scope in this sequence.
 
 - E1-01 Cargo init
 - E1-02 CLI scaffolding

@@ -6,6 +6,7 @@
 pub mod agent;
 pub mod config;
 pub mod did;
+mod hardening;
 pub mod runner;
 pub mod vault;
 
@@ -32,6 +33,11 @@ where
 
 /// Runs CLI parsing and prints user-facing diagnostics when parsing fails.
 pub fn run() -> i32 {
+    if let Err(err) = hardening::disable_core_dumps() {
+        eprintln!("Security hardening failed: {err}");
+        return 1;
+    }
+
     match parse_cli_from(std::env::args_os()) {
         Ok(_) => 0,
         Err(err) => {

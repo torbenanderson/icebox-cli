@@ -139,7 +139,7 @@ These tests are public-release blockers and must pass on macOS CI before shippin
 | T-E1-03 | E1-03 | Project structure modules exist and compile (`agent`, `config`, `vault`, `runner`, `did`) including platform-gated enclave split (`enclave_darwin.rs` on macOS and `enclave_stub.rs` elsewhere) |
 | T-E1-04 | E1-04 | CI workflows validate push/PR gates on macOS and Linux; happy path: merge-blocking jobs pass (`check`, `fmt`, `clippy -D warnings`, `test`) and enhancement jobs/reporting run as configured, failure path: any merge-blocking check marks workflow red and blocks merge until fixed |
 | T-E1-06 | E1-06 | `icebox --version` outputs version string, commit hash, and build date |
-| T-E1-07 | E1-07 | Process `RLIMIT_CORE` is 0 after startup |
+| T-E1-07 | E1-07 | Runtime hardening sets `RLIMIT_CORE=0` at startup (happy path) and returns a deterministic error when setting the limit fails (failure path) |
 | T-E1-10 | E1-10 | Default error messages contain no internal paths, key material, or crypto details |
 | T-E1-11 | E1-11 | `--debug` flag outputs detailed internal messages including paths and error codes |
 | T-E1-12 | E1-12 | `--quiet` flag suppresses all non-essential output |
