@@ -93,6 +93,15 @@ Required PR prompt sections:
    - explicit acceptance bullets
 9. `Closeout Evidence`
    - PR link, tests run, docs updated, changed files, ADR link or `n/a`
+10. `Merge Message`
+   - one merge-ready summary for squash/merge commit reuse
+
+Optional for epic/milestone PRs:
+
+1. `Community Communication`
+   - release/discussion/README announcement plan
+2. `Release Note Snippet`
+   - short copy-ready note with "what this is / what this isn't / how to try / what's next"
 
 Use imperative, testable statements. Avoid narrative prose.
 
@@ -222,4 +231,18 @@ Closeout Evidence:
 - Docs updated (paths): <paths or none>
 - Files added/changed (paths): <paths>
 - ADR link (or n/a): <value>
+
+Merge Message:
+- <title + concise merge body>
+
+Community Communication (optional for epic/milestone PRs):
+- GitHub Release (pre-release): <note or n/a>
+- README current-state update: <note or n/a>
+- Discussion/announcement: <note or n/a>
+
+Release Note Snippet (optional):
+- What this is: <text>
+- What this isn't: <text>
+- How to try it: <commands>
+- Next: <follow-up epic flow>
 ```
