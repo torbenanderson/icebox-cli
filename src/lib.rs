@@ -6,11 +6,13 @@
 pub mod agent;
 pub mod config;
 pub mod did;
+mod error;
 mod hardening;
 pub mod runner;
 pub mod vault;
 
 use clap::{Parser, error::ErrorKind};
+use std::ffi::OsStr;
 
 /// Top-level CLI parser scaffold for Icebox.
 #[derive(Debug, Parser)]
@@ -20,7 +22,11 @@ use clap::{Parser, error::ErrorKind};
     about = "Secure credential broker for AI agents",
     after_help = "Repository: https://github.com/torbenanderson/icebox-cli"
 )]
-pub struct Cli {}
+pub struct Cli {
+    /// Enables debug diagnostics in CLI error output.
+    #[arg(long)]
+    pub debug: bool,
+}
 
 /// Parses CLI arguments into [`Cli`].
 pub fn parse_cli_from<I, T>(args: I) -> Result<Cli, clap::Error>
@@ -33,12 +39,18 @@ where
 
 /// Runs CLI parsing and prints user-facing diagnostics when parsing fails.
 pub fn run() -> i32 {
+    run_from_args(std::env::args_os().collect())
+}
+
+fn run_from_args(args: Vec<std::ffi::OsString>) -> i32 {
+    let debug_enabled = args.iter().any(|arg| arg == OsStr::new("--debug"));
+
     if let Err(err) = hardening::disable_core_dumps() {
         eprintln!("Security hardening failed: {err}");
         return 1;
     }
 
-    match parse_cli_from(std::env::args_os()) {
+    match parse_cli_from(args) {
         Ok(_) => 0,
         Err(err) => {
             let exit_code = match err.kind() {
@@ -46,7 +58,18 @@ pub fn run() -> i32 {
                 _ => 2,
             };
 
-            let _ = err.print();
+            if exit_code == 0 {
+                let _ = err.print();
+                return 0;
+            }
+
+            let code = error::map_clap_error(err.kind());
+            let detail = err.to_string();
+            eprintln!(
+                "{}",
+                error::format_cli_error(code, debug_enabled, Some(detail.as_str()))
+            );
+
             exit_code
         }
     }

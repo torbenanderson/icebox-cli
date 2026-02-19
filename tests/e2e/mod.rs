@@ -1,4 +1,5 @@
 mod e1_02_cli_scaffolding;
+mod e1_13_structured_error_codes;
 
 #[test]
 fn e2e_layout_smoke() {

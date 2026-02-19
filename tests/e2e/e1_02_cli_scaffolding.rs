@@ -23,5 +23,5 @@ fn e1_02_unknown_flag_returns_non_zero() {
     assert_eq!(output.status.code(), Some(2));
 
     let stderr = String::from_utf8_lossy(&output.stderr);
-    assert!(stderr.contains("--not-a-real-flag"));
+    assert!(stderr.contains("ICE-701"));
 }
