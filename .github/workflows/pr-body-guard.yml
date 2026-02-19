@@ -32,10 +32,10 @@ jobs:
             ];
 
             const requiredFields = [
-              "Backlog ID:",
-              "Issue #:",
-              "Spec path:",
-              "Test IDs:",
+              "Backlog ID(s):",
+              "Issue reference(s):",
+              "Spec path(s):",
+              "Test ID(s):",
               "Docs touched:",
               "PR link:",
               "Tests run (commands + result):",

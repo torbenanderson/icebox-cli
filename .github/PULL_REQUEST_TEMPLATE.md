@@ -1,9 +1,9 @@
 ## Packet Metadata
 
-- Backlog ID: `E?-??`
-- Issue #: `#<id>`
-- Spec path: `docs/plan/spec/PKT-...-work-item.md`
-- Test IDs: `T-...` (comma-separated)
+- Backlog ID(s): `E1 (epic), E1-13` (or `E?-??`)
+- Issue reference(s): `#<id>, #<id>` (epic + packet refs allowed)
+- Spec path(s): `docs/plan/spec/PKT-...-work-item.md` (comma-separated if multiple)
+- Test ID(s): `T-...` (comma-separated)
 - Docs touched: `<paths>` or `none`
 
 ## Objective
@@ -70,4 +70,4 @@ Commands + key results:
 
 ## Linked Issues
 
-Closes #<id>
+Refs #<id>

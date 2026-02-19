@@ -76,7 +76,7 @@ Treat the PR body as an executable prompt for reviewers/agents.
 Required PR prompt sections:
 
 1. `Packet Metadata`
-   - backlog ID, issue #, spec path, test IDs, docs touched
+   - backlog IDs (epic + packets), issue references, spec paths, test IDs, docs touched
 2. `Objective`
    - one outcome sentence
 3. `Context`
@@ -184,10 +184,10 @@ When producing a PR body, use this exact shape:
 ```text
 PR Prompt
 Packet Metadata:
-- Backlog ID: <E*-* or N/A>
-- Issue #: <#id or N/A>
-- Spec path: <path or N/A>
-- Test IDs: <T-* list or N/A>
+- Backlog ID(s): <epic + packet IDs, or N/A>
+- Issue reference(s): <#id list or N/A>
+- Spec path(s): <path list or N/A>
+- Test ID(s): <T-* list or N/A>
 - Docs touched: <paths or none>
 
 Objective:
