@@ -83,7 +83,7 @@ jobs:
 
       - name: Upload failure diagnostics
         if: failure() && steps.detect.outputs.has_cargo == 'true'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: ci-failure-logs-${{ matrix.os }}
           path: ci-logs/
