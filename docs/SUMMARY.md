@@ -19,6 +19,7 @@
   - [Roadmap](plan/ROADMAP.md)
   - [Backlog](plan/BACKLOG.md)
   - [Implementation Bootstrap](plan/IMPLEMENTATION_BOOTSTRAP.md)
+  - [CI Process](plan/CI.md)
   - [Start Coding Checklist](plan/START_CODING_CHECKLIST.md)
   - [Bootstrap Issues](plan/BOOTSTRAP_ISSUES.md)
   - [Testing](plan/TESTING.md)

@@ -1,0 +1,86 @@
+name: CI Enhancements
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  coverage-trend:
+    name: Coverage Trend (non-blocking)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    if: github.event_name == 'push' || github.event_name == 'pull_request'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Detect Rust project
+        id: detect
+        shell: bash
+        run: |
+          if [ -f Cargo.toml ]; then
+            echo "has_cargo=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_cargo=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Setup Rust toolchain
+        if: steps.detect.outputs.has_cargo == 'true'
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install cargo-llvm-cov
+        if: steps.detect.outputs.has_cargo == 'true'
+        uses: taiki-e/install-action@cargo-llvm-cov
+
+      - name: Generate coverage summary
+        if: steps.detect.outputs.has_cargo == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p coverage
+          cargo llvm-cov --workspace --all-features --summary-only | tee coverage/summary.txt
+
+      - name: Upload coverage summary
+        if: always() && steps.detect.outputs.has_cargo == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-summary
+          path: coverage/summary.txt
+          retention-days: 90
+
+      - name: Skip (no Cargo.toml)
+        if: steps.detect.outputs.has_cargo != 'true'
+        run: echo "No Cargo.toml found. Coverage summary skipped."
+
+  pr-metadata:
+    name: PR Metadata (non-blocking)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - name: Validate PR metadata
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const title = (pr.title || '').trim();
+            const body = (pr.body || '').trim();
+
+            const titleOk = /^[a-z]+\([^)]+\):\s.+/.test(title);
+            const refsOk = /Refs\s+#\d+/i.test(body);
+
+            const errors = [];
+            if (!titleOk) {
+              errors.push('PR title should follow `<type>(<scope>): <summary>`.');
+            }
+            if (!refsOk) {
+              errors.push('PR body should include `Refs #<issue-number>`.');
+            }
+
+            if (errors.length > 0) {
+              core.warning(errors.join(' '));
+            } else {
+              core.info('PR metadata checks passed.');
+            }

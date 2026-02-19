@@ -71,7 +71,6 @@ flowchart LR
    - `done`, `closeout`, `ship this`, `finish packet`
 7. `icebox-commit-merge-hygiene`
    - `commit`, `pr`, `pull request`, `merge`, `squash`
-
 ## Recommended Skill Order
 
 1. `icebox-docs-standards`

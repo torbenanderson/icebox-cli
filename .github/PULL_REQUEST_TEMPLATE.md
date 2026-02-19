@@ -54,6 +54,30 @@ Commands + key results:
 - Files added/changed (paths):
 - ADR link (or `n/a`):
 
+## Merge Message
+
+Title:
+- `<type>(<scope>): <outcome>`
+
+Body:
+- Summary:
+- Changes:
+- Validation:
+- Follow-ups:
+
+## Community Communication (optional for epic/milestone PRs)
+
+- GitHub Release/pre-release note:
+- README current-state update:
+- Discussion/announcement:
+
+## Release Note Snippet (optional)
+
+- What this is:
+- What this isn't:
+- How to try it:
+- Next:
+
 ## Checklists
 
 - [ ] Docs only

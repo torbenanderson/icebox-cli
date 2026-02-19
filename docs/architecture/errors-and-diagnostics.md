@@ -6,6 +6,12 @@
 - Structured `ICE-xxx` codes mapped by root cause.
 - Debug mode can include additional internal context.
 
+## Phasing
+
+- MVP source of truth is runtime code mapping (typed errors/code map in `src/`).
+- `docs/reference/error-codes.json` is introduced later when external consumers (docs/support/tooling) need a machine-readable artifact.
+- When JSON is introduced, add a sync test between runtime code mapping and registry before any code generation step.
+
 ## Key Codes
 
 - `ICE-201`: vault parse/corruption failures (invalid JSON/truncated payloads).
@@ -22,4 +28,4 @@
 
 ---
 
-*Last updated: 2026-02-16*
+*Last updated: 2026-02-19*

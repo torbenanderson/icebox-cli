@@ -52,11 +52,13 @@ Requires **macOS** (Apple Silicon or Intel T2) for full security flow in MVP. `~
 | **DID Support** | `did:key` identity commands and `did:web` publishing | Phase 1.5 |
 | **Secret-Handling Boundary** | Icebox keeps secrets out of long-lived agent state and injects them only at execution time into trusted subprocesses; those subprocesses can still exfiltrate via stdout/stderr/files/network | Planned |
 
-## Current Status (February 15, 2026)
+## Current State
 
-- This repository is currently **design and planning docs only**.
-- The Rust implementation is not yet present in `src/`.
-- Use these docs as the implementation contract for the bootstrap phase.
+**v0.1.0-alpha** -- E1 bootstrap foundation only.
+
+The CLI runs and supports `--help`, `--version`, and `--debug`.
+
+No credential storage or execution yet. You cannot `register-agent`, `add`, or `run`, and secrets are not yet stored or injected.
 
 ## Non-Functional Requirements
 

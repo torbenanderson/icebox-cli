@@ -1,0 +1,42 @@
+name: Security Audit
+
+on:
+  schedule:
+    # GitHub cron uses UTC; 01:00 Saturday UTC maps to Friday 5:00 PM Pacific in standard time.
+    - cron: "0 1 * * 6"
+  workflow_dispatch:
+
+jobs:
+  cargo-audit:
+    name: Cargo Audit (weekly)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Detect Rust project
+        id: detect
+        shell: bash
+        run: |
+          if [ -f Cargo.toml ]; then
+            echo "has_cargo=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_cargo=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Setup Rust toolchain
+        if: steps.detect.outputs.has_cargo == 'true'
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install cargo-audit
+        if: steps.detect.outputs.has_cargo == 'true'
+        run: cargo install --locked cargo-audit
+
+      - name: Run cargo audit
+        if: steps.detect.outputs.has_cargo == 'true'
+        run: cargo audit
+
+      - name: Skip (no Cargo.toml)
+        if: steps.detect.outputs.has_cargo != 'true'
+        run: echo "No Cargo.toml found. Security audit skipped."

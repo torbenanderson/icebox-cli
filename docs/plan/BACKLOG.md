@@ -7,6 +7,7 @@
 ## Phase 1 Vertical Slice Milestone (Sequencing Only)
 
 > Early milestone for implementation velocity. This is a delivery order marker only; it does not add/remove scope or change phase ownership.
+> Backlog IDs are stable references and may be non-contiguous; gaps do not imply missing scope in this sequence.
 
 - E1-01 Cargo init
 - E1-02 CLI scaffolding
@@ -68,13 +69,13 @@
 | E1-10 | Error messaging (default) | Minimal, non-technical error messages by default; no internal paths, keys, or crypto details |
 | E1-11 | `--debug` flag | `--debug` on any command outputs detailed internals (paths, crypto codes, traces) to stdout only |
 | E1-12 | `--quiet` flag | `--quiet` suppresses all non-essential output (for scripting / automation) |
-| E1-13 | Structured error codes | Error codes (`ICE-1xx`, `ICE-2xx`, etc.) categorized by root cause (auth, vault, agent, secret, exec, enclave, input). Safe for support tickets without exposing internals. Codes never reused. |
+| E1-13 | Structured error codes | Error codes (`ICE-1xx`, `ICE-2xx`, etc.) categorized by root cause (auth, vault, agent, secret, exec, enclave, input). Safe for support tickets without exposing internals. Codes never reused. MVP implementation source of truth is runtime code mapping; keep JSON/codegen out of MVP scope. |
 | E1-14 | Test scaffolding | Set up `tests/` directory, test helpers (temp enclave keys, temp `~/.icebox/`), CI test runner. See [TESTING.md](TESTING.md) |
-| E1-15 | Release pipeline | GitHub Actions: `cargo build --release` / `cargo-dist`, **Developer ID signed + notarized** macOS binary, `cargo install` compatible (unsigned, dev only), GitHub Releases page. Homebrew pre-built bottles follow after first stable release |
+| E1-15 | Release pipeline | GitHub Actions: `cargo build --release` / `cargo-dist`, **Developer ID signed + notarized** macOS binary, `cargo install` compatible (unsigned, dev only), GitHub Releases page. Homebrew pre-built bottles follow after first stable release. Include tag-triggered release automation (`v*`) that runs validation, builds release artifacts, publishes checksums, and uploads assets to GitHub Releases. |
 | E1-16 | Install docs | Finalize install instructions in README (`cargo install` + binary download). Document that `cargo install` produces an unsigned binary with limited enclave access (dev only). |
 | E1-17 | Entitlements plist | Create `Entitlements.plist` with `com.apple.security.smartcard`, `com.apple.keychain-access-groups`, hardened runtime. Embedded during `codesign` step in release pipeline. |
 | E1-18 | Notarization | Integrate `xcrun notarytool` into release pipeline. Binary submitted to Apple for notarization after signing; stapled ticket attached to the distributed binary. |
-| E1-19 | Error code artifact | Publish machine-readable error-code registry at `docs/reference/error-codes.json` and keep it in sync with docs |
+| E1-19 | Error code artifact | Publish machine-readable error-code registry at `docs/reference/error-codes.json` when external consumers need it; add a sync test with runtime code mapping before introducing code generation |
 | E1-20 | File permission baseline | Enforce owner-only filesystem modes for runtime artifacts: `~/.icebox/` + agent dirs `0700`; sensitive files (`config.json`, `manifest.json`, `identity.pub`, `key.enc`, `vault.enc`, `hmac.enc`) `0600`. Validate and fail closed on mismatch for security-critical operations. |
 | E1-21 | Artifact type/version markers | Add `format` + `schemaVersion` to `manifest.json`, `vault.enc`, and `.icebox-agent` bundle metadata to prevent ambiguous migrations |
 | E1-22 | Canonical serialization contract | Enforce canonical JSON serialization rules (UTC RFC3339 timestamps, lowercase hex, fixed base64 variant, deterministic export ordering) |
@@ -243,4 +244,4 @@
 
 ---
 
-*Last updated: 2026-02-18*
+*Last updated: 2026-02-19*

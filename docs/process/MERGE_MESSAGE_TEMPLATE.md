@@ -31,6 +31,44 @@ Follow-ups:
 - <deferred work item or n/a>
 ```
 
+## Epic/Milestone Variant
+
+Use this variant when merging an epic-level PR that spans multiple packet issues.
+
+```text
+<Epic ID> - <Epic name> (<slice/phase label>)
+
+<1-2 sentence executive summary focused on user value and delivery stage.>
+
+Scope:
+- <concern group 1>
+- <concern group 2>
+- <concern group 3>
+
+Goal:
+- <why this merge matters before next epics>
+
+Refs: <backlog IDs and/or issue references>
+```
+
+## Community Communication Add-On (Optional)
+
+For milestone/epic merges, include a short copy-ready announcement block:
+
+```text
+What this is:
+- <foundation delivered now>
+
+What this isn't:
+- <not yet implemented capabilities>
+
+How to try:
+- <build/test/run commands>
+
+Next:
+- <upcoming epic sequence>
+```
+
 ## Required Quality Bar
 
 - Keep the title imperative and specific.
