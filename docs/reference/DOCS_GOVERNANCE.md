@@ -43,6 +43,9 @@ When a PR changes docs, include:
 1. Canonical file changed.
 2. Secondary docs linked (or explicitly noted as not needed).
 3. Any moved/renamed path references updated.
+4. Required PR sections: `Packet Metadata`, `Objective`, `Validation`, `Done When`, `Closeout Evidence`.
+5. Packet metadata fields: backlog ID(s) (epic and/or packet), issue reference(s), spec path(s), test ID(s), docs touched.
+6. Closeout evidence fields: PR link, tests run, docs updated, files changed, ADR link (`n/a` allowed).
 
 ## Review Checklist
 
@@ -55,4 +58,4 @@ When a PR changes docs, include:
 
 ---
 
-*Last updated: 2026-02-16*
+*Last updated: 2026-02-19*

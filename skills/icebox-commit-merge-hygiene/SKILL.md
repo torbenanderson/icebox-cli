@@ -35,6 +35,7 @@ Follow these repository rules when generating commit/PR outputs:
 2. `CONTRIBUTING.md` PR guidelines (what/why/affected docs/tests).
 3. `.github/OPENCLAW_COMMUNITY_ONRAMP.md` PR expectations (backlog IDs, concrete validation).
 4. `docs/reference/DOCS_GOVERNANCE.md` PR hygiene for docs changes.
+5. `docs/process/MERGE_MESSAGE_TEMPLATE.md` merge/squash title + body structure.
 
 ## Commit Message Standard
 
@@ -74,20 +75,24 @@ Treat the PR body as an executable prompt for reviewers/agents.
 
 Required PR prompt sections:
 
-1. `Objective`
+1. `Packet Metadata`
+   - backlog IDs (epic + packets), issue references, spec paths, test IDs, docs touched
+2. `Objective`
    - one outcome sentence
-2. `Context`
+3. `Context`
    - why now, backlog IDs, trust/security notes when relevant
-3. `Change Set`
+4. `Change Set`
    - concrete files/modules changed
-4. `Constraints`
+5. `Constraints`
    - what must not change
-5. `Validation`
+6. `Validation`
    - checks run and expected outcomes
-6. `Review Focus`
+7. `Review Focus`
    - where reviewers should look first
-7. `Done When`
+8. `Done When`
    - explicit acceptance bullets
+9. `Closeout Evidence`
+   - PR link, tests run, docs updated, changed files, ADR link or `n/a`
 
 Use imperative, testable statements. Avoid narrative prose.
 
@@ -178,6 +183,13 @@ When producing a PR body, use this exact shape:
 
 ```text
 PR Prompt
+Packet Metadata:
+- Backlog ID(s): <epic + packet IDs, or N/A>
+- Issue reference(s): <#id list or N/A>
+- Spec path(s): <path list or N/A>
+- Test ID(s): <T-* list or N/A>
+- Docs touched: <paths or none>
+
 Objective:
 - <outcome>
 
@@ -203,4 +215,11 @@ Review Focus:
 Done When:
 - <acceptance bullet>
 - <acceptance bullet>
+
+Closeout Evidence:
+- PR link: <url or pending>
+- Tests run (commands + result): <summary>
+- Docs updated (paths): <paths or none>
+- Files added/changed (paths): <paths>
+- ADR link (or n/a): <value>
 ```

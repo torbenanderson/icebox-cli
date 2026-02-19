@@ -1,0 +1,66 @@
+name: PR Body Guard
+
+on:
+  pull_request:
+    types: [opened, edited, reopened, synchronize]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  validate-pr-body:
+    name: Validate PR template sections
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate required PR sections and fields
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = context.payload.pull_request.body || "";
+
+            const requiredSections = [
+              "Packet Metadata",
+              "Objective",
+              "Context",
+              "Change Set",
+              "Constraints",
+              "Validation",
+              "Review Focus",
+              "Done When",
+              "Closeout Evidence",
+            ];
+
+            const requiredFields = [
+              "Backlog ID(s):",
+              "Issue reference(s):",
+              "Spec path(s):",
+              "Test ID(s):",
+              "Docs touched:",
+              "PR link:",
+              "Tests run (commands + result):",
+              "Docs updated (paths):",
+              "Files added/changed (paths):",
+              "ADR link (or `n/a`):",
+            ];
+
+            const missingSections = requiredSections.filter((section) => {
+              const pattern = new RegExp(`^##\\s+${section}\\s*$`, "im");
+              return !pattern.test(body);
+            });
+
+            const missingFields = requiredFields.filter((field) => !body.includes(field));
+
+            if (missingSections.length > 0 || missingFields.length > 0) {
+              const lines = [];
+              lines.push("PR body is missing required template content.");
+              if (missingSections.length > 0) {
+                lines.push(`Missing sections: ${missingSections.join(", ")}`);
+              }
+              if (missingFields.length > 0) {
+                lines.push(`Missing fields: ${missingFields.join(", ")}`);
+              }
+              core.setFailed(lines.join("\n"));
+            } else {
+              core.info("PR body contains required sections and fields.");
+            }
