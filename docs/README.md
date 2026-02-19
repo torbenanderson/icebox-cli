@@ -21,6 +21,10 @@ Use this file as the entrypoint for project docs.
 
 - [Backup & Recovery](guides/BACKUP.md)
 
+## Process
+
+- [Merge Message Template](process/MERGE_MESSAGE_TEMPLATE.md)
+
 ## Reference
 
 - [Versioning Policy](reference/VERSIONING.md)
@@ -52,4 +56,4 @@ cargo doc --workspace --all-features --no-deps
 
 ---
 
-*Last updated: 2026-02-18*
+*Last updated: 2026-02-19*

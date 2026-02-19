@@ -1,14 +1,27 @@
-## Summary
+## Packet Metadata
 
-- What changed?
-- Why was it needed?
+- Backlog ID: `E?-??`
+- Issue #: `#<id>`
+- Spec path: `docs/plan/spec/PKT-...-work-item.md`
+- Test IDs: `T-...` (comma-separated)
+- Docs touched: `<paths>` or `none`
 
-## Scope
+## Objective
 
-- [ ] Docs only
-- [ ] Code change
-- [ ] Tests added/updated
-- [ ] Security-sensitive behavior changed
+- <single outcome sentence>
+
+## Context
+
+- Why now: <reason>
+- Security/trust impact: <none or explicit note>
+
+## Change Set
+
+- <group changes by concern: code/tests/docs/contracts/infra>
+
+## Constraints
+
+- <what must not change>
 
 ## Validation
 
@@ -17,29 +30,44 @@
 - [ ] `cargo test`
 - [ ] Docs/schema checks (if applicable)
 
-List key commands/results:
+Commands + key results:
 
 ```text
-<paste relevant command output summary>
+<paste command summary with pass/fail>
 ```
 
-## Security Checklist
+## Review Focus
 
+1. `<highest-risk file/path>`
+2. `<next file/path>`
+
+## Done When
+
+- [ ] <acceptance bullet>
+- [ ] <acceptance bullet>
+
+## Closeout Evidence
+
+- PR link:
+- Tests run (commands + result):
+- Docs updated (paths):
+- Files added/changed (paths):
+- ADR link (or `n/a`):
+
+## Checklists
+
+- [ ] Docs only
+- [ ] Code change
+- [ ] Tests added/updated
+- [ ] Security-sensitive behavior changed
 - [ ] No plaintext secrets added to logs/output/files
 - [ ] Fail-closed behavior preserved where expected
 - [ ] `run` trust boundary unchanged or explicitly documented
 - [ ] File mode / integrity implications reviewed
-
-## Documentation Checklist
-
-- [ ] Updated canonical docs for behavior changes
-- [ ] Updated related planning/testing docs if needed
-- [ ] Updated schema/fixtures for persisted artifact changes
-
-Affected docs/files:
-
-- `...`
+- [ ] Canonical docs updated for behavior changes (or `n/a`)
+- [ ] Planning/testing docs updated when mappings changed (or `n/a`)
+- [ ] Schema/fixtures updated for persisted artifact changes (or `n/a`)
 
 ## Linked Issues
 
-Closes #
+Closes #<id>

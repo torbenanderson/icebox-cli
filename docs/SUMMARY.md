@@ -23,6 +23,7 @@
   - [Bootstrap Issues](plan/BOOTSTRAP_ISSUES.md)
   - [Testing](plan/TESTING.md)
 - [Guides](guides/BACKUP.md)
+- [Process](process/MERGE_MESSAGE_TEMPLATE.md)
 - [Reference](reference/VERSIONING.md)
   - [Docs Governance](reference/DOCS_GOVERNANCE.md)
   - [API Documentation](reference/API_DOCS.md)
