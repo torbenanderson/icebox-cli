@@ -25,6 +25,21 @@ Policy supports explicit user-selected modes:
 
 Default profile: `balanced`.
 
+### Mode Scope And Precedence
+
+1. Policy supports both:
+   - global mode (default for all agents)
+   - per-agent mode override (optional)
+2. Precedence rule: per-agent mode override wins over global mode for that agent.
+3. If no per-agent override exists, broker applies global mode.
+
+### Migration Rules
+
+1. Existing installs migrate to `balanced` as default.
+2. No silent upgrade to `strict`.
+3. Explicit opt-down to `yolo` remains available for users accepting higher risk.
+4. Migration messaging must be user-visible and deterministic (no hidden mode changes).
+
 ## Action-Based 2FA
 
 2FA is policy-driven by action category and selected mode:
@@ -162,7 +177,7 @@ Scope policy:
 
 ## Related Backlog And ADR
 
-1. `docs/plan/BACKLOG.md` (`E8-01`..`E8-13`, `E9-01`..`E9-03`)
+1. `docs/plan/BACKLOG.md` (`E8-01`..`E8-14`, `E9-01`..`E9-03`)
 2. `docs/plan/TESTING.md` (`T-E8-*`, `T-E9-*`, `T-SEC-21`..`T-SEC-24`)
 3. `docs/architecture/decisions/ADR-0001-brokered-secret-execution.md`
 4. Deferred plugin ecosystem discussion: `https://github.com/torbenanderson/icebox-cli/issues/17` (`D2`)

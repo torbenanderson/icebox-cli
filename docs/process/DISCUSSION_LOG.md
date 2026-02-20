@@ -8,8 +8,9 @@ Canonical source of truth remains the linked GitHub issue. This file is a scan-f
 
 | D-ID | Proposal Issue | Source Discussion | Contributor | Status | Backlog/ADR |
 |---|---|---|---|---|---|
-| D1 | [#16](https://github.com/torbenanderson/icebox-cli/issues/16) | [openclaw/openclaw#9676](https://github.com/openclaw/openclaw/discussions/9676) | [@Z-Lemke](https://github.com/Z-Lemke) | under review | E8-01..13, E9-01..03; [ADR-0001](../architecture/decisions/ADR-0001-brokered-secret-execution.md) |
+| D1 | [#16](https://github.com/torbenanderson/icebox-cli/issues/16) | [openclaw/openclaw#9676](https://github.com/openclaw/openclaw/discussions/9676) | [@Z-Lemke](https://github.com/Z-Lemke) | under review | E8-01..09, E8-11..13, E9-01..03; [ADR-0001](../architecture/decisions/ADR-0001-brokered-secret-execution.md); see D3 for mode scope/migration ownership |
 | D2 | [#17](https://github.com/torbenanderson/icebox-cli/issues/17) | [openclaw/openclaw#9676](https://github.com/openclaw/openclaw/discussions/9676) | [@Z-Lemke](https://github.com/Z-Lemke) | under review | Deferred: external vault plugin ecosystem (1Password/Bitwarden/HashiCorp Vault/AWS, etc.) |
+| D3 | [#19](https://github.com/torbenanderson/icebox-cli/issues/19) | [openclaw/openclaw discussion comment 15857763](https://github.com/openclaw/openclaw/discussions/9676#discussioncomment-15857763) | [@mergisi](https://github.com/mergisi) | under review | Security mode scope/precedence/migration rules (`E8-10`, `E8-14`) |
 
 ## Update Rules
 

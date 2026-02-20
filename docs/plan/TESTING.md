@@ -316,10 +316,11 @@ These tests are public-release blockers and must pass on macOS CI before shippin
 | T-E8-07 | E8-07 | Broker operation requests require `credentialRef`; broker responses never include plaintext secret material |
 | T-E8-08 | E8-08 | Success and error payload redaction removes secret bytes and auth-header material from returned objects/messages |
 | T-E8-09 | E8-09 | Policy-deny/authz failures map to stable `ICE-3xx` codes: generic deny=`ICE-301`, missing capability=`ICE-302`, destination/action deny=`ICE-303`, attestation/auth failure=`ICE-304`, unsafe mode blocked=`ICE-305`; mapping is deterministic across repeated runs |
-| T-E8-10 | E8-10 | Security mode selection applies deterministic policy profile behavior (`yolo`, `balanced`, `strict`) with `balanced` default when unset |
+| T-E8-10 | E8-10 | Security mode selection applies deterministic behavior with global default (`balanced`) and per-agent override precedence (`per-agent` wins over `global`) |
 | T-E8-11 | E8-11 | Action-based 2FA matrix enforced by mode: `api-call`, `form-fill`, `view-credential`, `send-credential` produce expected auto/2FA/blocked outcomes |
 | T-E8-12 | E8-12 | Tool payload containing raw credential value field is rejected; `credentialRef` + `credentialPlacement` payload is accepted |
 | T-E8-13 | E8-13 | Built-in backend abstraction supports system keychain and encrypted-file fallback while external plugin backends remain disabled/deferred |
+| T-E8-14 | E8-14 | Migration rules enforced: existing installs default to `balanced`, no silent `strict` cutover, explicit opt-down to `yolo`, and deterministic user-visible migration notice |
 
 ### E9 -- OpenClaw Skill (Phase 2)
 
