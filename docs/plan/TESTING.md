@@ -279,7 +279,7 @@ These tests are public-release blockers and must pass on macOS CI before shippin
 | T-E5-13 | E5-13 | After normal `icebox run` completion, the per-run TMPDIR directory no longer exists |
 | T-E5-14 | E5-14 | Create a stale `icebox-run-*` directory >1 hour old; verify Icebox removes it on startup |
 | T-E5-14b | E5-14 | Stale TMPDIR sweep runs on non-`run` commands too (every CLI invocation) |
-| T-E5-15 | E5-15 | `icebox run` emits trust-boundary warning when command provenance is unknown/untrusted |
+| T-E5-15 | E5-15 | MVP path: `icebox run` emits trust-boundary warning when command provenance is unknown/untrusted (warning-only; no enforcement) |
 
 ### E7 -- DID Support (Phase 1.5)
 
@@ -312,6 +312,10 @@ These tests are public-release blockers and must pass on macOS CI before shippin
 | T-E8-03 | E8-03 | Broker egress controls block non-approved network/filesystem targets and emit deterministic policy error |
 | T-E8-04 | E8-04 | Delegated token flow issues short-lived scoped token, enforces TTL/audience/scope, and clears token material after operation |
 | T-E8-05 | E8-05 | Raw secret injection requires explicit `--unsafe-raw-secret`; default mode rejects attempt and logs policy audit event |
+| T-E8-06 | E8-06 | Credential metadata API returns `type/provider/hint/capabilities` and never returns plaintext `value` |
+| T-E8-07 | E8-07 | Broker operation requests require `credentialRef`; broker responses never include plaintext secret material |
+| T-E8-08 | E8-08 | Success and error payload redaction removes secret bytes and auth-header material from returned objects/messages |
+| T-E8-09 | E8-09 | Policy-deny/authz failures map to stable `ICE-*` codes with deterministic behavior across repeated runs |
 
 ### E9 -- OpenClaw Skill (Phase 2)
 

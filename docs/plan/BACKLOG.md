@@ -176,7 +176,7 @@
 | E5-12 | TMPDIR creation (`0700`) | Create per-run temp dir via `tempfile::tempdir()`; immediately chmod to `0o700`; set as `TMPDIR` in subprocess env |
 | E5-13 | TMPDIR cleanup (RAII + signal) | `TempDir` implements `Drop` (automatic cleanup); install signal handler for `SIGINT`/`SIGTERM` to exit cleanly |
 | E5-14 | Stale TMPDIR startup sweep | On every Icebox CLI invocation, scan system temp dir for `icebox-run-*` directories older than 1 hour and remove them |
-| E5-15 | Command provenance warning | `icebox run` warns when command source/provenance is unknown or untrusted (trust-boundary reminder) |
+| E5-15 | Command provenance warning (MVP) | `icebox run` warns when command source/provenance is unknown or untrusted (trust-boundary reminder). Warning-only in MVP; superseded by enforced broker policy controls in E8 |
 
 ## E6 -- Zero-Exposure Hardening (Cross-Cutting)
 
@@ -238,6 +238,10 @@
 | E8-03 | Runtime egress controls | Apply subprocess/network/filesystem egress controls for broker-managed operation execution; fail closed on policy violation |
 | E8-04 | Short-lived delegated credentials | Exchange long-lived stored credentials for short-lived, scoped, audience-bound tokens where provider supports it; never persist delegated token beyond operation scope |
 | E8-05 | Unsafe raw-secret path quarantine | Move raw secret injection path behind explicit `--unsafe-raw-secret` mode with strong warning, audit event, and disabled-by-default policy |
+| E8-06 | Credential metadata projection | Expose agent-visible credential metadata (`type`, `provider`, `hint`, `capabilities`) without any plaintext `value` field |
+| E8-07 | Broker request/response schema contract | Require operation requests to use `credentialRef`; guarantee responses never include plaintext secret material |
+| E8-08 | Response and error redaction contract | Ensure success/error payloads omit secret bytes, raw auth headers, and equivalent sensitive material |
+| E8-09 | Deterministic policy error mapping | Map broker policy-deny/authz failures to stable user-safe `ICE-*` codes for debugging/support without secret disclosure |
 
 ## E9 -- OpenClaw Skill
 
