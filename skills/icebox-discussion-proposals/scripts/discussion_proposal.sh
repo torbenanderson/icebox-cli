@@ -5,8 +5,8 @@ usage() {
   cat <<'EOF'
 Usage:
   discussion_proposal.sh next-id
-  discussion_proposal.sh draft --link <url> [--d-id D#] [--title "..."] [--summary "..."] [--proposed-by "@user"] [--status "..."] [--backlog "..."]
-  discussion_proposal.sh create --link <url> [--d-id D#] [--title "..."] [--summary "..."] [--proposed-by "@user"] [--status "..."] [--backlog "..."]
+  discussion_proposal.sh draft --link <url> [--d-id D#] [--title "..."] [--summary "..."] [--proposed-by "@user"] [--proposed-by-link "https://..."] [--status "..."] [--backlog "..."]
+  discussion_proposal.sh create --link <url> [--d-id D#] [--title "..."] [--summary "..."] [--proposed-by "@user"] [--proposed-by-link "https://..."] [--status "..."] [--backlog "..."]
 
 Defaults:
   status  = logged
@@ -55,12 +55,17 @@ render_title() {
 render_body() {
   local link="$1"
   local proposed_by="$2"
-  local summary="$3"
-  local status="$4"
-  local backlog="$5"
+  local proposed_by_link="$3"
+  local summary="$4"
+  local status="$5"
+  local backlog="$6"
+  local attribution="$proposed_by"
+  if [[ -n "$proposed_by_link" ]]; then
+    attribution="${proposed_by} (${proposed_by_link})"
+  fi
   cat <<EOF
 ## Source
-[$link]($link) — proposed by ${proposed_by}
+[$link]($link) — proposed by ${attribution}
 
 ## Summary
 ${summary}
@@ -79,6 +84,7 @@ parse_args() {
   TITLE=""
   SUMMARY="Brief description of the proposal."
   PROPOSED_BY="@unknown"
+  PROPOSED_BY_LINK=""
   STATUS="logged"
   BACKLOG="n/a"
 
@@ -102,6 +108,10 @@ parse_args() {
         ;;
       --proposed-by)
         PROPOSED_BY="${2:-}"
+        shift 2
+        ;;
+      --proposed-by-link)
+        PROPOSED_BY_LINK="${2:-}"
         shift 2
         ;;
       --status)
@@ -147,7 +157,7 @@ main() {
       if [[ -z "$TITLE" ]]; then
         TITLE="$(render_title "$DID" "$LINK")"
       fi
-      BODY="$(render_body "$LINK" "$PROPOSED_BY" "$SUMMARY" "$STATUS" "$BACKLOG")"
+      BODY="$(render_body "$LINK" "$PROPOSED_BY" "$PROPOSED_BY_LINK" "$SUMMARY" "$STATUS" "$BACKLOG")"
 
       if [[ "$cmd" == "draft" ]]; then
         printf 'D-ID: %s\n' "$DID"

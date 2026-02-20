@@ -19,6 +19,19 @@ Trigger on requests like:
 
 Create or update a D-prefixed issue that preserves source context and keeps proposal status visible until it is either mapped to backlog work or closed.
 
+## Attribution Rule
+
+Always capture contributor attribution when available:
+
+1. Source discussion URL
+2. Contributor handle/name
+3. Contributor profile link
+
+When a proposal is adopted and translated into ADR/spec/backlog decisions, carry attribution forward by linking both:
+
+1. Source discussion URL
+2. Internal D-issue URL
+
 ## Canonical Pattern
 
 1. Title: `[D#] Proposal: <topic> from discussion #<id>`
@@ -48,6 +61,7 @@ Use `skills/icebox-discussion-proposals/scripts/discussion_proposal.sh`:
    - `--d-id D7`
    - `--summary "<text>"`
    - `--proposed-by "@handle"`
+   - `--proposed-by-link "https://github.com/handle"`
    - `--backlog E2-XX`
    - `--status "under review"`
    - `--title "<custom title>"`
@@ -60,3 +74,4 @@ Return:
 2. Created issue URL (or draft content if creation was not requested/possible)
 3. Source discussion URL
 4. Current status and backlog mapping value
+5. Contributor attribution line (handle + profile link when available)
