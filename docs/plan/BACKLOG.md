@@ -241,7 +241,7 @@
 | E8-06 | Credential metadata projection | Expose agent-visible credential metadata (`type`, `provider`, `hint`, `capabilities`) without any plaintext `value` field |
 | E8-07 | Broker request/response schema contract | Require operation requests to use `credentialRef`; guarantee responses never include plaintext secret material |
 | E8-08 | Response and error redaction contract | Ensure success/error payloads omit secret bytes, raw auth headers, and equivalent sensitive material |
-| E8-09 | Deterministic policy error mapping | Map broker policy-deny/authz failures to stable user-safe `ICE-*` codes for debugging/support without secret disclosure |
+| E8-09 | Deterministic policy error mapping | Map broker policy-deny/authz failures to stable user-safe `ICE-3xx` codes for debugging/support without secret disclosure: `ICE-301` policy deny (generic), `ICE-302` missing capability, `ICE-303` destination/action not allowlisted, `ICE-304` identity/attestation failure, `ICE-305` unsafe mode disabled by policy |
 
 ## E9 -- OpenClaw Skill
 
