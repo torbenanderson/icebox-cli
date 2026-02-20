@@ -43,8 +43,8 @@ gantt
 | **E6** | Zero-Exposure Hardening | Cross-cutting | Not a standalone phase; items distributed into E1, E2, E3, E5 (built-in from day one) |
 | **E7** | DID Support | 1.5 | `did:key` derivation from agent keypair + `did:web` document generation |
 | **E7.5** | Seed Backup & Portability | 1.5 | `--seed` flag, BIP39 mnemonic, SLIP-0010 derivation, `recover-agent`, `export`/`import` |
-| **E8** | Socket Server | 2 | Unix socket daemon for persistent agent connections |
-| **E9** | OpenClaw Skill | 2 | ClawHub skill package wrapping the socket API |
+| **E8** | Socket Server | 2 | Brokered execution daemon with policy-gated operations and no long-lived plaintext credential export |
+| **E9** | OpenClaw Skill | 2 | OpenClaw skill integration using broker-first capability-scoped operations |
 | **E10** | Browser Extension | 3 | Token-based browser login via Icebox-managed credentials |
 
 **Dependency chain (Phase 1 MVP):** E1 → E2 → E3 → E4 → E5 (strictly sequential). E3 requires E2's Ed25519 public key to seal secrets to. E4 requires E3's vault to store entries. E5 requires E4's secret retrieval to inject into subprocesses. E6 is cross-cutting and woven into each epic.
@@ -73,4 +73,4 @@ gantt
 
 ---
 
-*Last updated: 2026-02-16*
+*Last updated: 2026-02-20*

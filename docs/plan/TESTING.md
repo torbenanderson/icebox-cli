@@ -303,6 +303,24 @@ These tests are public-release blockers and must pass on macOS CI before shippin
 | T-E7.5-07 | E7.5-07 | `icebox import` verifies `bundle.manifest.json` checksums before processing; with valid seed it restores agent from archive and secrets decrypt on new device |
 | T-E7.5-08 | E7.5-08 | Import rejects checksum mismatch, unsupported required fields/algorithms, duplicate `agentId`/`entryId`, and conflicting records unless explicit recovery mode is set |
 
+### E8 -- Socket Server (Phase 2)
+
+| Test ID | Backlog | Test Description |
+|---|---|---|
+| T-E8-01 | E8-01 | Brokered execution performs approved remote/API operation without disclosing long-lived plaintext credential to client process |
+| T-E8-02 | E8-02 | Deny-by-default policy rejects operations not explicitly allowlisted by action + destination + capability |
+| T-E8-03 | E8-03 | Broker egress controls block non-approved network/filesystem targets and emit deterministic policy error |
+| T-E8-04 | E8-04 | Delegated token flow issues short-lived scoped token, enforces TTL/audience/scope, and clears token material after operation |
+| T-E8-05 | E8-05 | Raw secret injection requires explicit `--unsafe-raw-secret`; default mode rejects attempt and logs policy audit event |
+
+### E9 -- OpenClaw Skill (Phase 2)
+
+| Test ID | Backlog | Test Description |
+|---|---|---|
+| T-E9-01 | E9-01 | OpenClaw skill uses broker API flow and cannot retrieve/export stored long-lived credential values |
+| T-E9-02 | E9-02 | Skill invocation fails closed when policy compatibility/attestation handshake is missing or invalid |
+| T-E9-03 | E9-03 | Session capability grant enforces least privilege; revoked or expired grants are rejected deterministically |
+
 ---
 
 ## Integration Tests
@@ -349,8 +367,12 @@ Dedicated tests that verify hardening guarantees:
 | T-SEC-18 | HMAC key tamper | Corrupt `hmac.enc` (flip a byte); verify vault load fails with an enclave decryption error (not `ICE-204` -- the HMAC key itself can't be unwrapped). |
 | T-SEC-19 | Coordinated vault + HMAC rollback | Roll back both `vault.enc` and `hmac.enc` to a consistent older state. Verify rollback is detected across process restart via persisted monotonic integrity anchor (not process-local cache only). |
 | T-SEC-20 | Reconcile fail-closed | Introduce registry/filesystem drift, then run `add`/`run`/`remove`; verify commands fail until `icebox reconcile` resolves drift |
+| T-SEC-21 | No plaintext export in broker mode | Attempt credential-read APIs from untrusted client path; verify broker never returns long-lived plaintext secret material |
+| T-SEC-22 | Policy bypass resistance | Attempt non-allowlisted host/action combinations and command-shape tampering; verify deny with deterministic policy code |
+| T-SEC-23 | Delegated token containment | Verify delegated tokens are short-lived, capability scoped, and rejected outside audience/TTL/policy constraints |
+| T-SEC-24 | Unsafe mode governance | Verify `--unsafe-raw-secret` is disabled by default and requires explicit policy flag plus user-visible warning to execute |
 
 
 ---
 
-*Last updated: 2026-02-18*
+*Last updated: 2026-02-20*

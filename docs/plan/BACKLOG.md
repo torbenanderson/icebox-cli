@@ -231,11 +231,21 @@
 
 ## E8 -- Socket Server
 
-> Backlog items TBD -- will be detailed when Phase 2 begins.
+| ID | Use Case | Description |
+|---|---|---|
+| E8-01 | Brokered execution default | Introduce brokered execution path where untrusted clients request approved operations and do not receive long-lived plaintext credentials |
+| E8-02 | Policy-gated operations | Enforce deny-by-default policy with explicit allowlists for operation type, target host/service, and agent capabilities |
+| E8-03 | Runtime egress controls | Apply subprocess/network/filesystem egress controls for broker-managed operation execution; fail closed on policy violation |
+| E8-04 | Short-lived delegated credentials | Exchange long-lived stored credentials for short-lived, scoped, audience-bound tokens where provider supports it; never persist delegated token beyond operation scope |
+| E8-05 | Unsafe raw-secret path quarantine | Move raw secret injection path behind explicit `--unsafe-raw-secret` mode with strong warning, audit event, and disabled-by-default policy |
 
 ## E9 -- OpenClaw Skill
 
-> Backlog items TBD -- will be detailed when Phase 2 begins.
+| ID | Use Case | Description |
+|---|---|---|
+| E9-01 | Broker-first skill integration | OpenClaw skill uses brokered operation APIs by default and never requests/export long-lived plaintext credentials |
+| E9-02 | Policy and attestation handshake | Skill startup requires policy compatibility check and client identity/attestation handshake before privileged operations |
+| E9-03 | Capability-scoped session contracts | Skill session grants least-privilege capabilities (`read-only inventory`, `run approved operation`) with explicit expiry and revocation |
 
 ## E10 -- Browser Extension
 
@@ -244,4 +254,4 @@
 
 ---
 
-*Last updated: 2026-02-19*
+*Last updated: 2026-02-20*
