@@ -24,6 +24,7 @@ Use this file as the entrypoint for project docs.
 
 ## Process
 
+- [Discussion Proposals](process/DISCUSSION_PROPOSALS.md)
 - [Merge Message Template](process/MERGE_MESSAGE_TEMPLATE.md)
 
 ## Reference
@@ -57,4 +58,4 @@ cargo doc --workspace --all-features --no-deps
 
 ---
 
-*Last updated: 2026-02-19*
+*Last updated: 2026-02-20*

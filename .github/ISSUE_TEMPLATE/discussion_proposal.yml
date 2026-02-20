@@ -1,0 +1,79 @@
+name: Discussion Proposal
+description: Track external/community discussion ideas as proposal issues.
+title: "[D#] Proposal: "
+labels:
+  - discussion-proposal
+  - proposal
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form to track ideas originating outside the repo (for example GitHub Discussions, community channels, or external threads).
+
+        Suggested title pattern: `[D#] Proposal: <short topic> from discussion #<id>`
+
+  - type: input
+    id: discussion_id
+    attributes:
+      label: Discussion ID
+      description: Your local discussion tracker ID, for example D1, D2, D3.
+      placeholder: D1
+    validations:
+      required: true
+
+  - type: input
+    id: source_link
+    attributes:
+      label: Discussion Link
+      description: Canonical source discussion URL.
+      placeholder: https://github.com/torbenanderson/icebox-cli/discussions/42
+    validations:
+      required: true
+
+  - type: input
+    id: proposed_by
+    attributes:
+      label: Proposed By
+      description: Source author/handle (if known).
+      placeholder: "@username"
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: Brief proposal description and expected impact.
+      placeholder: Brief description of the proposal.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: status
+    attributes:
+      label: Status
+      description: Current triage state for this proposal.
+      options:
+        - logged
+        - under review
+        - added to backlog
+        - closed without adoption
+    validations:
+      required: true
+
+  - type: input
+    id: backlog_link
+    attributes:
+      label: Backlog Mapping
+      description: Fill when adopted into backlog (for example E2-XX), otherwise n/a.
+      placeholder: E2-XX or n/a
+    validations:
+      required: true
+
+  - type: textarea
+    id: milestone_links
+    attributes:
+      label: Milestone / PR / Commit Links
+      description: Optional tracking links once implementation begins.
+      placeholder: |
+        Milestone:
+        PR:
+        Commit set:

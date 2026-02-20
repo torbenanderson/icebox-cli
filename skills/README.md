@@ -34,23 +34,27 @@ flowchart LR
    - Path: `skills/icebox-load/SKILL.md`
    - Purpose: prepare backlog work into a reviewable execution packet with canonical issue reference and state machine controls.
    - Trigger: load/prep/stage-for-review requests before coding.
-3. `icebox-execute`
+3. `icebox-discussion-proposals`
+   - Path: `skills/icebox-discussion-proposals/SKILL.md`
+   - Purpose: track external/community ideas as D-prefixed proposal issues with source links, status, and backlog mapping.
+   - Trigger: `add discussion <link>`, log/track discussion proposal requests.
+4. `icebox-execute`
    - Path: `skills/icebox-execute/SKILL.md`
    - Purpose: enforce pre-coding alignment gates and execute refusal until packet is truly ready.
    - Trigger: `execute`, start-building, build-component, execute-backlog, kickoff alignment.
-4. `icebox-ai-harness`
+5. `icebox-ai-harness`
    - Path: `skills/icebox-ai-harness/SKILL.md`
    - Purpose: schema-contract propagation, workflow guardrails, governance hook, and concern-based commit split guidance.
    - Trigger: schema/examples changes, persisted artifact contract updates, `.github/workflows/*` edits, commit-splitting requests.
-5. `icebox-test`
+6. `icebox-test`
    - Path: `skills/icebox-test/SKILL.md`
    - Purpose: require runnable test artifacts during execute, with at least one happy-path and one failure-path test.
    - Trigger: loaded with `execute` and any request to implement backlog work; can also be invoked standalone via `build tests #<issue-id>` or `build tests E*`.
-6. `icebox-done-gate`
+7. `icebox-done-gate`
    - Path: `skills/icebox-done-gate/SKILL.md`
    - Purpose: hard closeout gate with evidence validation before `in-progress -> done`.
    - Trigger: done/closeout/ship/finish-packet requests.
-7. `icebox-commit-merge-hygiene`
+8. `icebox-commit-merge-hygiene`
    - Path: `skills/icebox-commit-merge-hygiene/SKILL.md`
    - Purpose: standardize commit, PR, and merge message quality with concern-aware structure and push policy.
    - Trigger: commit/PR/merge messaging requests.
@@ -61,25 +65,28 @@ flowchart LR
    - `docs`, `SUMMARY.md`, `footer`, `rustdoc`, `api docs`
 2. `icebox-load`
    - `load backlog`, `prepare issue`, `stage for review`, `packetize`
-3. `icebox-execute`
+3. `icebox-discussion-proposals`
+   - `add discussion`, `log discussion`, `track discussion proposal`
+4. `icebox-execute`
    - `execute`, `start building`, `build component`, `kickoff`
-4. `icebox-ai-harness`
+5. `icebox-ai-harness`
    - `schema change`, `workflow change`, `contracts`, `split commits by concern`
-5. `icebox-test`
+6. `icebox-test`
    - `execute`, `build tests`, `write tests`, `add happy path and failure path tests`
-6. `icebox-done-gate`
+7. `icebox-done-gate`
    - `done`, `closeout`, `ship this`, `finish packet`
-7. `icebox-commit-merge-hygiene`
+8. `icebox-commit-merge-hygiene`
    - `commit`, `pr`, `pull request`, `merge`, `squash`
 ## Recommended Skill Order
 
 1. `icebox-docs-standards`
 2. `icebox-load`
-3. `icebox-execute`
-4. `icebox-test`
-5. `icebox-ai-harness`
-6. `icebox-done-gate`
-7. `icebox-commit-merge-hygiene`
+3. `icebox-discussion-proposals`
+4. `icebox-execute`
+5. `icebox-test`
+6. `icebox-ai-harness`
+7. `icebox-done-gate`
+8. `icebox-commit-merge-hygiene`
 
 ## Canonical Execution Path
 
