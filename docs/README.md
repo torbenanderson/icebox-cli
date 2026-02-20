@@ -25,6 +25,7 @@ Use this file as the entrypoint for project docs.
 ## Process
 
 - [Discussion Proposals](process/DISCUSSION_PROPOSALS.md)
+- [Discussion Log](process/DISCUSSION_LOG.md)
 - [Merge Message Template](process/MERGE_MESSAGE_TEMPLATE.md)
 
 ## Reference

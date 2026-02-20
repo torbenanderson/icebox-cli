@@ -26,6 +26,7 @@
 - [Guides](guides/BACKUP.md)
 - [Process](process/README.md)
   - [Discussion Proposals](process/DISCUSSION_PROPOSALS.md)
+  - [Discussion Log](process/DISCUSSION_LOG.md)
   - [Merge Message Template](process/MERGE_MESSAGE_TEMPLATE.md)
 - [Reference](reference/VERSIONING.md)
   - [Docs Governance](reference/DOCS_GOVERNANCE.md)
