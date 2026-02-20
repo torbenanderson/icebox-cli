@@ -35,10 +35,10 @@ Tradeoffs:
 ## Related Backlog And Tests
 
 - Backlog:
-  - `E8-01`, `E8-02`, `E8-03`, `E8-04`, `E8-05`, `E8-06`, `E8-07`, `E8-08`, `E8-09`
+  - `E8-01`, `E8-02`, `E8-03`, `E8-04`, `E8-05`, `E8-06`, `E8-07`, `E8-08`, `E8-09`, `E8-10`, `E8-11`, `E8-12`, `E8-13`
   - `E9-01`, `E9-02`, `E9-03`
 - Tests:
-  - `T-E8-01` through `T-E8-09`
+  - `T-E8-01` through `T-E8-13`
   - `T-E9-01` through `T-E9-03`
   - `T-SEC-21` through `T-SEC-24`
 

@@ -242,6 +242,10 @@
 | E8-07 | Broker request/response schema contract | Require operation requests to use `credentialRef`; guarantee responses never include plaintext secret material |
 | E8-08 | Response and error redaction contract | Ensure success/error payloads omit secret bytes, raw auth headers, and equivalent sensitive material |
 | E8-09 | Deterministic policy error mapping | Map broker policy-deny/authz failures to stable user-safe `ICE-3xx` codes for debugging/support without secret disclosure: `ICE-301` policy deny (generic), `ICE-302` missing capability, `ICE-303` destination/action not allowlisted, `ICE-304` identity/attestation failure, `ICE-305` unsafe mode disabled by policy |
+| E8-10 | Security mode profiles | Support explicit security profiles: `yolo`, `balanced`, `strict` with `balanced` as default policy profile |
+| E8-11 | Action-based 2FA policy | Enforce per-action 2FA policy matrix by mode (`api-call`, `form-fill`, `view-credential`, `send-credential`) with fail-closed behavior |
+| E8-12 | Tool schema reference enforcement | Require broker-facing tools to use `credentialRef` + `credentialPlacement`; reject raw secret value fields in protected flows |
+| E8-13 | Vault backend abstraction (built-ins first) | Implement backend interface for system keychain + encrypted file fallback now; defer external plugin ecosystem and track separately in `D2` (`#17`) |
 
 ## E9 -- OpenClaw Skill
 
