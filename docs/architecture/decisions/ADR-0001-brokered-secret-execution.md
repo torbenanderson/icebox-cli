@@ -52,4 +52,5 @@ Tradeoffs:
 ## Source Discussion And Tracking
 
 - External discussion: `https://github.com/openclaw/openclaw/discussions/9676`
+- Contributor credit: `https://github.com/Z-Lemke` (security model critique and runtime exfiltration framing)
 - Internal proposal issue: `https://github.com/torbenanderson/icebox-cli/issues/16` (`[D1]`)
