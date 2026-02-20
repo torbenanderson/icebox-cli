@@ -37,6 +37,13 @@ body:
       description: Source author/handle (if known).
       placeholder: "@username"
 
+  - type: input
+    id: proposed_by_link
+    attributes:
+      label: Contributor Profile Link
+      description: Optional profile URL for attribution (GitHub/user page).
+      placeholder: https://github.com/username
+
   - type: textarea
     id: summary
     attributes:

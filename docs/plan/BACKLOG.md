@@ -176,7 +176,7 @@
 | E5-12 | TMPDIR creation (`0700`) | Create per-run temp dir via `tempfile::tempdir()`; immediately chmod to `0o700`; set as `TMPDIR` in subprocess env |
 | E5-13 | TMPDIR cleanup (RAII + signal) | `TempDir` implements `Drop` (automatic cleanup); install signal handler for `SIGINT`/`SIGTERM` to exit cleanly |
 | E5-14 | Stale TMPDIR startup sweep | On every Icebox CLI invocation, scan system temp dir for `icebox-run-*` directories older than 1 hour and remove them |
-| E5-15 | Command provenance warning | `icebox run` warns when command source/provenance is unknown or untrusted (trust-boundary reminder) |
+| E5-15 | Command provenance warning (MVP) | `icebox run` warns when command source/provenance is unknown or untrusted (trust-boundary reminder). Warning-only in MVP; superseded by enforced broker policy controls in E8 |
 
 ## E6 -- Zero-Exposure Hardening (Cross-Cutting)
 
@@ -231,11 +231,30 @@
 
 ## E8 -- Socket Server
 
-> Backlog items TBD -- will be detailed when Phase 2 begins.
+| ID | Use Case | Description |
+|---|---|---|
+| E8-01 | Brokered execution default | Introduce brokered execution path where untrusted clients request approved operations and do not receive long-lived plaintext credentials |
+| E8-02 | Policy-gated operations | Enforce deny-by-default policy with explicit allowlists for operation type, target host/service, and agent capabilities |
+| E8-03 | Runtime egress controls | Apply subprocess/network/filesystem egress controls for broker-managed operation execution; fail closed on policy violation |
+| E8-04 | Short-lived delegated credentials | Exchange long-lived stored credentials for short-lived, scoped, audience-bound tokens where provider supports it; never persist delegated token beyond operation scope |
+| E8-05 | Unsafe raw-secret path quarantine | Move raw secret injection path behind explicit `--unsafe-raw-secret` mode with strong warning, audit event, and disabled-by-default policy |
+| E8-06 | Credential metadata projection | Expose agent-visible credential metadata (`type`, `provider`, `hint`, `capabilities`) without any plaintext `value` field |
+| E8-07 | Broker request/response schema contract | Require operation requests to use `credentialRef`; guarantee responses never include plaintext secret material |
+| E8-08 | Response and error redaction contract | Ensure success/error payloads omit secret bytes, raw auth headers, and equivalent sensitive material |
+| E8-09 | Deterministic policy error mapping | Map broker policy-deny/authz failures to stable user-safe `ICE-3xx` codes for debugging/support without secret disclosure: `ICE-301` policy deny (generic), `ICE-302` missing capability, `ICE-303` destination/action not allowlisted, `ICE-304` identity/attestation failure, `ICE-305` unsafe mode disabled by policy |
+| E8-10 | Security mode profiles and precedence | Support explicit security profiles: `yolo`, `balanced`, `strict` with `balanced` as default global policy profile; allow per-agent overrides with precedence `per-agent` > `global` |
+| E8-11 | Action-based 2FA policy | Enforce per-action 2FA policy matrix by mode (`api-call`, `form-fill`, `view-credential`, `send-credential`) with fail-closed behavior |
+| E8-12 | Tool schema reference enforcement | Require broker-facing tools to use `credentialRef` + `credentialPlacement`; reject raw secret value fields in protected flows |
+| E8-13 | Vault backend abstraction (built-ins first) | Implement backend interface for system keychain + encrypted file fallback now; defer external plugin ecosystem and track separately in `D2` (`#17`) |
+| E8-14 | Security mode migration contract | Migration behavior: existing installs default to `balanced`, no silent cutover to `strict`, explicit opt-down to `yolo`, and deterministic user-visible migration messaging |
 
 ## E9 -- OpenClaw Skill
 
-> Backlog items TBD -- will be detailed when Phase 2 begins.
+| ID | Use Case | Description |
+|---|---|---|
+| E9-01 | Broker-first skill integration | OpenClaw skill uses brokered operation APIs by default and never requests/export long-lived plaintext credentials |
+| E9-02 | Policy and attestation handshake | Skill startup requires policy compatibility check and client identity/attestation handshake before privileged operations |
+| E9-03 | Capability-scoped session contracts | Skill session grants least-privilege capabilities (`read-only inventory`, `run approved operation`) with explicit expiry and revocation |
 
 ## E10 -- Browser Extension
 
@@ -244,4 +263,4 @@
 
 ---
 
-*Last updated: 2026-02-19*
+*Last updated: 2026-02-20*

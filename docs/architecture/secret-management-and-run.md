@@ -68,9 +68,10 @@ and `icebox run`.
 - `identity-and-enclave.md`
 - `errors-and-diagnostics.md`
 - `data-models-and-layout.md`
+- `brokered-credential-execution.md`
 - `mvp-decision-lock.md`
 
 
 ---
 
-*Last updated: 2026-02-16*
+*Last updated: 2026-02-20*

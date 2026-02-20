@@ -21,9 +21,9 @@ Lightweight ADR log for new architecture decisions going forward.
 
 ## Index
 
-- None yet (forward-only log starts with next qualifying decision).
+- [ADR-0001 Brokered Secret Execution Boundary](ADR-0001-brokered-secret-execution.md)
 
 
 ---
 
-*Last updated: 2026-02-16*
+*Last updated: 2026-02-20*

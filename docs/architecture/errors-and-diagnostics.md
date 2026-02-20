@@ -19,6 +19,11 @@
 - `ICE-205`: vault entry-structure/validation failures (entry shape/uniqueness violations).
 - `ICE-203`: rollback (`seq` stale).
 - `ICE-204`: integrity/HMAC mismatch.
+- `ICE-301`: broker policy deny (generic).
+- `ICE-302`: missing capability for requested broker operation.
+- `ICE-303`: destination/action not allowlisted by broker policy.
+- `ICE-304`: broker identity/attestation/authentication failure.
+- `ICE-305`: unsafe raw-secret mode blocked by policy.
 
 ## Related Docs
 
@@ -28,4 +33,4 @@
 
 ---
 
-*Last updated: 2026-02-19*
+*Last updated: 2026-02-20*

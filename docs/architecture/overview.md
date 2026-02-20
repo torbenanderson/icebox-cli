@@ -1,6 +1,6 @@
 # Overview
 
-Icebox is a local-only macOS CLI credential broker. It injects secrets into trusted subprocesses while keeping encrypted secrets at rest.
+Icebox is a local-only macOS CLI credential broker. MVP injects secrets into trusted subprocesses while keeping encrypted secrets at rest; post-MVP brokered execution moves untrusted integrations to a no-plaintext-export model.
 
 ## Core Model
 
@@ -39,9 +39,10 @@ flowchart LR
 - `identity-and-enclave.md`
 - `vault-and-integrity.md`
 - `secret-management-and-run.md`
+- `brokered-credential-execution.md`
 - `security-model.md`
 
 
 ---
 
-*Last updated: 2026-02-18*
+*Last updated: 2026-02-20*

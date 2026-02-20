@@ -24,6 +24,7 @@ Required content:
 2. Summary
 3. Status
 4. Backlog mapping (`E*-*` or `n/a`)
+5. Contributor attribution (`Proposed By` and profile link when available)
 
 Default labels:
 
@@ -46,6 +47,7 @@ When adopted:
 1. Add backlog mapping in the proposal issue.
 2. Link the proposal issue from backlog/spec/packet work as needed.
 3. Add milestone/PR/commit links back to the proposal issue for traceability.
+4. Include source discussion link and contributor attribution in ADR/decision docs when that proposal drives architecture or policy changes.
 
 ## Aging And Closure
 

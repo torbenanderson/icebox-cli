@@ -279,7 +279,7 @@ These tests are public-release blockers and must pass on macOS CI before shippin
 | T-E5-13 | E5-13 | After normal `icebox run` completion, the per-run TMPDIR directory no longer exists |
 | T-E5-14 | E5-14 | Create a stale `icebox-run-*` directory >1 hour old; verify Icebox removes it on startup |
 | T-E5-14b | E5-14 | Stale TMPDIR sweep runs on non-`run` commands too (every CLI invocation) |
-| T-E5-15 | E5-15 | `icebox run` emits trust-boundary warning when command provenance is unknown/untrusted |
+| T-E5-15 | E5-15 | MVP path: `icebox run` emits trust-boundary warning when command provenance is unknown/untrusted (warning-only; no enforcement) |
 
 ### E7 -- DID Support (Phase 1.5)
 
@@ -302,6 +302,33 @@ These tests are public-release blockers and must pass on macOS CI before shippin
 | T-E7.5-06 | E7.5-06 | `icebox export claw` creates versioned deterministic `.icebox-agent` archive containing `vault.enc`, `identity.pub`, `manifest.json`, `bundle.manifest.json`; does NOT contain `key.enc`, `hmac.enc`, or plaintext keys |
 | T-E7.5-07 | E7.5-07 | `icebox import` verifies `bundle.manifest.json` checksums before processing; with valid seed it restores agent from archive and secrets decrypt on new device |
 | T-E7.5-08 | E7.5-08 | Import rejects checksum mismatch, unsupported required fields/algorithms, duplicate `agentId`/`entryId`, and conflicting records unless explicit recovery mode is set |
+
+### E8 -- Socket Server (Phase 2)
+
+| Test ID | Backlog | Test Description |
+|---|---|---|
+| T-E8-01 | E8-01 | Brokered execution performs approved remote/API operation without disclosing long-lived plaintext credential to client process |
+| T-E8-02 | E8-02 | Deny-by-default policy rejects operations not explicitly allowlisted by action + destination + capability |
+| T-E8-03 | E8-03 | Broker egress controls block non-approved network/filesystem targets and emit deterministic policy error |
+| T-E8-04 | E8-04 | Delegated token flow issues short-lived scoped token, enforces TTL/audience/scope, and clears token material after operation |
+| T-E8-05 | E8-05 | Raw secret injection requires explicit `--unsafe-raw-secret`; default mode rejects attempt and logs policy audit event |
+| T-E8-06 | E8-06 | Credential metadata API returns `type/provider/hint/capabilities` and never returns plaintext `value` |
+| T-E8-07 | E8-07 | Broker operation requests require `credentialRef`; broker responses never include plaintext secret material |
+| T-E8-08 | E8-08 | Success and error payload redaction removes secret bytes and auth-header material from returned objects/messages |
+| T-E8-09 | E8-09 | Policy-deny/authz failures map to stable `ICE-3xx` codes: generic deny=`ICE-301`, missing capability=`ICE-302`, destination/action deny=`ICE-303`, attestation/auth failure=`ICE-304`, unsafe mode blocked=`ICE-305`; mapping is deterministic across repeated runs |
+| T-E8-10 | E8-10 | Security mode selection applies deterministic behavior with global default (`balanced`) and per-agent override precedence (`per-agent` wins over `global`) |
+| T-E8-11 | E8-11 | Action-based 2FA matrix enforced by mode: `api-call`, `form-fill`, `view-credential`, `send-credential` produce expected auto/2FA/blocked outcomes |
+| T-E8-12 | E8-12 | Tool payload containing raw credential value field is rejected; `credentialRef` + `credentialPlacement` payload is accepted |
+| T-E8-13 | E8-13 | Built-in backend abstraction supports system keychain and encrypted-file fallback while external plugin backends remain disabled/deferred |
+| T-E8-14 | E8-14 | Migration rules enforced: existing installs default to `balanced`, no silent `strict` cutover, explicit opt-down to `yolo`, and deterministic user-visible migration notice |
+
+### E9 -- OpenClaw Skill (Phase 2)
+
+| Test ID | Backlog | Test Description |
+|---|---|---|
+| T-E9-01 | E9-01 | OpenClaw skill uses broker API flow and cannot retrieve/export stored long-lived credential values |
+| T-E9-02 | E9-02 | Skill invocation fails closed when policy compatibility/attestation handshake is missing or invalid |
+| T-E9-03 | E9-03 | Session capability grant enforces least privilege; revoked or expired grants are rejected deterministically |
 
 ---
 
@@ -349,8 +376,12 @@ Dedicated tests that verify hardening guarantees:
 | T-SEC-18 | HMAC key tamper | Corrupt `hmac.enc` (flip a byte); verify vault load fails with an enclave decryption error (not `ICE-204` -- the HMAC key itself can't be unwrapped). |
 | T-SEC-19 | Coordinated vault + HMAC rollback | Roll back both `vault.enc` and `hmac.enc` to a consistent older state. Verify rollback is detected across process restart via persisted monotonic integrity anchor (not process-local cache only). |
 | T-SEC-20 | Reconcile fail-closed | Introduce registry/filesystem drift, then run `add`/`run`/`remove`; verify commands fail until `icebox reconcile` resolves drift |
+| T-SEC-21 | No plaintext export in broker mode | Attempt credential-read APIs from untrusted client path; verify broker never returns long-lived plaintext secret material |
+| T-SEC-22 | Policy bypass resistance | Attempt non-allowlisted host/action combinations and command-shape tampering; verify deny with deterministic policy code |
+| T-SEC-23 | Delegated token containment | Verify delegated tokens are short-lived, capability scoped, and rejected outside audience/TTL/policy constraints |
+| T-SEC-24 | Unsafe mode governance | Verify `--unsafe-raw-secret` is disabled by default and requires explicit policy flag plus user-visible warning to execute |
 
 
 ---
 
-*Last updated: 2026-02-18*
+*Last updated: 2026-02-20*
