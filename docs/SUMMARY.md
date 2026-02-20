@@ -24,7 +24,7 @@
   - [Bootstrap Issues](plan/BOOTSTRAP_ISSUES.md)
   - [Testing](plan/TESTING.md)
 - [Guides](guides/BACKUP.md)
-- [Process](process/DISCUSSION_PROPOSALS.md)
+- [Process](process/README.md)
   - [Discussion Proposals](process/DISCUSSION_PROPOSALS.md)
   - [Merge Message Template](process/MERGE_MESSAGE_TEMPLATE.md)
 - [Reference](reference/VERSIONING.md)
