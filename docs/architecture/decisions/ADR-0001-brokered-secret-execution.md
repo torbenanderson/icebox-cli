@@ -49,3 +49,7 @@ Tradeoffs:
 - `docs/plan/BACKLOG.md`
 - `docs/plan/TESTING.md`
 
+## Source Discussion And Tracking
+
+- External discussion: `https://github.com/openclaw/openclaw/discussions/9676`
+- Internal proposal issue: `https://github.com/torbenanderson/icebox-cli/issues/16` (`[D1]`)
