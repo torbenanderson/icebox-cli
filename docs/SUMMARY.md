@@ -6,6 +6,7 @@
   - [Identity And Enclave](architecture/identity-and-enclave.md)
   - [Vault And Integrity](architecture/vault-and-integrity.md)
   - [Secret Management And Run](architecture/secret-management-and-run.md)
+  - [Brokered Credential Execution](architecture/brokered-credential-execution.md)
   - [Security Model](architecture/security-model.md)
   - [Errors And Diagnostics](architecture/errors-and-diagnostics.md)
   - [Data Models And Layout](architecture/data-models-and-layout.md)

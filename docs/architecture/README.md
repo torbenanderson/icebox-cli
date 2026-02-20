@@ -14,6 +14,7 @@ This folder contains the canonical architecture reference for Icebox.
 - [Identity & Enclave](identity-and-enclave.md)
 - [Vault & Integrity](vault-and-integrity.md)
 - [Secret Management & Run](secret-management-and-run.md)
+- [Brokered Credential Execution](brokered-credential-execution.md)
 - [Data Models & Layout](data-models-and-layout.md)
 - [Compatibility & Evolution](compatibility-and-evolution.md)
 - [Decision Log](decisions/)
@@ -29,4 +30,4 @@ This folder contains the canonical architecture reference for Icebox.
 
 ---
 
-*Last updated: 2026-02-18*
+*Last updated: 2026-02-20*
