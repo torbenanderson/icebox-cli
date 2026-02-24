@@ -11,6 +11,7 @@ fn e1_02_help_path_returns_usage_and_zero() {
 
     let stdout = String::from_utf8_lossy(&output.stdout);
     assert!(stdout.contains("Usage: icebox-cli"));
+    assert!(stdout.contains("OpenClaw lobster mode"));
 }
 
 #[test]

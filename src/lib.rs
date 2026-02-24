@@ -20,6 +20,17 @@ use std::ffi::OsStr;
     name = "icebox-cli",
     version,
     about = "Secure credential broker for AI agents",
+    before_help = r#"                 ,
+        _.-;;-._/ )
+     .-'.'         '-.
+    /   /  _   _      \
+   |   |  (o) (o)      |
+   |   |   .---.       |
+    \   \ (_____)     /
+     '._  '--.___..-'
+        '-..____..-'
+OpenClaw lobster mode
+"#,
     after_help = "Repository: https://github.com/torbenanderson/icebox-cli"
 )]
 pub struct Cli {
