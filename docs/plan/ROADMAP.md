@@ -68,9 +68,10 @@ gantt
 **Linux planning status (explicit):**
 - Phase 1/1.5 remain macOS-first and enclave-first.
 - Linux full-flow support is a post-`v0.1.1` discovery track (earliest in Phase 2 planning), with no committed GA date yet.
+- Linux path-model follow-up: evaluate XDG support (`$XDG_CONFIG_HOME`, `$XDG_DATA_HOME`) as part of Linux ergonomics planning.
 - Candidate Linux backends to evaluate: TPM-backed wrapping, OS keyring-backed wrapping, software-only dev/CI fallback with reduced guarantees, and external hardware token paths (for example YubiKey via PIV/PKCS#11).
 
 
 ---
 
-*Last updated: 2026-02-20*
+*Last updated: 2026-02-24*
