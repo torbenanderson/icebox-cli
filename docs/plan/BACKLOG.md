@@ -19,6 +19,7 @@
 - E2-02 Enclave wrapping key
 - E2-03 Wrap Ed25519 key
 - E2-04 No plaintext key on disk
+- E2-09 Duplicate guard
 - E2-11 Active agent tracking (minimum usable config)
 - E2-18 Agent name validation
 - E3-01 Vault creation
@@ -263,4 +264,4 @@
 
 ---
 
-*Last updated: 2026-02-20*
+*Last updated: 2026-02-24*
