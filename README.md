@@ -48,6 +48,7 @@ Requires **macOS** (Apple Silicon or Intel T2) for full security flow in MVP. `~
 | Feature | Description | Status |
 |---|---|---|
 | **Agent Identity** | `icebox register-agent claw` -- creates Ed25519 keypair (Secure Enclave-wrapped) + isolated vault per agent | Planned |
+| **Identity Lanes** | `local-enclave` (MVP-first) and `paired-remote-signer` (post-MVP) share identity contract with backend-specific implementation | Planned |
 | **Recovery Model (MVP)** | If a device is lost, regenerate provider API keys/tokens and re-add them to a new agent. Seed-based recovery is deferred. | MVP |
 | **Seed Backup (Optional)** | `icebox register-agent claw --seed` -- 24-word recovery phrase for portability/cross-device recovery ([guide](docs/guides/BACKUP.md)) | Phase 1.5 |
 | **Secure Vault** | Per-agent encrypted vault (`~/.icebox/identities/<name>/vault.enc`) using `crypto_box_seal` (libsodium-compatible) | Planned |
@@ -69,6 +70,8 @@ The CLI runs and supports `--help`, `--version`, and `--debug`.
 `register-agent` is available for initial identity bootstrap (creates identity directory + `identity.pub`).
 
 Credential storage and execution are not available yet. You cannot `add` or `run`, and secrets are not yet stored or injected.
+
+Current implementation lane: `local-enclave` bootstrap path only.
 
 ## Non-Functional Requirements
 
@@ -183,6 +186,8 @@ icebox run openai "curl ..." --debug
 ## Trust Boundary
 
 `icebox run` should execute trusted commands only. Icebox controls secret handling in its own process and avoids persisting secrets in agent state, but the executed subprocess still receives the injected credential and can exfiltrate it via stdout/stderr, files, or network.
+
+Approval/session note: protected-operation flows are moving toward explicit outcomes (`ok`, `pending_approval`, `denied`, `expired`) as broker/mobile lanes are introduced.
 
 ## License
 

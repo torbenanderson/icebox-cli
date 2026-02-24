@@ -9,7 +9,7 @@
 
 - E2-01 generates an Ed25519 identity keypair, but private-key protection is still incomplete until the wrapping key is hardware-backed and non-exportable.
 - Without a Secure Enclave wrapping key, filesystem compromise or process-level exfiltration paths can more easily recover long-lived key material.
-- This item exists to establish a per-agent hardware trust anchor for wrapping operations before E2-03 writes encrypted key blobs.
+- This item exists to establish a per-agent hardware trust anchor for wrapping operations in `local-enclave` lane before E2-03 writes encrypted key blobs.
 
 ## Scope
 

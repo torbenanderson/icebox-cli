@@ -7,7 +7,9 @@
 
 ## Problem
 
-- Why this exists: implement the backlog contract in a way that is testable, deterministic, and easy to extend.
+- E2-01 establishes the identity branch bootstrap in `local-enclave` lane.
+- Without deterministic keypair/bootstrap behavior, downstream wrapping (`E2-02/E2-03`) and registry tracking (`E2-11`) cannot be validated safely.
+- This item must remain lane-compatible so paired/remote-signer mode can reuse the same identity metadata contract later.
 
 ## Scope
 
@@ -19,9 +21,10 @@
 
 ## Acceptance Criteria
 
-- AC1: E2-01 behavior matches backlog description: As a user, I can run `icebox register-agent claw` to create an Ed25519 keypair and `~/.icebox/identities/claw/` directory
-- AC2: CLI output/errors are deterministic and user-safe.
-- AC3: Changes are validated with mapped tests.
+- AC1: `register-agent` in `local-enclave` lane creates `~/.icebox/identities/<name>/` and writes `identity.pub`.
+- AC2: Ed25519 key generation uses OS-backed CSPRNG (`rand_core::OsRng`).
+- AC3: Runtime errors are deterministic and user-safe in default mode.
+- AC4: Changes are validated with mapped tests.
 
 ## Rust Implementation Plan
 

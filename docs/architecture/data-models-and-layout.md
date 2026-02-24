@@ -29,6 +29,10 @@
   - Reserved: `human`, `robot`, `service`, `algorithm`
 - Reserved nullable forward-compat fields must exist in v1:
   - `keyAlgorithm`, `curve`, `didMethod`, `derivationScheme`, `coinType`, `network`, `keyPurposes`
+- Reserved device/lane compatibility fields for expansion:
+  - `wrappingScheme`
+  - `backendClass`
+  - `identityLane`
 - Unknown fields must be preserved across read/write cycles.
 - Unknown `type` must fail safely as unsupported until explicitly implemented.
 
@@ -44,6 +48,7 @@
 
 - Primary selector is `activeAgentId` (not agent name).
 - `agents` entries include at least: `agentId`, `name`, `did`.
+- Device enrollment metadata may expand `agents` entries (or adjacent arrays) with backend/class references while preserving existing keys.
 - Name-based CLI commands resolve `name` -> `agentId` before vault/identity operations.
 - Backward compatibility:
   - If `agentId` is missing in legacy config or manifest records, generate one UUID/ULID once.
@@ -76,4 +81,4 @@
 
 ---
 
-*Last updated: 2026-02-16*
+*Last updated: 2026-02-24*

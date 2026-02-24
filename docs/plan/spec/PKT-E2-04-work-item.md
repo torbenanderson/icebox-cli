@@ -7,7 +7,8 @@
 
 ## Problem
 
-- Why this exists: implement the backlog contract in a way that is testable, deterministic, and easy to extend.
+- E2-03 adds encrypted persistence, but security posture is incomplete without explicit guarantees that plaintext Ed25519 key bytes are never written to disk.
+- This item enforces disk-write boundaries for `local-enclave` lane and defines verification/failure behavior for unsafe write paths.
 
 ## Scope
 
@@ -19,9 +20,11 @@
 
 ## Acceptance Criteria
 
-- AC1: E2-04 behavior matches backlog description: Ed25519 private key never written to disk in plaintext; only the enclave-wrapped `key.enc` blob exists
-- AC2: CLI output/errors are deterministic and user-safe.
-- AC3: Changes are validated with mapped tests.
+- AC1: Registration/wrapping flow never writes plaintext Ed25519 private-key bytes to disk in `local-enclave` lane.
+- AC2: Only wrapped blob artifacts (`key.enc`) are persisted for identity private-key material.
+- AC3: Unsafe persistence paths fail closed with deterministic runtime errors.
+- AC4: CLI output/errors are deterministic and user-safe.
+- AC5: Changes are validated with mapped tests.
 
 ## Rust Implementation Plan
 
@@ -39,8 +42,10 @@
 
 ## Security/Runtime Notes
 
-- Keep secret-handling boundaries unchanged unless explicitly in scope.
-- Preserve direct-exec/no-shell guarantees where relevant.
+- Security goal in scope: verify and enforce no-plaintext-on-disk contract for identity private key material.
+- Explicit non-goals for E2-04:
+  - does not eliminate runtime in-memory plaintext windows during unwrap/use,
+  - does not replace approval/session controls handled by broker policy lanes.
 - Preserve user-safe default errors (no sensitive internals in normal mode).
 
 ## Test Mapping
@@ -72,3 +77,6 @@
 ## Execution Notes
 
 - Commit split plan will be finalized in the issue `Execution Plan` comment during `execute`.
+
+---
+*Last updated: 2026-02-24*

@@ -90,12 +90,14 @@
 
 ## E2 -- Agent Identity
 
+> E2 supports two execution lanes: `local-enclave` (MVP-first) and `paired-remote-signer` (post-MVP). The logical identity contract stays the same across lanes; backend/device scheme differs.
+
 | ID | Use Case | Description |
 |---|---|---|
-| E2-01 | Generate keypair | As a user, I can run `icebox register-agent claw` to create an Ed25519 keypair and `~/.icebox/identities/claw/` directory |
-| E2-02 | Enclave wrapping key | Create a P-256 key inside the Secure Enclave (non-exportable, per-agent); used to encrypt the Ed25519 private key |
-| E2-03 | Wrap Ed25519 key | Encrypt the Ed25519 private key with the enclave P-256 key (`SecKeyCreateEncryptedData`); store as `key.enc` |
-| E2-04 | No plaintext key on disk | Ed25519 private key never written to disk in plaintext; only the enclave-wrapped `key.enc` blob exists |
+| E2-01 | Generate keypair | As a user, I can run `icebox register-agent claw` to create an Ed25519 keypair and `~/.icebox/identities/claw/` directory (local lane baseline) |
+| E2-02 | Enclave wrapping key | Create a P-256 key inside the Secure Enclave (non-exportable, per-agent); used to encrypt the Ed25519 private key in `local-enclave` lane |
+| E2-03 | Wrap Ed25519 key | Encrypt the Ed25519 private key with the enclave P-256 key (`SecKeyCreateEncryptedData`); store as `key.enc` in `local-enclave` lane |
+| E2-04 | No plaintext key on disk | Ed25519 private key never written to disk in plaintext; only the enclave-wrapped `key.enc` blob exists in `local-enclave` lane |
 | E2-05 | Multicodec + DID compatibility | Public key stored as `identity.pub` in multicodec-prefixed binary format (`[0xed, 0x01] \|\| 32-byte Ed25519 pubkey`, 34 bytes total). `did:key` value and `pubkeyFingerprint` are stored in `manifest.json` as compatibility anchors; DID-facing commands remain Phase 1.5 |
 | E2-06 | Agent manifest | `manifest.json` stores versioned identity metadata: `version`, immutable `agentId` (UUID/ULID), `type` ("agent"), `name`, `did` (compatibility anchor), `parent` (null in v1), `created`, `pubkeyFingerprint`, `enclaveKeyRef`, `derivationVersion` (`null` in MVP), plus reserved nullable forward-compat fields (`keyAlgorithm`, `curve`, `didMethod`, `derivationScheme`, `coinType`, `network`, `keyPurposes`). Unknown fields are preserved across read/write. |
 | E2-07 | Agent listing | `icebox list-agents` reads from `config.json` `agents` registry (`agentId`, `name`, `did`). No filesystem scan. Shows name, DID, and active status. Orphaned directories (not in registry) listed separately with a warning. |
@@ -117,6 +119,9 @@
 | E2-30 | Identity type enum contract | `manifest.json` `type` is enum-based: MVP supports `agent`; reserves `human`, `robot`, `service`, `algorithm`. Unknown type fails safely with unsupported-type error until implemented |
 | E2-31 | Capability-first authorization | Operation eligibility is checked via explicit capability flags (`canHoldSecrets`, `canRunCommands`, `canSign`, `hasEnclaveBinding`) instead of branching on `type` |
 | E2-32 | Internal identity naming | Keep CLI/user UX `agent` terms in MVP, but use neutral `identity` terminology in internal domain/service layers |
+| E2-33 | Identity lane metadata | Persist explicit identity operation lane metadata (`local-enclave`, `paired-remote-signer`) with fail-safe behavior for unknown lanes |
+| E2-34 | Device enrollment bindings | Track per-device backend bindings for an identity without changing identity primary keys (`agentId`) |
+| E2-35 | Approval/session states | Broker/CLI contract returns deterministic approval states (`ok`, `pending_approval`, `denied`, `expired`) for protected operations |
 
 ## E3 -- Encrypted Vault
 

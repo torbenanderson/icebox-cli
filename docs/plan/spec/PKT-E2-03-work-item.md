@@ -7,7 +7,9 @@
 
 ## Problem
 
-- Why this exists: implement the backlog contract in a way that is testable, deterministic, and easy to extend.
+- E2-02 creates the hardware-backed wrapping key, but key-protection is incomplete until identity private-key material is persisted only as wrapped ciphertext.
+- This item defines the `local-enclave` lane persistence boundary (`key.enc`) and the deterministic failure behavior when wrapping cannot be completed.
+- The output artifact must stay compatible with future lane expansion (paired/remote signer) without changing identity primary keys.
 
 ## Scope
 
@@ -19,9 +21,11 @@
 
 ## Acceptance Criteria
 
-- AC1: E2-03 behavior matches backlog description: Encrypt the Ed25519 private key with the enclave P-256 key (`SecKeyCreateEncryptedData`); store as `key.enc`
-- AC2: CLI output/errors are deterministic and user-safe.
-- AC3: Changes are validated with mapped tests.
+- AC1: Ed25519 private key bytes are encrypted via enclave wrapping key and persisted as `key.enc` in `local-enclave` lane.
+- AC2: `key.enc` is non-empty and parseable as encrypted blob format expected by unwrap path.
+- AC3: Wrapping failures return deterministic structured runtime errors and non-zero exit.
+- AC4: CLI output/errors are user-safe in default mode.
+- AC5: Changes are validated with mapped tests.
 
 ## Rust Implementation Plan
 
@@ -39,8 +43,10 @@
 
 ## Security/Runtime Notes
 
-- Keep secret-handling boundaries unchanged unless explicitly in scope.
-- Preserve direct-exec/no-shell guarantees where relevant.
+- Security goal in scope: ensure at-rest private-key persistence is ciphertext-only for `local-enclave`.
+- Explicit non-goals for E2-03:
+  - does not complete global "never plaintext on disk" verification controls (E2-04),
+  - does not define paired/remote-signer transport protocol.
 - Preserve user-safe default errors (no sensitive internals in normal mode).
 
 ## Test Mapping
@@ -72,3 +78,6 @@
 ## Execution Notes
 
 - Commit split plan will be finalized in the issue `Execution Plan` comment during `execute`.
+
+---
+*Last updated: 2026-02-24*

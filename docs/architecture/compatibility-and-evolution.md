@@ -51,6 +51,16 @@ This document defines non-negotiable compatibility guardrails to reduce breaking
   - `deprecated`
 - Deprecated algorithms remain readable for at least one full minor cycle before removal.
 
+## Identity Lane Compatibility Policy
+
+- Support explicit identity operation lanes:
+  - `local-enclave`
+  - `paired-remote-signer`
+- Persist lane/backend metadata without breaking existing manifests/config:
+  - unknown lane/backend values must fail safely with deterministic unsupported-lane errors.
+  - known lane/backend values must preserve existing capability checks.
+- Lane transitions must be explicit operator actions (no silent lane switching).
+
 ## Deterministic Import/Export Validation
 
 - Reject on checksum mismatch.
@@ -77,4 +87,4 @@ Each stage must specify minimum release counts before advancing.
 
 ---
 
-*Last updated: 2026-02-16*
+*Last updated: 2026-02-24*

@@ -203,6 +203,9 @@ These tests are public-release blockers and must pass on macOS CI before shippin
 | T-E2-30b | E2-30 | Unknown `type` fails safely with deterministic unsupported-type error (no fallback to `agent`) |
 | T-E2-31 | E2-31 | Authorization checks use capability flags; disabling `canRunCommands` blocks `run` even when `type` is `agent` |
 | T-E2-32 | E2-32 | Internal identity resolution/services remain type-neutral while CLI continues to accept `agent`-named commands |
+| T-E2-33 | E2-33 | Manifest/config lane metadata supports `local-enclave` and `paired-remote-signer`; unknown lane fails with deterministic unsupported-lane error |
+| T-E2-34 | E2-34 | Device enrollment bindings preserve stable `agentId` identity while adding/removing per-device backend references |
+| T-E2-35 | E2-35 | Protected operation contract returns deterministic state: `ok`, `pending_approval`, `denied`, or `expired` |
 
 ### E3 -- Encrypted Vault
 

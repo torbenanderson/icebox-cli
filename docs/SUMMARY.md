@@ -16,6 +16,7 @@
   - [Rust Implementation](architecture/rust-implementation.md)
   - [MVP Decision Lock](architecture/mvp-decision-lock.md)
   - [Architecture Decisions](architecture/decisions/README.md)
+    - [ADR-0002 Dual-Branch Identity And Device Model](architecture/decisions/ADR-0002-dual-branch-identity-device-model.md)
 - [Planning](plan/README.md)
   - [Roadmap](plan/ROADMAP.md)
   - [Backlog](plan/BACKLOG.md)

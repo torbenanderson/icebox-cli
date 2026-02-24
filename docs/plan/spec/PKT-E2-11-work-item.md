@@ -7,7 +7,9 @@
 
 ## Problem
 
-- Why this exists: implement the backlog contract in a way that is testable, deterministic, and easy to extend.
+- Identity selection must be explicit and stable across commands, lanes, and devices.
+- Without deterministic active-agent tracking, one-shot lane/device operations can silently target the wrong identity.
+- This item defines the stable registry/selector contract while leaving lane-specific backend behavior to dedicated items.
 
 ## Scope
 
@@ -19,9 +21,11 @@
 
 ## Acceptance Criteria
 
-- AC1: E2-11 behavior matches backlog description: `~/.icebox/config.json` `activeAgentId` tracks the active agent. `agents` array is the registry of all known agents (`agentId` + `name` + DID). Registration appends, removal deletes, rotation updates DID. `--agent` is one-shot targeting only and does not mutate `activeAgentId`.
-- AC2: CLI output/errors are deterministic and user-safe.
-- AC3: Changes are validated with mapped tests.
+- AC1: `config.json` tracks `activeAgentId` and `agents` registry keyed by `agentId` for deterministic identity selection.
+- AC2: `--agent` remains one-shot and never mutates `activeAgentId`.
+- AC3: Lane/backend metadata additions must not break existing `activeAgentId` selection semantics.
+- AC4: CLI output/errors are deterministic and user-safe.
+- AC5: Changes are validated with mapped tests.
 
 ## Rust Implementation Plan
 
@@ -39,8 +43,10 @@
 
 ## Security/Runtime Notes
 
-- Keep secret-handling boundaries unchanged unless explicitly in scope.
-- Preserve direct-exec/no-shell guarantees where relevant.
+- Security goal in scope: prevent accidental cross-identity operations due to selector drift.
+- Explicit non-goals for E2-11:
+  - does not implement complete device enrollment protocol,
+  - does not define approval/session lease policy enforcement.
 - Preserve user-safe default errors (no sensitive internals in normal mode).
 
 ## Test Mapping
@@ -73,3 +79,6 @@
 ## Execution Notes
 
 - Commit split plan will be finalized in the issue `Execution Plan` comment during `execute`.
+
+---
+*Last updated: 2026-02-24*

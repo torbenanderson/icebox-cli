@@ -7,6 +7,7 @@ Use this file as the entrypoint for project docs.
 - [Architecture Index](architecture/)
 - [Compatibility & Evolution](architecture/compatibility-and-evolution.md)
 - [Architecture Decision Log](architecture/decisions/)
+- Identity lane model: see [Identity And Enclave](architecture/identity-and-enclave.md) and ADR-0002.
 - [Brokered Credential Execution](architecture/brokered-credential-execution.md)
 - [Rust Implementation Notes](architecture/rust-implementation.md)
 
@@ -60,4 +61,4 @@ cargo doc --workspace --all-features --no-deps
 
 ---
 
-*Last updated: 2026-02-20*
+*Last updated: 2026-02-24*

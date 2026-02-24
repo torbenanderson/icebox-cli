@@ -83,6 +83,16 @@
     "network": {
       "type": ["string", "null"]
     },
+    "identityLane": {
+      "type": ["string", "null"],
+      "enum": ["local-enclave", "paired-remote-signer", null]
+    },
+    "wrappingScheme": {
+      "type": ["string", "null"]
+    },
+    "backendClass": {
+      "type": ["string", "null"]
+    },
     "keyPurposes": {
       "type": ["array", "null"],
       "items": {

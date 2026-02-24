@@ -36,7 +36,7 @@ gantt
 | Code | Epic | Phase | Description |
 |---|---|---|---|
 | **E1** | Project Bootstrap | 1 (MVP) | Cargo init, CI, CLI scaffolding (clap), project structure |
-| **E2** | Agent Identity | 1 (MVP) | Ed25519 keypair generation, multicodec encoding, Secure Enclave wrapping |
+| **E2** | Agent Identity | 1 (MVP) | Ed25519 keypair generation, multicodec encoding, Secure Enclave wrapping (`local-enclave` lane), plus post-MVP paired remote-signer lane |
 | **E3** | Encrypted Vault | 1 (MVP) | `crypto_box_seal` (XSalsa20-Poly1305) vault creation, read/write, in-memory decryption |
 | **E4** | Secret Management | 1 (MVP) | `add`, `list`, and `remove` commands for managing secrets |
 | **E5** | Secure Run | 1 (MVP) | `run` command -- decrypt, inject, execute, wipe |
@@ -60,6 +60,8 @@ gantt
 - Canonical hardening sequence: [Implementation Bootstrap](IMPLEMENTATION_BOOTSTRAP.md#hardening-layer-order-post-slice).
 
 **Policy boundary sequencing:** Trust-policy/allowlisted command templates are deferred to Phase 2 (`icebox serve` policy layer). MVP documents and warns on trust boundary but does not enforce template policy yet.
+
+**Identity lane sequencing:** MVP executes `local-enclave` first. `paired-remote-signer` is added post-MVP behind the same identity/capability contract with explicit lane metadata.
 
 **Phase 1.5 prerequisite:** File SLIP-44 registration **now** so it is approved by Phase 1.5. Seed backup (E7.5) uses a custom derivation path (`m/7737'/0'/0'`) until a registered coin type is available.
 

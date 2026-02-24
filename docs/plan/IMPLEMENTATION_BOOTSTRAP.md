@@ -84,6 +84,10 @@ To avoid early over-engineering, keep one command path runnable at all times.
 
 ## Milestone 2: Config + Agent Identity
 
+> Identity execution lanes:
+> - MVP: `local-enclave`
+> - Post-MVP: `paired-remote-signer` (same logical identity contract, different backend path)
+
 - [ ] Implement `~/.icebox/config.json` read/write with atomic update
 - [ ] Implement non-interactive first-run fail behavior
 - [ ] Implement interactive first-run prompt behavior
@@ -106,6 +110,8 @@ To avoid early over-engineering, keep one command path runnable at all times.
 - [ ] Keep internal domain/service naming neutral (`identity`), while preserving agent-based CLI UX
 - [ ] Implement per-agent Secure Enclave wrapping key and `key.enc`
 - [ ] Implement hard fail on `enclaveAlgorithm` mismatch
+- [ ] Reserve/persist lane/backend metadata for identity operations (`identityLane`, `backendClass`, `wrappingScheme`)
+- [ ] Define deterministic approval/session outcome contract (`ok`, `pending_approval`, `denied`, `expired`) for protected operations
 
 ## Milestone 3: Vault Core
 
@@ -243,4 +249,4 @@ After the runnable slice gate is passing, apply hardening in this order:
 
 ---
 
-*Last updated: 2026-02-19*
+*Last updated: 2026-02-24*

@@ -85,6 +85,20 @@ Constraints:
 5. Broker zeroizes transient sensitive buffers.
 6. Broker returns sanitized operation result.
 
+### Session/Approval Outcomes
+
+Broker responses for protected operations must be explicit:
+
+1. `ok`: operation allowed and completed.
+2. `pending_approval`: operation queued/waiting for user approval (for example mobile prompt).
+3. `denied`: policy/user denied operation.
+4. `expired`: prior approval lease expired; re-approval required.
+
+Notes:
+
+- Pending state is expected behavior when no active lease exists and user is unavailable.
+- Broker must avoid silent retries that hide approval state from callers.
+
 Example request shape:
 
 ```json
@@ -184,4 +198,4 @@ Scope policy:
 
 ---
 
-*Last updated: 2026-02-20*
+*Last updated: 2026-02-24*

@@ -17,6 +17,7 @@ assets, boundaries, and required controls, and links to deeper subsystem specs.
 - Vault secret material (`vault.enc` sealed entries).
 - Vault integrity state (`hmac.enc`, `seq`, integrity metadata).
 - Agent identity metadata (`manifest.json`, `identity.pub`, `config.json`).
+- Device-binding metadata and backend references used for local protection.
 
 ## Trust Boundaries
 
@@ -47,9 +48,11 @@ assets, boundaries, and required controls, and links to deeper subsystem specs.
 
 ### Identity/Key Protection
 
-- Ed25519 private key is enclave-wrapped and stored only as `key.enc`.
+- Identity branch (`K_identity`) is portable by contract; device branch (`K_device`) is local by contract.
+- Local lane (MVP): Ed25519 private key is enclave-wrapped and stored only as `key.enc`.
 - Runtime unwrap occurs only when needed for operation execution.
 - Private key is never intentionally persisted in plaintext form.
+- Paired/remote-signer lane (post-MVP): private identity key operations are delegated; caller receives operation results only.
 
 ### Vault Confidentiality + Integrity
 
@@ -78,6 +81,7 @@ assets, boundaries, and required controls, and links to deeper subsystem specs.
 - Compromised signed binaries remain a hard threat class.
 - Root-level local attackers can bypass many user-space protections.
 - Coordinated rollback/downgrade defenses must be implemented correctly to avoid false assurance.
+- For local unwrap flows, transient plaintext-in-memory windows cannot be reduced to zero in a normal user-space CLI model.
 
 ## Control Mapping (Where Spec Lives)
 
@@ -99,4 +103,4 @@ assets, boundaries, and required controls, and links to deeper subsystem specs.
 
 ---
 
-*Last updated: 2026-02-16*
+*Last updated: 2026-02-24*

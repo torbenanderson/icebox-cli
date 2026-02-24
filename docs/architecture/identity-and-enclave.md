@@ -4,10 +4,28 @@
 
 - One agent identity record per `agentId` (UUID/ULID).
 - `name` is a mutable user label; it is not the internal primary key.
-- Ed25519 keypair per agent.
+- Ed25519 keypair per agent in MVP.
 - Public key stored as multicodec-prefixed bytes in `identity.pub`.
 - DID compatibility fields (`did`, `pubkeyFingerprint`) persisted for forward compatibility.
 - CLI UX remains name-based (`use-agent <name>`), with internal resolution to `agentId`.
+
+## Two-Branch Key Model
+
+- Identity branch (`K_identity`, portable):
+  - Logical roots for `identity/did` and `identity/vault`.
+  - Intended to stay stable across enrolled devices for the same identity.
+- Device branch (`K_device`, per-device):
+  - Local hardware-backed keys used for wrapping/integrity (`wrapping_key`, `hmac_key`).
+  - Never shared across devices.
+- Enrollment model:
+  - Each device enrolls independently and binds its local `K_device` to the same logical identity.
+  - Re-wrap per device is expected behavior.
+
+## Lane Contract
+
+- Local lane (`local-enclave`): identity operations use local OS/backend protection (Secure Enclave first in MVP).
+- Paired lane (`paired-remote-signer`, post-MVP): identity key operations are delegated to a paired device/service that returns operation results, not key bytes.
+- Both lanes must preserve the same manifest compatibility contract and capability checks.
 
 ## Identity Type Contract
 
@@ -51,6 +69,14 @@
 - Ed25519 private key is generated in software memory.
 - Private key is wrapped by Secure Enclave P-256 key and stored as `key.enc`.
 - Unwrap occurs only at operation time; buffers are wiped after use.
+- Residual risk remains for runtime plaintext windows when unwrapped bytes are in process memory.
+
+## Approval Model (Session-Based)
+
+- Approval is lease-based, not permanently unlocked.
+- MVP policy uses device approval as the first gate.
+- Future strict policy can require explicit identity-level second factor for selected operations.
+- Expired/locked sessions must produce deterministic pending/denied outcomes.
 
 ## Registration-Time Integrity Material
 
@@ -73,4 +99,4 @@
 
 ---
 
-*Last updated: 2026-02-16*
+*Last updated: 2026-02-24*
