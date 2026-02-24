@@ -14,18 +14,30 @@ pub mod vault;
 use clap::{Parser, error::ErrorKind};
 use std::ffi::OsStr;
 
+#[derive(Debug, clap::Subcommand)]
+pub enum Commands {
+    /// Registers a new agent identity.
+    RegisterAgent {
+        /// Agent name to register.
+        name: String,
+    },
+}
+
 /// Top-level CLI parser scaffold for Icebox.
 #[derive(Debug, Parser)]
 #[command(
     name = "icebox-cli",
     version,
     about = "Secure credential broker for AI agents",
-    after_help = "Repository: https://github.com/torbenanderson/icebox-cli"
+    after_help = "Environment:\n  ICEBOX_HOME  Override Icebox home path (default: ~/.icebox)\n\nRepository: https://github.com/torbenanderson/icebox-cli"
 )]
 pub struct Cli {
     /// Enables debug diagnostics in CLI error output.
     #[arg(long)]
     pub debug: bool,
+    /// Supported Icebox commands.
+    #[command(subcommand)]
+    pub command: Option<Commands>,
 }
 
 /// Parses CLI arguments into [`Cli`].
@@ -51,7 +63,21 @@ fn run_from_args(args: Vec<std::ffi::OsString>) -> i32 {
     }
 
     match parse_cli_from(args) {
-        Ok(_) => 0,
+        Ok(cli) => match run_command(cli) {
+            Ok(()) => 0,
+            Err(err) => {
+                let detail = err.to_string();
+                eprintln!(
+                    "{}",
+                    error::format_runtime_error(
+                        error::IceErrorCode::IdentitySetup,
+                        debug_enabled,
+                        Some(detail.as_str())
+                    )
+                );
+                1
+            }
+        },
         Err(err) => {
             let exit_code = match err.kind() {
                 ErrorKind::DisplayHelp | ErrorKind::DisplayVersion => 0,
@@ -75,6 +101,13 @@ fn run_from_args(args: Vec<std::ffi::OsString>) -> i32 {
     }
 }
 
+fn run_command(cli: Cli) -> Result<(), agent::RegisterAgentError> {
+    match cli.command {
+        Some(Commands::RegisterAgent { name }) => agent::register_agent(&name),
+        None => Ok(()),
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -91,5 +124,15 @@ mod tests {
         let err = parse_cli_from(["icebox-cli", "--not-a-real-flag"])
             .expect_err("expected parse failure");
         assert_eq!(err.kind(), ErrorKind::UnknownArgument);
+    }
+
+    #[test]
+    fn parse_register_agent_command_succeeds() {
+        let result = parse_cli_from(["icebox-cli", "register-agent", "claw"])
+            .expect("expected command parse success");
+        match result.command {
+            Some(Commands::RegisterAgent { name }) => assert_eq!(name, "claw"),
+            _ => panic!("expected register-agent command"),
+        }
     }
 }
