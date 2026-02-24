@@ -35,6 +35,14 @@ cargo install icebox-cli
 
 Requires **macOS** (Apple Silicon or Intel T2) for full security flow in MVP. `~/.icebox/` must be on a **local filesystem** -- not iCloud Drive, Dropbox, NFS, or any synced/network drive (see [Architecture](docs/architecture/README.md) and [Vault & Integrity](docs/architecture/vault-and-integrity.md)).
 
+### Environment
+
+- `ICEBOX_HOME`: override Icebox storage root (default: `~/.icebox`).
+- Example:
+  ```bash
+  ICEBOX_HOME=/tmp/icebox-dev icebox-cli register-agent claw
+  ```
+
 ## Key Features (MVP)
 
 | Feature | Description | Status |
@@ -54,11 +62,13 @@ Requires **macOS** (Apple Silicon or Intel T2) for full security flow in MVP. `~
 
 ## Current State
 
-**v0.1.0-alpha** -- E1 bootstrap foundation only.
+**v0.1.0-alpha** -- E1 foundation + initial E2 identity bootstrap (`register-agent`).
 
 The CLI runs and supports `--help`, `--version`, and `--debug`.
 
-No credential storage or execution yet. You cannot `register-agent`, `add`, or `run`, and secrets are not yet stored or injected.
+`register-agent` is available for initial identity bootstrap (creates identity directory + `identity.pub`).
+
+Credential storage and execution are not available yet. You cannot `add` or `run`, and secrets are not yet stored or injected.
 
 ## Non-Functional Requirements
 

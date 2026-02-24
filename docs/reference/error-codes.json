@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated": "2026-02-16",
+  "updated": "2026-02-24",
   "codes": [
     {
       "code": "ICE-101",
@@ -36,6 +36,11 @@
       "code": "ICE-301",
       "category": "agent_not_found",
       "message": "Agent not found. Run `icebox list-agents` to see registered agents."
+    },
+    {
+      "code": "ICE-306",
+      "category": "identity_setup",
+      "message": "Identity setup failed."
     },
     {
       "code": "ICE-401",

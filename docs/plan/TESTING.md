@@ -164,7 +164,7 @@ These tests are public-release blockers and must pass on macOS CI before shippin
 
 | Test ID | Backlog | Test Description |
 |---|---|---|
-| T-E2-01 | E2-01 | `register-agent` creates `~/.icebox/identities/<name>/` with `identity.pub`, `key.enc`, `vault.enc`, `manifest.json` |
+| T-E2-01 | E2-01 | `register-agent` creates `~/.icebox/identities/<name>/` and writes `identity.pub` (happy path); when identity setup fails, command exits non-zero with structured runtime error code |
 | T-E2-02 | E2-02 | A P-256 wrapping key is created in the Secure Enclave; verify via Security.framework query |
 | T-E2-03 | E2-03 | `key.enc` exists and is a valid enclave-encrypted blob; no plaintext Ed25519 key on disk |
 | T-E2-04 | E2-04 | Ed25519 private key never written to disk in plaintext; grep agent dir for raw key bytes |
@@ -384,4 +384,4 @@ Dedicated tests that verify hardening guarantees:
 
 ---
 
-*Last updated: 2026-02-20*
+*Last updated: 2026-02-24*
