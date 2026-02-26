@@ -94,7 +94,7 @@ Use these repository examples as audit-trail references:
   - [Issue comment 2](https://github.com/torbenanderson/icebox-cli/issues/23#issuecomment-3948310190)
   - [Issue comment 3](https://github.com/torbenanderson/icebox-cli/issues/23#issuecomment-3948366051)
   - [Issue comment 4](https://github.com/torbenanderson/icebox-cli/issues/23#issuecomment-3948377375)
-- GitHub Projects v2 examples: [Project #8](https://github.com/orgs/torbenanderson/projects/8), [Project #6](https://github.com/orgs/torbenanderson/projects/6)
+- GitHub Projects v2 examples: [Project #8](https://github.com/users/torbenanderson/projects/8), [Project #6](https://github.com/users/torbenanderson/projects/6)
 - Milestone example: [Milestone #2](https://github.com/torbenanderson/icebox-cli/milestone/2)
 
 Current repository note: PR review discussion anchors are supported (for example `#discussion_r...`) and should be linked when present; this repo currently uses issue comment trails most heavily for gate evidence.
