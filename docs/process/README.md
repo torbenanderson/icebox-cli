@@ -2,7 +2,43 @@
 
 This process framework defines how Icebox enforces enterprise-grade delivery control from intake through release. It is built for traceability, quality gates, and hardening evidence at every transition.
 
+Icebox is open source, but open source need not lack rigor. Enterprises require SDLC, compliance, audit trails, and governance. For a cybersecurity application that brokers credentials and protects secrets, traceable, auditable delivery is essential to trust.
+
 The model is intentionally structured to support a delivery evolution from `CI/CD` to `AI/CD` and eventually `AI/AD`, while preserving clear accountability and auditability.
+
+```mermaid
+%%{init: {'themeVariables': {'fontSize': '22px'}, 'flowchart': {'padding': 30, 'nodeSpacing': 40, 'rankSpacing': 50, 'subGraphTitleMargin': 50}}}%%
+flowchart LR
+  subgraph ASIS["AS-IS: CI/CD"]
+    direction TB
+    C1[CI: Human-driven]
+    C2[CD: Build, test, deploy]
+  end
+  subgraph TOBE1["TO-BE Phase 1: AI/CD"]
+    direction TB
+    A1[AI: Agent-assisted]
+    A2[CD: Humans retain gates]
+  end
+  subgraph TOBE2["TO-BE Phase 2: AI/AD"]
+    direction TB
+    D1[AI: Agent-autonomous]
+    D2[AD: Policy guardrails]
+  end
+  ASIS --> TOBE1 --> TOBE2
+  style ASIS min-width: 260px
+  style TOBE1 min-width: 260px
+  style TOBE2 min-width: 260px
+```
+
+<small>*Figure 1: Delivery Evolution (CI/CD → AI/CD → AI/AD)*</small>
+
+<small><small>**AI** = Agentic Integration. **AD** = Autonomous Delivery.</small></small>
+
+**AS-IS:** Automation handles build, test, and deploy; humans implement and approve.
+
+**TO-BE Phase 1:** AI agents assist with implementation, tests, and reviews; humans retain gate and release control.
+
+**TO-BE Phase 2:** Agents execute more of the lifecycle under policy; humans set strategy and handle exceptions.
 
 ## Background
 
@@ -13,6 +49,8 @@ Enterprises have relied on **CI/CD** (Continuous Integration / Continuous Delive
 | **CI/CD** | Continuous Integration / Continuous Delivery | Automated build, test, deploy; human-driven implementation and approval. |
 | **AI/CD** | Agentic Integration / Continuous Delivery | AI agents assist implementation, tests, and reviews; humans retain gate and release control. |
 | **AI/AD** | Agentic Integration / Autonomous Delivery | Agents execute more of the lifecycle under policy; humans set strategy and handle exceptions. |
+
+<small>*AI/CD and AI/AD terminology as used here was introduced by Torben Anderson (Rewired) in February 2026.*</small>
 
 ## Lifecycle Overview
 
@@ -35,6 +73,8 @@ flowchart TB
   S6 --> O1([Production Feedback Loop]):::done
   O1 --> S1
 ```
+
+<small>*Figure 2: Lifecycle Overview (Steps and Gates)*</small>
 
 ## Operating Model
 
@@ -106,6 +146,19 @@ Best practice: every gate transition should link to at least one immutable artif
 - [Discussion Proposals](DISCUSSION_PROPOSALS.md)
 - [Discussion Log](DISCUSSION_LOG.md)
 - [Merge Message Template](MERGE_MESSAGE_TEMPLATE.md)
+
+## Glossary
+
+| Term | Definition |
+|------|-------------|
+| **ADR** | Architecture Decision Record. A document capturing a significant architectural decision and its rationale. |
+| **AI/AD** | Agentic Integration / Autonomous Delivery. Agents execute more of the lifecycle under policy; humans set strategy and handle exceptions. |
+| **AI/CD** | Agentic Integration / Continuous Delivery. AI agents assist implementation, tests, and reviews; humans retain gate and release control. |
+| **CI/CD** | Continuous Integration / Continuous Delivery. Automated build, test, deploy; human-driven implementation and approval. |
+| **Gate** | A checkpoint with explicit exit criteria. Work cannot proceed to the next step until the gate passes. |
+| **Packet** | An execution packet: a load-approved work item with aligned spec, tests, and contract references. |
+| **Spec** | Execution spec. A document defining scope, acceptance criteria, and test mapping for a backlog item. |
+| **Step** | A phase in the lifecycle (e.g. Strategy and Intake, Implementation and Tests). |
 
 ---
 
