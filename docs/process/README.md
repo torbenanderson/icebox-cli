@@ -8,6 +8,8 @@ This framework is a simplified working prototype that could be applied to regula
 
 This is a Rewired methodology. The model is intentionally structured to support a delivery evolution from `CI/CD` to `AI/CD` and eventually `AI/AD`, while preserving clear accountability and auditability.
 
+The diagram below illustrates this evolution from the current state (AS-IS) through two target phases (TO-BE).
+
 ```mermaid
 %%{init: {'themeVariables': {'fontSize': '22px'}, 'flowchart': {'padding': 15, 'nodeSpacing': 20, 'rankSpacing': 30, 'subGraphTitleMargin': 15}}}%%
 flowchart LR
@@ -55,6 +57,10 @@ This progression preserves delivery discipline while increasing agentic executio
 
 ## Lifecycle Overview
 
+The lifecycle is a gate-driven flow from strategy and intake through merge and release. Each step has an explicit gate; work cannot proceed until the gate passes.
+
+Gates act as stage gates and audit points—steering probabilistic AI decisions and output back to quality management best practice defined by the organisation. A different process would be designed for each organisation. Below is the Icebox process.
+
 ```mermaid
 flowchart TB
   classDef step fill:#F6F8FA,stroke:#2F3B52,stroke-width:1px,color:#0F172A;
@@ -80,7 +86,7 @@ flowchart TB
 ## Operating Model
 
 - Gate-driven lifecycle with explicit readiness and exit criteria.
-- Cross-artifact alignment between roadmap, backlog, specs, tests, architecture decisions, and workflows.
+- Cross-artifact alignment between [roadmap](../plan/ROADMAP.md), [backlog](../plan/BACKLOG.md), [specs](../plan/spec/), [tests](../plan/TESTING.md), [architecture decisions](../architecture/decisions/), and [workflows](../../.github/workflows/).
 - Evidence-first closeout so "done" means validated, reviewable, and auditable.
 - Documentation as a contract surface for both humans and automation.
 
