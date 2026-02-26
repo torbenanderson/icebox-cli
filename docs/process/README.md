@@ -127,20 +127,15 @@ In this model, Git (plus the repository host) is the chosen process log of recor
 - PRs/issues/comments capture decisions and rationale (`why` it changed).
 - Workflows and checks capture verification evidence (`how` it was validated).
 
-The same enterprise gating model can be implemented on other platforms, including:
+Icebox uses GitHub (Issues, PRs, Actions) as its system of record. The same enterprise gating model can be implemented on other stacks via integrations that pair project management tools with source control. Organizations can adopt equivalent PM + [SCM](#scm) combos; examples:
 
-- Jira Software (Atlassian)
-- Azure DevOps Boards + Repos + Pipelines
-- GitLab Issues + Merge Requests + Milestones
-- Linear
-- YouTrack
-- Rally (Broadcom Agile Central)
-- ServiceNow Strategic Portfolio Management / Agile modules
-- IBM Engineering Workflow Management (formerly Rational Team Concert)
+**Top enterprise platforms:** Jira Software, Azure DevOps, GitLab, ServiceNow Strategic Portfolio Management, IBM Engineering Workflow Management.
+
+**Example integration combos:** Jira + GitHub; Linear + GitLab.
 
 ## Traceability Examples
 
-Use these repository examples as audit-trail references:
+Icebox implements this process on GitHub; the links below are real artifacts from the repository. Use them as audit-trail references and as a working example of the gate-step model in practice:
 
 - Pull Request examples: [PR #22](https://github.com/torbenanderson/icebox-cli/pull/22), [PR #7](https://github.com/torbenanderson/icebox-cli/pull/7)
 - Issue example with multiple comments: [Issue #23](https://github.com/torbenanderson/icebox-cli/issues/23)
@@ -162,6 +157,8 @@ Best practice: every gate transition should link to at least one immutable artif
 - [Discussion Log](DISCUSSION_LOG.md)
 - [Merge Message Template](MERGE_MESSAGE_TEMPLATE.md)
 
+**Learn more / talk to Torben:** For AI/CD implementation support, agentic pipeline setup, or questions about this process, see [AI/CD for Startups](https://www.rewired.co/ai-cd?utm_source=github&utm_medium=referral&utm_campaign=icebox-cli) at Rewired Consulting.
+
 ## Glossary
 
 | Term | Definition |
@@ -172,6 +169,7 @@ Best practice: every gate transition should link to at least one immutable artif
 | **CI/CD** | Continuous Integration / Continuous Delivery. Automated build, test, deploy; human-driven implementation and approval. |
 | **Gate** | A checkpoint with explicit exit criteria. Work cannot proceed to the next step until the gate passes. |
 | **Packet** | An execution packet: a load-approved work item with aligned spec, tests, and contract references. |
+| **SCM** <a id="scm"></a> | Source Control Management. Version control for code and documentation (e.g. Git, GitHub, GitLab). |
 | **Spec** | Execution spec. A document defining scope, acceptance criteria, and test mapping for a backlog item. |
 | **Step** | A phase in the lifecycle (e.g. Strategy and Intake, Implementation and Tests). |
 
