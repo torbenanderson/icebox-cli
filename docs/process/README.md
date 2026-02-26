@@ -1,13 +1,15 @@
 # Enterprise Process Governance
 
-This process framework defines how Icebox enforces enterprise-grade delivery control from intake through release. It is built for traceability, quality gates, and hardening evidence at every transition.
+This process framework defines how Icebox enforces enterprise-grade delivery controls from intake through release. It is built for traceability, quality gates, and hardening evidence at every transition.
 
-Icebox is open source, but open source need not lack rigor. Enterprises require SDLC, compliance, audit trails, and governance. For a cybersecurity application that brokers credentials and protects secrets, traceable, auditable delivery is essential to trust.
+Icebox is open source, but open source need not lack rigor. Organizations require SDLC, compliance, audit trails, and governance. For a cybersecurity application that brokers credentials and protects secrets, traceable, auditable delivery is essential to trust and quality code.
 
-The model is intentionally structured to support a delivery evolution from `CI/CD` to `AI/CD` and eventually `AI/AD`, while preserving clear accountability and auditability.
+This framework is a simplified working prototype that could be applied to regulated environments, corporations and enterprises that require safeguards, and may form part of a larger body of work for agentic transformation.
+
+This is a Rewired methodology. The model is intentionally structured to support a delivery evolution from `CI/CD` to `AI/CD` and eventually `AI/AD`, while preserving clear accountability and auditability.
 
 ```mermaid
-%%{init: {'themeVariables': {'fontSize': '22px'}, 'flowchart': {'padding': 30, 'nodeSpacing': 40, 'rankSpacing': 50, 'subGraphTitleMargin': 50}}}%%
+%%{init: {'themeVariables': {'fontSize': '22px'}, 'flowchart': {'padding': 15, 'nodeSpacing': 20, 'rankSpacing': 30, 'subGraphTitleMargin': 15}}}%%
 flowchart LR
   subgraph ASIS["AS-IS"]
     direction TB
@@ -35,23 +37,19 @@ flowchart LR
 
 <small>*Figure 1: Delivery Evolution (CI/CD → AI/CD → AI/AD)*</small>
 
-<small><small>**AI** = Agentic Integration. **AD** = Autonomous Delivery.</small></small>
-
-**AS-IS:** Automation handles build, test, and deploy; humans implement and approve.
-
-**TO-BE Phase 1:** AI agents assist with implementation, tests, and reviews; humans retain gate and release control.
-
-**TO-BE Phase 2:** Agents execute more of the lifecycle under policy; humans set strategy and handle exceptions.
+<small>**AI** = Agentic Integration. **AD** = Autonomous Delivery.<br>**AS-IS:** Automation handles build, test, and deploy; humans implement and approve.<br>**TO-BE Phase 1:** AI agents assist with implementation, tests, and reviews; humans retain gate and release control.<br>**TO-BE Phase 2:** Agents execute more of the lifecycle under policy; humans set strategy and handle exceptions.</small>
 
 ## Background
 
-Enterprises have relied on **CI/CD** (Continuous Integration / Continuous Delivery) for years to automate builds, tests, and deployments. That foundation is now the springboard for the next shift: AI-augmented and agentic delivery. Teams that have mastered CI/CD are well positioned to adopt **AI/CD** and **AI/AD**, but the transition requires deliberate learning and a phased approach. A practical two-step strategy is: (1) **AI/CD first**—introduce AI coding agents (e.g. Cursor, Copilot, Codex) into existing CI/CD pipelines so agents assist with implementation, tests, and reviews while humans retain approval and release authority; (2) **AI/AD next**—evolve toward autonomous delivery where agents execute more of the lifecycle (spec preparation, workflow changes, release decisions) under policy guardrails, with humans focused on strategy, gates, and exceptions. This progression preserves delivery discipline while increasing agentic execution and policy-backed release confidence.
+Enterprises have relied on **CI/CD** (Continuous Integration / Continuous Delivery) for years to automate builds, tests, and deployments. That foundation is now the springboard for the next shift: AI-augmented and agentic delivery.
 
-| Acronym | Meaning | Focus |
-|---------|---------|-------|
-| **CI/CD** | Continuous Integration / Continuous Delivery | Automated build, test, deploy; human-driven implementation and approval. |
-| **AI/CD** | Agentic Integration / Continuous Delivery | AI agents assist implementation, tests, and reviews; humans retain gate and release control. |
-| **AI/AD** | Agentic Integration / Autonomous Delivery | Agents execute more of the lifecycle under policy; humans set strategy and handle exceptions. |
+Teams that have mastered CI/CD are well positioned to adopt **AI/CD** and **AI/AD**, but the transition requires deliberate learning and a phased approach.
+
+*Example scenario:* I have gone through this phasing myself as CTO at Rewired Consulting.
+
+We started by weaving AI agents into our existing pipelines. Developers used Cursor and Copilot for implementation; agents ran tests and suggested reviews. We kept approval and release control. Six months in, we trusted the setup. We expanded: agents now draft specs, propose workflow changes, and handle routine release decisions—all within policy guardrails. We shifted from gatekeepers to strategists, stepping in only for exceptions.
+
+This progression preserves delivery discipline while increasing agentic execution and policy-backed release confidence.
 
 <small>*AI/CD and AI/AD terminology as used here was introduced by Torben Anderson (Rewired) in February 2026.*</small>
 
