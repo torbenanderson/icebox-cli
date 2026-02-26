@@ -11,10 +11,11 @@ This is a Rewired methodology. The model is intentionally structured to support 
 The diagram below illustrates this evolution from the current state (AS-IS) through two target phases (TO-BE).
 
 ```mermaid
-flowchart LR
-  classDef step fill:#F6F8FA,stroke:#2F3B52,stroke-width:1px,color:#0F172A;
-  classDef gate fill:#E8F1FF,stroke:#1D4ED8,stroke-width:1.2px,color:#0B1F44;
-  classDef done fill:#EAFBF2,stroke:#15803D,stroke-width:1.2px,color:#052E16;
+%%{init: {'flowchart': {'padding': 8, 'nodeSpacing': 15, 'rankSpacing': 20}}}%%
+flowchart TB
+  classDef step fill:#F6F8FA,stroke:#2F3B52,stroke-width:1px,color:#000000;
+  classDef gate fill:#E8F1FF,stroke:#1D4ED8,stroke-width:1.2px,color:#000000;
+  classDef done fill:#EAFBF2,stroke:#15803D,stroke-width:1.2px,color:#000000;
 
   subgraph ASIS["AS-IS"]
     direction TB
@@ -35,9 +36,9 @@ flowchart LR
     D2[AD: Policy guardrails]:::done
   end
   ASIS --> TOBE1 --> TOBE2
-  style ASIS fill:#F6F8FA,stroke:#2F3B52,stroke-width:1px
-  style TOBE1 fill:#E8F1FF,stroke:#1D4ED8,stroke-width:1.2px
-  style TOBE2 fill:#EAFBF2,stroke:#15803D,stroke-width:1.2px
+  style ASIS fill:#F6F8FA,stroke:#2F3B52,stroke-width:1px,color:#000000
+  style TOBE1 fill:#E8F1FF,stroke:#1D4ED8,stroke-width:1.2px,color:#000000
+  style TOBE2 fill:#EAFBF2,stroke:#15803D,stroke-width:1.2px,color:#000000
 ```
 
 <small>*Figure 1: Delivery Evolution (CI/CD → AI/CD → AI/AD)*</small>
@@ -66,9 +67,9 @@ Gates act as stage gates and audit points—steering probabilistic AI decisions 
 
 ```mermaid
 flowchart TB
-  classDef step fill:#F6F8FA,stroke:#2F3B52,stroke-width:1px,color:#0F172A;
-  classDef gate fill:#E8F1FF,stroke:#1D4ED8,stroke-width:1.2px,color:#0B1F44;
-  classDef done fill:#EAFBF2,stroke:#15803D,stroke-width:1.2px,color:#052E16;
+  classDef step fill:#F6F8FA,stroke:#2F3B52,stroke-width:1px,color:#000000;
+  classDef gate fill:#E8F1FF,stroke:#1D4ED8,stroke-width:1.2px,color:#000000;
+  classDef done fill:#EAFBF2,stroke:#15803D,stroke-width:1.2px,color:#000000;
 
   S1[01 Strategy and Intake]:::step --> G1{G1 Load and Scope Ready}:::gate
   G1 --> S2[02 Packet and Spec Preparation]:::step
