@@ -1,6 +1,6 @@
 # Enterprise Process Governance
 
-This process framework defines how Icebox enforces enterprise-grade delivery controls from intake through release. It is built for traceability, quality gates, and hardening evidence at every transition.
+This process framework defines how Icebox enforces enterprise-grade delivery controls from intake through release. It is built for traceability, quality gates, and hardening evidence at every transition. The intended audience is contributors, engineering leadership, and auditors evaluating delivery rigor.
 
 Icebox is open source, but open source need not lack rigor. Organizations require SDLC, compliance, audit trails, and governance. For a cybersecurity application that brokers credentials and protects secrets, traceable, auditable delivery is essential to trust and quality code.
 
@@ -51,11 +51,11 @@ Enterprises have relied on **CI/CD** (Continuous Integration / Continuous Delive
 
 Teams that have mastered CI/CD are well positioned to adopt **AI/CD** and **AI/AD**, but the transition requires deliberate learning and a phased approach.
 
-*Example scenario:* I have gone through this phasing myself as CTO at Rewired Consulting.
+*Practitioner account (Torben Anderson, CTO at Rewired Consulting):*
 
-We started by weaving AI agents into our existing pipelines. Developers used Cursor and Copilot for implementation; agents ran tests and suggested reviews. We kept approval and release control. Six months in, we trusted the setup. We expanded: agents now draft specs, propose workflow changes, and handle routine release decisions—all within policy guardrails. We shifted from gatekeepers to strategists, stepping in only for exceptions.
+At Rewired, the team started by weaving AI agents into existing pipelines. Developers used Cursor and Copilot for implementation; agents ran tests and suggested reviews. The team kept approval and release control. Six months in, the setup was trusted enough to expand: agents now draft specs, propose workflow changes, and handle routine release decisions—all within policy guardrails. The shift moved the team from gatekeepers to strategists, stepping in only for exceptions.
 
-This progression preserves delivery discipline while increasing agentic execution and policy-backed release confidence.
+This progression preserves delivery discipline while increasing agentic execution and policy-backed release confidence. The organization is intentionally moving from classic CI/CD toward agentic and autonomous delivery models, as illustrated in Figure 1 above.
 
 <small>*AI/CD and AI/AD terminology as used here was introduced by Torben Anderson (Rewired) in February 2026.*</small>
 
@@ -63,7 +63,7 @@ This progression preserves delivery discipline while increasing agentic executio
 
 The lifecycle is a gate-driven flow from strategy and intake through merge and release. Each step has an explicit gate; work cannot proceed until the gate passes.
 
-Gates act as stage gates and audit points—steering probabilistic AI decisions and output back to quality management best practice defined by the organisation. A different process would be designed for each organisation. Below is the Icebox process.
+Gates act as stage gates and audit points—steering probabilistic AI decisions and output back to quality management best practice defined by the organization. A different process would be designed for each organization. Below is the Icebox process.
 
 ```mermaid
 flowchart TB
@@ -115,10 +115,6 @@ The gate-step map is the reference table for the lifecycle diagram above. Each s
 | `S6` | Step | Merge Hygiene and Release | Enforce merge/commit hygiene and release discipline. | Change is merged and releasable. |
 | `O1` | Outcome | Production Feedback Loop | Feed production learnings back into intake. | New cycle begins with updated context. |
 
-## Delivery Evolution
-
-The organization is intentionally moving from classic CI/CD toward agentic and autonomous delivery models. See the [Background](#background) section for definitions and the two-step adoption strategy. This shift preserves delivery discipline while increasing agentic execution, guardrailed autonomy, and policy-backed release confidence.
-
 ## System of Record and Platform Options
 
 In this model, Git (plus the repository host) is the chosen process log of record:
@@ -139,17 +135,16 @@ Icebox implements this process on GitHub; the links below are real artifacts fro
 
 - Pull Request examples: [PR #22](https://github.com/torbenanderson/icebox-cli/pull/22), [PR #7](https://github.com/torbenanderson/icebox-cli/pull/7)
 - Issue example with multiple comments: [Issue #23](https://github.com/torbenanderson/icebox-cli/issues/23)
-- Issue comment evidence:
-  - [Issue comment 1](https://github.com/torbenanderson/icebox-cli/issues/23#issuecomment-3948275377)
-  - [Issue comment 2](https://github.com/torbenanderson/icebox-cli/issues/23#issuecomment-3948310190)
-  - [Issue comment 3](https://github.com/torbenanderson/icebox-cli/issues/23#issuecomment-3948366051)
-  - [Issue comment 4](https://github.com/torbenanderson/icebox-cli/issues/23#issuecomment-3948377375)
+- Issue comment evidence (gate transitions on Issue #23):
+  - [Load approval evidence](https://github.com/torbenanderson/icebox-cli/issues/23#issuecomment-3948275377)
+  - [Spec alignment confirmation](https://github.com/torbenanderson/icebox-cli/issues/23#issuecomment-3948310190)
+  - [Test mapping and validation](https://github.com/torbenanderson/icebox-cli/issues/23#issuecomment-3948366051)
+  - [Closeout and gate sign-off](https://github.com/torbenanderson/icebox-cli/issues/23#issuecomment-3948377375)
 - GitHub Projects v2 examples: [Project #8](https://github.com/users/torbenanderson/projects/8), [Project #6](https://github.com/users/torbenanderson/projects/6)
 - Milestone example: [Milestone #2](https://github.com/torbenanderson/icebox-cli/milestone/2)
+- Packet decision log example: [Issue #9 (E1-04)](https://github.com/torbenanderson/icebox-cli/issues/9) — complete packet lifecycle showing scope, acceptance criteria, execution plan, and closeout evidence. Also available as [PDF](assets/packet-e1-04-decision-log-example.pdf).
 
-Current repository note: PR review discussion anchors are supported (for example `#discussion_r...`) and should be linked when present; this repo currently uses issue comment trails most heavily for gate evidence.
-
-Best practice: every gate transition should link to at least one immutable artifact (commit, PR, issue comment, workflow run, or release tag) so the delivery chain is independently auditable.
+This repository primarily uses issue comment trails for gate evidence. PR review discussion anchors (`#discussion_r...`) should also be linked when present. Every gate transition should link to at least one immutable artifact (commit, PR, issue comment, workflow run, or release tag) so the delivery chain is independently auditable.
 
 ## Process Artifacts
 
@@ -157,7 +152,9 @@ Best practice: every gate transition should link to at least one immutable artif
 - [Discussion Log](DISCUSSION_LOG.md)
 - [Merge Message Template](MERGE_MESSAGE_TEMPLATE.md)
 
-**Learn more / talk to Torben:** For AI/CD implementation support, agentic pipeline setup, or questions about this process, see [AI/CD for Startups](https://www.rewired.co/ai-cd?utm_source=github&utm_medium=referral&utm_campaign=icebox-cli) at Rewired Consulting.
+## Learn More
+
+For AI/CD implementation support, agentic pipeline setup, or questions about this process, see [AI/CD for Startups](https://www.rewired.co/ai-cd?utm_source=github&utm_medium=referral&utm_campaign=icebox-cli) at Rewired Consulting.
 
 ## Glossary
 
@@ -169,6 +166,7 @@ Best practice: every gate transition should link to at least one immutable artif
 | **CI/CD** | Continuous Integration / Continuous Delivery. Automated build, test, deploy; human-driven implementation and approval. |
 | **Gate** | A checkpoint with explicit exit criteria. Work cannot proceed to the next step until the gate passes. |
 | **Packet** | An execution packet: a load-approved work item with aligned spec, tests, and contract references. |
+| **PM** | Project Management. Planning, tracking, and delivery coordination tools (e.g. Jira, Linear, Azure Boards). |
 | **SCM** <a id="scm"></a> | Source Control Management. Version control for code and documentation (e.g. Git, GitHub, GitLab). |
 | **Spec** | Execution spec. A document defining scope, acceptance criteria, and test mapping for a backlog item. |
 | **Step** | A phase in the lifecycle (e.g. Strategy and Intake, Implementation and Tests). |
