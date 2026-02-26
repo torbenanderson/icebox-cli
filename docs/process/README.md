@@ -9,18 +9,21 @@ The model is intentionally structured to support a delivery evolution from `CI/C
 ```mermaid
 %%{init: {'themeVariables': {'fontSize': '22px'}, 'flowchart': {'padding': 30, 'nodeSpacing': 40, 'rankSpacing': 50, 'subGraphTitleMargin': 50}}}%%
 flowchart LR
-  subgraph ASIS["AS-IS: CI/CD"]
+  subgraph ASIS["AS-IS"]
     direction TB
+    C0[CI/CD]
     C1[CI: Human-driven]
     C2[CD: Build, test, deploy]
   end
-  subgraph TOBE1["TO-BE Phase 1: AI/CD"]
+  subgraph TOBE1["TO-BE Phase 1"]
     direction TB
+    A0[AI/CD]
     A1[AI: Agent-assisted]
     A2[CD: Humans retain gates]
   end
-  subgraph TOBE2["TO-BE Phase 2: AI/AD"]
+  subgraph TOBE2["TO-BE Phase 2"]
     direction TB
+    D0[AI/AD]
     D1[AI: Agent-autonomous]
     D2[AD: Policy guardrails]
   end
