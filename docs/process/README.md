@@ -11,30 +11,33 @@ This is a Rewired methodology. The model is intentionally structured to support 
 The diagram below illustrates this evolution from the current state (AS-IS) through two target phases (TO-BE).
 
 ```mermaid
-%%{init: {'themeVariables': {'fontSize': '22px'}, 'flowchart': {'padding': 15, 'nodeSpacing': 20, 'rankSpacing': 30, 'subGraphTitleMargin': 15}}}%%
 flowchart LR
+  classDef step fill:#F6F8FA,stroke:#2F3B52,stroke-width:1px,color:#0F172A;
+  classDef gate fill:#E8F1FF,stroke:#1D4ED8,stroke-width:1.2px,color:#0B1F44;
+  classDef done fill:#EAFBF2,stroke:#15803D,stroke-width:1.2px,color:#052E16;
+
   subgraph ASIS["AS-IS"]
     direction TB
-    C0[CI/CD]
-    C1[CI: Human-driven]
-    C2[CD: Build, test, deploy]
+    C0[CI/CD]:::step
+    C1[CI: Human-driven]:::step
+    C2[CD: Build, test, deploy]:::step
   end
   subgraph TOBE1["TO-BE Phase 1"]
     direction TB
-    A0[AI/CD]
-    A1[AI: Agent-assisted]
-    A2[CD: Humans retain gates]
+    A0[AI/CD]:::gate
+    A1[AI: Agent-assisted]:::gate
+    A2[CD: Humans retain gates]:::gate
   end
   subgraph TOBE2["TO-BE Phase 2"]
     direction TB
-    D0[AI/AD]
-    D1[AI: Agent-autonomous]
-    D2[AD: Policy guardrails]
+    D0[AI/AD]:::done
+    D1[AI: Agent-autonomous]:::done
+    D2[AD: Policy guardrails]:::done
   end
   ASIS --> TOBE1 --> TOBE2
-  style ASIS min-width: 260px
-  style TOBE1 min-width: 260px
-  style TOBE2 min-width: 260px
+  style ASIS fill:#F6F8FA,stroke:#2F3B52,stroke-width:1px
+  style TOBE1 fill:#E8F1FF,stroke:#1D4ED8,stroke-width:1.2px
+  style TOBE2 fill:#EAFBF2,stroke:#15803D,stroke-width:1.2px
 ```
 
 <small>*Figure 1: Delivery Evolution (CI/CD → AI/CD → AI/AD)*</small>
@@ -85,12 +88,16 @@ flowchart TB
 
 ## Operating Model
 
+The operating model describes how Icebox delivers work: gate-driven, evidence-first, and traceable. It defines the principles that govern the lifecycle and how artifacts stay aligned across roadmap, backlog, specs, tests, and automation.
+
 - Gate-driven lifecycle with explicit readiness and exit criteria.
 - Cross-artifact alignment between [roadmap](../plan/ROADMAP.md), [backlog](../plan/BACKLOG.md), [specs](../plan/spec/), [tests](../plan/TESTING.md), [architecture decisions](../architecture/decisions/), and [workflows](../../.github/workflows/).
 - Evidence-first closeout so "done" means validated, reviewable, and auditable.
 - Documentation as a contract surface for both humans and automation.
 
 ## Gate and Step Map
+
+The gate-step map is the reference table for the lifecycle diagram above. Each step (S1–S6) and gate (G1–G5) has a diagram ID, purpose, and exit signal. These steps and gates correspond to **actual skills**—executable checklists and workflows in the [skills](../../skills/) folder that guide load, execute, test, and closeout flows. Use this table to interpret the flowchart and to verify that work has met the criteria before moving to the next stage.
 
 | Diagram ID | Type | Name | Purpose | Exit Signal |
 |---|---|---|---|---|
