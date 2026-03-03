@@ -3,7 +3,7 @@
 //! Command naming can remain "agent" while internal types stay identity-neutral.
 
 use ed25519_dalek::SigningKey;
-use rand_core::OsRng;
+use rand_core::{OsRng, RngCore};
 use std::error::Error;
 use std::fmt::{Display, Formatter};
 use std::fs::{self, OpenOptions};
@@ -104,6 +104,13 @@ fn enclave_err(op: &'static str, source: crate::enclave::EnclaveError) -> Regist
     }
 }
 
+fn config_err(op: &'static str, source: crate::config::ConfigError) -> RegisterAgentError {
+    RegisterAgentError::Io {
+        op,
+        source: std::io::Error::other(source.to_string()),
+    }
+}
+
 fn cleanup_file_if_created(path: &Path, created: bool) -> Result<(), std::io::Error> {
     if !created {
         return Ok(());
@@ -138,6 +145,33 @@ fn resolve_icebox_home() -> Result<PathBuf, RegisterAgentError> {
     Ok(PathBuf::from(home).join(".icebox"))
 }
 
+fn bytes_to_hex(bytes: &[u8]) -> String {
+    const HEX: &[u8; 16] = b"0123456789abcdef";
+    let mut out = String::with_capacity(bytes.len() * 2);
+    for byte in bytes {
+        out.push(HEX[(byte >> 4) as usize] as char);
+        out.push(HEX[(byte & 0x0f) as usize] as char);
+    }
+    out
+}
+
+fn generate_agent_id() -> String {
+    let mut random = [0u8; 16];
+    OsRng.fill_bytes(&mut random);
+    format!(
+        "{}-{}-{}-{}-{}",
+        bytes_to_hex(&random[0..4]),
+        bytes_to_hex(&random[4..6]),
+        bytes_to_hex(&random[6..8]),
+        bytes_to_hex(&random[8..10]),
+        bytes_to_hex(&random[10..16]),
+    )
+}
+
+fn did_from_public_key(public_key: &[u8; 32]) -> String {
+    format!("did:key:ed25519-raw:{}", bytes_to_hex(public_key))
+}
+
 /// Registers an agent by generating a new Ed25519 keypair and writing identity artifacts.
 ///
 /// For E2-01, this writes only `identity.pub` under
@@ -145,9 +179,11 @@ fn resolve_icebox_home() -> Result<PathBuf, RegisterAgentError> {
 pub fn register_agent(raw_name: &str) -> Result<(), RegisterAgentError> {
     let name = IdentityName::parse(raw_name).map_err(RegisterAgentError::InvalidName)?;
     let home = resolve_icebox_home()?;
+    let config_home = home.clone();
+    let _existing_config = crate::config::load_or_default_with_repair(&config_home)
+        .map_err(|err| config_err("failed to load config.json", err))?;
+
     let agent_dir = home.join("identities").join(name.as_str());
-    fs::create_dir_all(&agent_dir)
-        .map_err(|err| io_err("failed to create agent directory", err))?;
 
     let key_ref_path = agent_dir.join("enclave.keyref");
     let key_enc_path = agent_dir.join("key.enc");
@@ -158,6 +194,9 @@ pub fn register_agent(raw_name: &str) -> Result<(), RegisterAgentError> {
     let mut identity_pub_created = false;
 
     let result = (|| -> Result<(), RegisterAgentError> {
+        fs::create_dir_all(&agent_dir)
+            .map_err(|err| io_err("failed to create agent directory", err))?;
+
         let wrapping_key_ref = crate::enclave::create_wrapping_key(name.as_str())
             .map_err(|err| enclave_err("failed to create enclave wrapping key", err))?;
         let mut key_ref_out = OpenOptions::new()
@@ -187,14 +226,23 @@ pub fn register_agent(raw_name: &str) -> Result<(), RegisterAgentError> {
             .map_err(|err| io_err("failed to write key.enc", err))?;
 
         let public_key = signing_key.verifying_key();
+        let public_key_bytes = public_key.to_bytes();
         let mut out = OpenOptions::new()
             .write(true)
             .create_new(true)
             .open(&identity_pub_path)
             .map_err(|err| io_err("failed to create identity.pub", err))?;
         identity_pub_created = true;
-        out.write_all(public_key.as_bytes())
+        out.write_all(&public_key_bytes)
             .map_err(|err| io_err("failed to write identity.pub", err))?;
+
+        let agent_record = crate::config::AgentRecord {
+            agent_id: generate_agent_id(),
+            name: name.as_str().to_owned(),
+            did: did_from_public_key(&public_key_bytes),
+        };
+        crate::config::append_agent_and_set_active(&config_home, agent_record)
+            .map_err(|err| config_err("failed to persist config.json", err))?;
 
         Ok(())
     })();

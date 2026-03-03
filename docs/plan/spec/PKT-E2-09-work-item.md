@@ -7,21 +7,26 @@
 
 ## Problem
 
-- Why this exists: implement the backlog contract in a way that is testable, deterministic, and easy to extend.
+- Name collisions in the registry can make `use-agent <name>` and `--agent <name>` ambiguous.
+- Schema alone does not guarantee unique names; runtime validation must enforce uniqueness.
 
 ## Scope
 
 - In scope:
   - Registering an agent name that already exists in the `agents` registry returns a clear error
+  - Enforce duplicate-name guard at registration boundary and config-load validation boundary.
+  - Duplicate detection is deterministic and case/format aligned with E2-18 canonical name parser.
 - Out of scope:
   - Unrelated backlog items outside E2-09
   - Cross-epic behavior changes not requested by E2-09
 
 ## Acceptance Criteria
 
-- AC1: E2-09 behavior matches backlog description: Registering an agent name that already exists in the `agents` registry returns a clear error
-- AC2: CLI output/errors are deterministic and user-safe.
-- AC3: Changes are validated with mapped tests.
+- AC1: Registering an agent name that already exists in `agents` fails with deterministic clear error (no overwrite).
+- AC2: Config-load validation fails closed when `agents` already contains duplicate names.
+- AC3: Duplicate checks use the same canonical name rules used by E2-18.
+- AC4: CLI output/errors are deterministic and user-safe.
+- AC5: Changes are validated with mapped tests.
 
 ## Rust Implementation Plan
 
@@ -39,8 +44,8 @@
 
 ## Security/Runtime Notes
 
+- Security goal in scope: prevent ambiguous identity selection caused by registry collisions.
 - Keep secret-handling boundaries unchanged unless explicitly in scope.
-- Preserve direct-exec/no-shell guarantees where relevant.
 - Preserve user-safe default errors (no sensitive internals in normal mode).
 
 ## Test Mapping
@@ -72,3 +77,6 @@
 ## Execution Notes
 
 - Commit split plan will be finalized in the issue `Execution Plan` comment during `execute`.
+
+---
+*Last updated: 2026-03-03*
