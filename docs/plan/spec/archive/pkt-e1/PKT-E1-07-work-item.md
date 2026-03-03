@@ -1,9 +1,9 @@
-# E1-13 Execution Spec
+# E1-07 Execution Spec
 
 ## Objective
 
-- Deliver E1-13 (Structured error codes).
-- Backlog contract: Error codes (`ICE-1xx`, `ICE-2xx`, etc.) categorized by root cause (auth, vault, agent, secret, exec, enclave, input). Safe for support tickets without exposing internals. Codes never reused.
+- Deliver E1-07 (Disable core dumps).
+- Backlog contract: Set `RLIMIT_CORE = 0` at process start to prevent secret leakage via crash dumps
 
 ## Problem
 
@@ -12,27 +12,27 @@
 ## Scope
 
 - In scope:
-  - Error codes (`ICE-1xx`, `ICE-2xx`, etc.) categorized by root cause (auth, vault, agent, secret, exec, enclave, input). Safe for support tickets without exposing internals. Codes never reused.
+  - Set `RLIMIT_CORE = 0` at process start to prevent secret leakage via crash dumps
 - Out of scope:
-  - Unrelated backlog items outside E1-13
-  - Cross-epic behavior changes not requested by E1-13
+  - Unrelated backlog items outside E1-07
+  - Cross-epic behavior changes not requested by E1-07
 
 ## Acceptance Criteria
 
-- AC1: E1-13 behavior matches backlog description: Error codes (`ICE-1xx`, `ICE-2xx`, etc.) categorized by root cause (auth, vault, agent, secret, exec, enclave, input). Safe for support tickets without exposing internals. Codes never reused.
+- AC1: E1-07 behavior matches backlog description: Set `RLIMIT_CORE = 0` at process start to prevent secret leakage via crash dumps
 - AC2: CLI output/errors are deterministic and user-safe.
 - AC3: Changes are validated with mapped tests.
 
 ## Rust Implementation Plan
 
 - Crate/module touch points:
-  - `src/lib.rs` (CLI boundary mapping), `src/main.rs` (thin entrypoint), and `src/error.rs` (typed ICE code registry/mapping).
-- MVP source-of-truth policy:
-  - runtime truth lives in code (`src/error.rs`) as typed enum/constants plus deterministic code/message mapping.
-  - do not introduce JSON-driven code generation in MVP.
-- Docs authority policy:
-  - docs remain lightweight reference material and are not authoritative for runtime behavior.
-  - runtime mapping in code is authoritative during MVP; machine-readable docs artifacts are a later-phase concern.
+  - `src/lib.rs` (startup hardening gate) and `src/hardening.rs` (core-dump limit logic).
+- Unix runtime hardening implementation:
+  - use `rustix::process::{getrlimit, setrlimit}` with `Resource::Core`.
+  - set soft core limit (`current`) to `0` and preserve existing hard limit (`maximum`).
+  - on `setrlimit` failure, return deterministic `CoreDumpHardeningError::SetLimit(errno)`.
+- Non-Unix behavior:
+  - no-op return `Ok(())` to keep cross-platform startup behavior deterministic.
 - Keep interfaces explicit:
   - prefer small pure functions for parsing/validation paths.
   - avoid hidden global state.
@@ -52,7 +52,7 @@
 ## Test Mapping
 
 - Linked tests from `docs/plan/TESTING.md`:
-- T-E1-13
+- T-E1-07
 - Add at least:
   - one happy-path test
   - one failure-path test
@@ -64,7 +64,7 @@
 
 ## Docs Impact
 
-- [x] docs/plan/spec/PKT-E1-13-work-item.md
+- [x] docs/plan/spec/PKT-E1-07-work-item.md
 - [ ] docs/plan/TESTING.md (if test mappings are added/changed)
 - [ ] docs/architecture/decisions/ADR-*.md (if ADR required)
 - [ ] docs/README.md (if user-facing behavior changed)
@@ -79,6 +79,11 @@
 
 - Commit split plan will be finalized in the issue `Execution Plan` comment during `execute`.
 
+## As-Built (Delivered)
+
+- `src/hardening.rs`: `disable_core_dumps()` using `rustix::process::{getrlimit, setrlimit}` with `Resource::Core`; called from `src/lib.rs` at startup. Non-Unix no-op.
+- Tests: unit tests in `src/hardening.rs` (e1_07_happy_path_sets_core_soft_limit_to_zero, e1_07_failure_path_surfaces_set_limit_error).
+
 ---
 
-*Last updated: 2026-02-19*
+*Last updated: 2026-03-03*

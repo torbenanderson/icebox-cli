@@ -1,9 +1,9 @@
-# E1-02 Execution Spec
+# E1-01 Execution Spec
 
 ## Objective
 
-- Deliver E1-02 (CLI scaffolding).
-- Backlog contract: Set up `src/main.rs` with `clap`
+- Deliver E1-01 (Cargo init).
+- Backlog contract: `cargo init` (icebox-cli crate)
 
 ## Problem
 
@@ -12,17 +12,16 @@
 ## Scope
 
 - In scope:
-  - Set up `src/main.rs` with `clap`
+  - `cargo init` (icebox-cli crate)
 - Out of scope:
-  - Unrelated backlog items outside E1-02
-  - Cross-epic behavior changes not requested by E1-02
+  - Unrelated backlog items outside E1-01
+  - Cross-epic behavior changes not requested by E1-01
 
 ## Acceptance Criteria
 
-- AC1: `src/main.rs` is scaffolded to use `clap` for top-level CLI parsing.
-- AC2: Running `cargo run -- --help` succeeds and shows CLI help output.
-- AC3: CLI help includes standard project metadata (repository link).
-- AC4: Changes are validated with mapped tests.
+- AC1: Running `cargo init` for `icebox-cli` yields a valid Rust binary crate scaffold with `Cargo.toml` and `src/main.rs`.
+- AC2: Scaffold creation is non-interactive and reproducible for the same inputs.
+- AC3: Changes are validated with mapped tests.
 
 ## Rust Implementation Plan
 
@@ -47,12 +46,11 @@
 ## Test Mapping
 
 - Linked tests from `docs/plan/TESTING.md`:
-- `T-E1-02`: CLI scaffolding compiles with `clap`, `--help` output path is wired, and help metadata includes repository information.
+- `T-E1-01`: Cargo scaffold validation for manifest/bin presence and invalid-manifest failure path.
 - Scaffold-only validation mapping (no runtime feature code in scope):
-  - verify `Cargo.toml` includes `clap` dependency and compiles
-  - verify `src/main.rs` contains clap parser scaffolding
+  - verify `Cargo.toml` exists and package name is `icebox-cli`
+  - verify `src/main.rs` exists
   - run `cargo check`
-  - run `cargo run -- --help`
 - Add at least:
   - one happy-path test
   - one failure-path test
@@ -64,21 +62,22 @@
 
 ## Docs Impact
 
-- [x] docs/plan/spec/PKT-E1-02-work-item.md
+- [x] docs/plan/spec/PKT-E1-01-work-item.md
 - [x] docs/plan/TESTING.md (if test mappings are added/changed)
 - [ ] docs/architecture/decisions/ADR-*.md (if ADR required)
 - [ ] docs/README.md (if user-facing behavior changed)
 
 ## Validation Commands
 
-- `cargo check`
-- `cargo run -- --help`
+- `cargo fmt --check`
+- `cargo clippy -- -D warnings`
+- `cargo test`
 
 ## Execution Notes
 
 - Commit split plan will be finalized in the issue `Execution Plan` comment during `execute`.
 
+## As-Built (Delivered)
 
----
-
-*Last updated: 2026-02-18*
+- `Cargo.toml` with package name `icebox-cli`; `src/main.rs` thin entrypoint.
+- Tests: `tests/integration/e1_01_cargo_init.rs` (scaffold manifest/main, missing-manifest failure).

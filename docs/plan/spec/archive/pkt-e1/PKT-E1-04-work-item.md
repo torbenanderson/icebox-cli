@@ -115,6 +115,10 @@
 
 - Commit split plan will be finalized in the issue `Execution Plan` comment during `execute`.
 
+## As-Built (Delivered)
+
+- Workflows: `ci.yml` (merge-blocking: check, fmt, clippy, test on ubuntu + macos); `security-audit.yml` (weekly cargo audit); `mutation-testing.yml` (weekly cargo mutants on Linux); `ci-enhancements.yml` (coverage trend, non-blocking); `dependabot.yml` configured.
+
 ---
 
-*Last updated: 2026-02-18*
+*Last updated: 2026-03-03*
