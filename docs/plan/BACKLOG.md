@@ -23,8 +23,7 @@
 - E2-09 Duplicate guard
 - E2-18 Agent name validation
 - E3-21 Identity/config refactor baseline
-- E3-01 Vault creation
-- E3-02 Sealed-box encryption
+- E3-01 + E3-02 Vault creation + sealed-box encryption (combined execution unit)
 - E3-05 Empty vault
 - E3-10 Vault version field
 - E3-11 Atomic vault writes
