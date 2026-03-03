@@ -48,17 +48,36 @@ Use on requests like:
    - Optional packet-scope override (recommended when workspace has unrelated changes):
      - `--file-path <path>` (repeatable)
      - `--doc-path <path>` (repeatable)
-3. Run hard validation:
+3. Run docs closeout checklist (required before done transition):
+   - Internal docs updated when impacted:
+     - `docs/plan/**` (backlog/spec/testing/plan index)
+     - `docs/architecture/**` (when architecture/contract/security behavior changes)
+   - External/public docs updated when impacted:
+     - `README.md`
+     - `docs/README.md`
+     - user-facing docs pages under `docs/`
+   - mdBook surface sync checks:
+     - `docs/SUMMARY.md` reflects added/removed/moved pages
+     - `docs/book.toml` remains aligned with docs structure and build metadata
+   - Evidence comment must include:
+     - `Internal docs updated:` paths or `none (not impacted)`
+     - `External docs updated:` paths or `none (not impacted)`
+4. Validate docs build/readiness when docs changed:
+   - `mdbook build docs`
+   - `cargo doc --workspace --all-features --no-deps`
+5. Run hard validation:
    - `skills/icebox-load/scripts/issue_packet.sh validate-closeout --issue <id>`
-4. If validation passes, transition:
+6. If validation passes, transition:
    - `skills/icebox-load/scripts/issue_packet.sh transition --issue <id> --to done`
-5. Preferred one-shot command:
+7. Preferred one-shot command:
    - `skills/icebox-load/scripts/issue_packet.sh done --issue <id> [--file-path <path>]... [--doc-path <path>]...`
-6. If validation fails, return a short blocker list and do not transition.
+8. If validation fails, return a short blocker list and do not transition.
 
 ## Hard Gate
 
 Never transition to `done` when closeout evidence is incomplete.
+Never transition to `done` when internal/external docs impact is not explicitly accounted for.
+Never transition to `done` if docs changed and mdBook/rustdoc validation was not run.
 
 ## Output Requirements
 
@@ -66,5 +85,9 @@ Return:
 
 1. Closeout status: `passed` or `blocked`
 2. Any missing evidence fields (if blocked)
-3. Transition line on success:
+3. Docs checklist status:
+   - internal docs: `updated` or `none (not impacted)`
+   - external docs: `updated` or `none (not impacted)`
+   - mdBook sync: `pass`/`fail`/`n/a`
+4. Transition line on success:
    - `Transition: in-progress -> done`

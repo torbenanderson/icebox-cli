@@ -51,6 +51,9 @@ Commands + key results:
 - PR link:
 - Tests run (commands + result):
 - Docs updated (paths):
+- Internal docs updated:
+- External docs updated:
+- Docs sync checks (mdBook/SUMMARY/book.toml):
 - Files added/changed (paths):
 - ADR link (or `n/a`):
 

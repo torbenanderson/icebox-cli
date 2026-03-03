@@ -15,6 +15,9 @@ required_closeout_fields=(
   "PR link:"
   "Tests run"
   "Docs updated"
+  "Internal docs updated:"
+  "External docs updated:"
+  "Docs sync checks (mdBook/SUMMARY/book.toml):"
   "Files added/changed (paths):"
 )
 
@@ -598,8 +601,11 @@ post_closeout_comment() {
   local pr_link="$2"
   local tests_run="$3"
   local docs_paths="$4"
-  local files_paths="$5"
-  local adr_link="$6"
+  local internal_docs_paths="$5"
+  local external_docs_paths="$6"
+  local docs_sync_status="$7"
+  local files_paths="$8"
+  local adr_link="$9"
 
   local tmp
   tmp="$(mktemp)"
@@ -617,6 +623,11 @@ ${tests_run}
 ### Artifact Deltas
 Docs updated (paths):
 ${docs_paths}
+Internal docs updated:
+${internal_docs_paths}
+External docs updated:
+${external_docs_paths}
+Docs sync checks (mdBook/SUMMARY/book.toml): ${docs_sync_status}
 Files added/changed (paths):
 ${files_paths}
 EOF
@@ -630,8 +641,11 @@ sync_closeout_fields_to_body() {
   local pr_link="$2"
   local tests_summary="$3"
   local docs_summary="$4"
-  local files_summary="$5"
-  local adr_link="$6"
+  local internal_docs_summary="$5"
+  local external_docs_summary="$6"
+  local docs_sync_summary="$7"
+  local files_summary="$8"
+  local adr_link="$9"
 
   local body tmp
   body="$(issue_body "$issue")"
@@ -640,14 +654,20 @@ sync_closeout_fields_to_body() {
     -v pr="PR link: ${pr_link}" \
     -v tests="Tests run (commands + result): ${tests_summary}" \
     -v docs="Docs updated (paths): ${docs_summary}" \
+    -v docs_internal="Internal docs updated: ${internal_docs_summary}" \
+    -v docs_external="External docs updated: ${external_docs_summary}" \
+    -v docs_sync="Docs sync checks (mdBook/SUMMARY/book.toml): ${docs_sync_summary}" \
     -v files="Files added/changed (paths): ${files_summary}" \
     -v adr="ADR link: ${adr_link}" '
     BEGIN {
-      done_pr=0; done_tests=0; done_docs=0; done_files=0; done_adr=0;
+      done_pr=0; done_tests=0; done_docs=0; done_internal=0; done_external=0; done_sync=0; done_files=0; done_adr=0;
     }
     /^PR link:[[:space:]]*/ { print pr; done_pr=1; next }
     /^Tests run \(commands \+ result\):[[:space:]]*/ { print tests; done_tests=1; next }
     /^Docs updated \(paths\):[[:space:]]*/ { print docs; done_docs=1; next }
+    /^Internal docs updated:[[:space:]]*/ { print docs_internal; done_internal=1; next }
+    /^External docs updated:[[:space:]]*/ { print docs_external; done_external=1; next }
+    /^Docs sync checks \(mdBook\/SUMMARY\/book\.toml\):[[:space:]]*/ { print docs_sync; done_sync=1; next }
     /^Files added\/changed \(paths\):[[:space:]]*/ { print files; done_files=1; next }
     /^ADR link:[[:space:]]*/ { print adr; done_adr=1; next }
     { print }
@@ -655,6 +675,9 @@ sync_closeout_fields_to_body() {
       if (!done_pr) print pr
       if (!done_tests) print tests
       if (!done_docs) print docs
+      if (!done_internal) print docs_internal
+      if (!done_external) print docs_external
+      if (!done_sync) print docs_sync
       if (!done_files) print files
       if (!done_adr) print adr
     }' > "$tmp"
@@ -692,7 +715,7 @@ closeout_issue() {
     tests_run="- skipped (manual override: --skip-tests)"
   fi
 
-  local paths docs_paths files_paths
+  local paths docs_paths files_paths internal_docs_paths external_docs_paths docs_sync_status
   paths="$(changed_paths)"
   docs_paths="$(echo "$paths" | grep -E '^docs/' || true)"
   files_paths="$paths"
@@ -706,13 +729,43 @@ closeout_issue() {
 
   [[ -z "$docs_paths" ]] && docs_paths="- none"
   [[ -z "$files_paths" ]] && files_paths="- none"
+
+  if [[ "$docs_paths" == "- none" ]]; then
+    internal_docs_paths="- none (not impacted)"
+    external_docs_paths="- none (not impacted)"
+    docs_sync_status="n/a"
+  else
+    internal_docs_paths="$(echo "$docs_paths" | grep -E '^(docs/plan/|docs/architecture/)' || true)"
+    external_docs_paths="$(echo "$docs_paths" | grep -Ev '^(docs/plan/|docs/architecture/)' || true)"
+    if echo "$paths" | grep -Eq '^README\.md$'; then
+      external_docs_paths="$(printf "%s\n%s\n" "$external_docs_paths" "README.md" | awk 'NF' | sort -u)"
+    fi
+    [[ -z "$internal_docs_paths" ]] && internal_docs_paths="- none (not impacted)"
+    [[ -z "$external_docs_paths" ]] && external_docs_paths="- none (not impacted)"
+    docs_sync_status="pass"
+  fi
+
   docs_paths="$(echo "$docs_paths" | sed 's/^/- /')"
+  internal_docs_paths="$(echo "$internal_docs_paths" | sed 's/^/- /')"
+  external_docs_paths="$(echo "$external_docs_paths" | sed 's/^/- /')"
   files_paths="$(echo "$files_paths" | sed 's/^/- /')"
 
-  post_closeout_comment "$issue" "$pr_link" "$tests_run" "$docs_paths" "$files_paths" "$adr_link"
+  post_closeout_comment \
+    "$issue" \
+    "$pr_link" \
+    "$tests_run" \
+    "$docs_paths" \
+    "$internal_docs_paths" \
+    "$external_docs_paths" \
+    "$docs_sync_status" \
+    "$files_paths" \
+    "$adr_link"
   sync_closeout_fields_to_body \
     "$issue" \
     "$pr_link" \
+    "see latest Closeout Evidence comment" \
+    "see latest Closeout Evidence comment" \
+    "see latest Closeout Evidence comment" \
     "see latest Closeout Evidence comment" \
     "see latest Closeout Evidence comment" \
     "see latest Closeout Evidence comment" \
@@ -1099,6 +1152,9 @@ load_issue() {
     printf "PR link:\n"
     printf "Tests run (commands + result):\n"
     printf "Docs updated (paths):\n"
+    printf "Internal docs updated:\n"
+    printf "External docs updated:\n"
+    printf "Docs sync checks (mdBook/SUMMARY/book.toml):\n"
     printf "Files added/changed (paths):\n"
     printf "ADR link:\n"
   } > "$tmp"
@@ -1217,6 +1273,9 @@ Risk notes:
 PR link:
 Tests run (commands + result):
 Docs updated (paths):
+Internal docs updated:
+External docs updated:
+Docs sync checks (mdBook/SUMMARY/book.toml):
 Files added/changed (paths):
 ADR link:
 EOF

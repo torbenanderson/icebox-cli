@@ -89,6 +89,9 @@
 - PR link:
 - Tests run (commands + result):
 - Docs updated (paths):
+- Internal docs updated:
+- External docs updated:
+- Docs sync checks (mdBook/SUMMARY/book.toml):
 - ADR link (if required):
 
 ## Labels / State
