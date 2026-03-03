@@ -94,7 +94,9 @@ pub enum RegisterAgentError {
 impl Display for RegisterAgentError {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::InvalidName(err) => write!(f, "{err}"),
+            Self::InvalidName(_) => {
+                f.write_str("Invalid agent name. Use [a-z0-9-]{3,32} and do not start with '-'.")
+            }
             Self::MissingHomeDir => f.write_str("could not resolve home directory"),
             Self::DuplicateName { name } => write!(
                 f,

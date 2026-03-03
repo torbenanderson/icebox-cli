@@ -7,6 +7,7 @@ pub(crate) enum IceErrorCode {
     InputValidation,
     IdentitySetup,
     DuplicateAgentName,
+    InvalidAgentName,
 }
 
 impl IceErrorCode {
@@ -15,6 +16,7 @@ impl IceErrorCode {
             Self::InputValidation => "ICE-701",
             Self::IdentitySetup => "ICE-306",
             Self::DuplicateAgentName => "ICE-307",
+            Self::InvalidAgentName => "ICE-308",
         }
     }
 
@@ -23,6 +25,7 @@ impl IceErrorCode {
             Self::InputValidation => "Invalid input. See `--help` for usage.",
             Self::IdentitySetup => "Identity setup failed.",
             Self::DuplicateAgentName => "Agent already exists.",
+            Self::InvalidAgentName => "Invalid agent name.",
         }
     }
 }
@@ -54,7 +57,10 @@ pub(crate) fn format_runtime_error(
     debug_enabled: bool,
     detail: Option<&str>,
 ) -> String {
-    if matches!(code, IceErrorCode::DuplicateAgentName) {
+    if matches!(
+        code,
+        IceErrorCode::DuplicateAgentName | IceErrorCode::InvalidAgentName
+    ) {
         if let Some(detail) = detail {
             return format!("[{}] {detail}", code.code());
         }
@@ -120,6 +126,20 @@ mod tests {
         assert_eq!(
             rendered,
             "[ICE-307] Agent claw already exists. Choose a different name or remove the existing agent."
+        );
+    }
+
+    #[test]
+    fn format_invalid_name_error_shows_friendly_detail_in_default_mode() {
+        let rendered = format_runtime_error(
+            IceErrorCode::InvalidAgentName,
+            false,
+            Some("Invalid agent name. Use [a-z0-9-]{3,32} and do not start with '-'."),
+        );
+
+        assert_eq!(
+            rendered,
+            "[ICE-308] Invalid agent name. Use [a-z0-9-]{3,32} and do not start with '-'."
         );
     }
 }

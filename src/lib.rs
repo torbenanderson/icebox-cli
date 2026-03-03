@@ -69,6 +69,9 @@ fn run_from_args(args: Vec<std::ffi::OsString>) -> i32 {
             Err(err) => {
                 let detail = err.to_string();
                 let code = match &err {
+                    agent::RegisterAgentError::InvalidName(_) => {
+                        error::IceErrorCode::InvalidAgentName
+                    }
                     agent::RegisterAgentError::DuplicateName { .. } => {
                         error::IceErrorCode::DuplicateAgentName
                     }

@@ -61,12 +61,12 @@ fn e2_18_register_agent_rejects_invalid_names_with_safe_error() {
         );
         let stderr = String::from_utf8_lossy(&output.stderr);
         assert!(
-            stderr.contains("ICE-306"),
+            stderr.contains("ICE-308"),
             "runtime error code should be shown for invalid name"
         );
         assert!(
-            !stderr.contains("identity name must match [a-z0-9-]{3,32}"),
-            "default mode should keep detail user-safe"
+            stderr.contains("Invalid agent name. Use [a-z0-9-]{3,32} and do not start with '-'."),
+            "default mode should provide actionable user-safe guidance"
         );
 
         assert!(
