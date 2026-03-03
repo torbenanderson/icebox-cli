@@ -83,8 +83,10 @@ fn e2_09_register_agent_fails_closed_when_config_has_duplicate_names() {
         .expect("register-agent should run against duplicate config");
     assert_eq!(output.status.code(), Some(1));
     let stderr = String::from_utf8_lossy(&output.stderr);
-    assert!(stderr.contains("ICE-306"));
-    assert!(!stderr.contains("duplicate agent name in config registry"));
+    assert!(stderr.contains("ICE-310"));
+    assert!(stderr.contains(
+        "Config has duplicate agent names. Resolve duplicates in ~/.icebox/config.json and retry."
+    ));
     assert!(
         !icebox_home.join("identities").join("core").exists(),
         "new identity should not be created when config registry is invalid"

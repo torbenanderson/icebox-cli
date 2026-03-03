@@ -9,6 +9,7 @@ pub(crate) enum IceErrorCode {
     DuplicateAgentName,
     InvalidAgentName,
     InvalidConfig,
+    DuplicateConfigAgentNames,
 }
 
 impl IceErrorCode {
@@ -19,6 +20,7 @@ impl IceErrorCode {
             Self::DuplicateAgentName => "ICE-307",
             Self::InvalidAgentName => "ICE-308",
             Self::InvalidConfig => "ICE-309",
+            Self::DuplicateConfigAgentNames => "ICE-310",
         }
     }
 
@@ -29,6 +31,7 @@ impl IceErrorCode {
             Self::DuplicateAgentName => "Agent already exists.",
             Self::InvalidAgentName => "Invalid agent name.",
             Self::InvalidConfig => "Config is invalid.",
+            Self::DuplicateConfigAgentNames => "Config has duplicate agent names.",
         }
     }
 }
@@ -65,6 +68,7 @@ pub(crate) fn format_runtime_error(
         IceErrorCode::DuplicateAgentName
             | IceErrorCode::InvalidAgentName
             | IceErrorCode::InvalidConfig
+            | IceErrorCode::DuplicateConfigAgentNames
     ) {
         if let Some(detail) = detail {
             return format!("[{}] {detail}", code.code());
@@ -159,6 +163,22 @@ mod tests {
         assert_eq!(
             rendered,
             "[ICE-309] Config is invalid. Fix ~/.icebox/config.json or reinitialize."
+        );
+    }
+
+    #[test]
+    fn format_duplicate_config_names_error_shows_friendly_detail_in_default_mode() {
+        let rendered = format_runtime_error(
+            IceErrorCode::DuplicateConfigAgentNames,
+            false,
+            Some(
+                "Config has duplicate agent names. Resolve duplicates in ~/.icebox/config.json and retry.",
+            ),
+        );
+
+        assert_eq!(
+            rendered,
+            "[ICE-310] Config has duplicate agent names. Resolve duplicates in ~/.icebox/config.json and retry."
         );
     }
 }

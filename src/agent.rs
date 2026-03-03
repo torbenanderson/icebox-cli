@@ -75,6 +75,8 @@ pub enum RegisterAgentError {
         /// Existing canonical agent name.
         name: String,
     },
+    /// Config contains duplicate agent names.
+    DuplicateRegistryNames,
     /// Config file is invalid and must be repaired.
     InvalidConfig,
     /// Filesystem operation failed.
@@ -104,6 +106,9 @@ impl Display for RegisterAgentError {
                 f,
                 "Agent {name} already exists. Choose a different name or remove the existing agent."
             ),
+            Self::DuplicateRegistryNames => f.write_str(
+                "Config has duplicate agent names. Resolve duplicates in ~/.icebox/config.json and retry.",
+            ),
             Self::InvalidConfig => {
                 f.write_str("Config is invalid. Fix ~/.icebox/config.json or reinitialize.")
             }
@@ -119,6 +124,7 @@ impl Error for RegisterAgentError {
             Self::InvalidName(err) => Some(err),
             Self::MissingHomeDir => None,
             Self::DuplicateName { .. } => None,
+            Self::DuplicateRegistryNames => None,
             Self::InvalidConfig => None,
             Self::Io { source, .. } => Some(source),
             Self::Enclave { .. } => None,
@@ -138,6 +144,13 @@ fn enclave_err(op: &'static str, source: crate::enclave::EnclaveError) -> Regist
 }
 
 fn config_err(op: &'static str, source: crate::config::ConfigError) -> RegisterAgentError {
+    if matches!(
+        source,
+        crate::config::ConfigError::Validation { ref message }
+            if message == "duplicate agent name in config registry"
+    ) {
+        return RegisterAgentError::DuplicateRegistryNames;
+    }
     if matches!(source, crate::config::ConfigError::Parse { .. }) {
         return RegisterAgentError::InvalidConfig;
     }
