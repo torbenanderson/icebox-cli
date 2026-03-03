@@ -1211,9 +1211,9 @@ create_issue() {
   epic="$(epic_code_from_backlog "$backlog")"
   epic_name="$(roadmap_epic_name "$epic" || true)"
   if [[ -n "$epic_name" ]]; then
-    project_name="${epic} - ${epic_name}"
+    project_name="IceBox - ${epic} - ${epic_name}"
   else
-    project_name="${epic}"
+    project_name="IceBox - ${epic}"
   fi
   milestone="$(ensure_milestone "$epic" "$epic_name" || true)"
   project_title="$project_name"

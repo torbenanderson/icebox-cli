@@ -114,6 +114,17 @@ Use epic-level packet branches for implementation and closeout automation:
 1. Format: `pkt/<epic-id>` (example: `pkt/e1` for `E1-03`).
 2. Avoid backlog-item branch names like `pkt/e1-03` as the default.
 
+## Project Naming Standard
+
+When creating or linking GitHub Projects for packet issues, use:
+
+1. `IceBox - <Epic> - <Epic Name>` (for example `IceBox - E2 - Agent Identity`)
+2. If epic name is unavailable, fallback to `IceBox - <Epic>`
+3. After project creation, always link it to the repository (`gh project link ... --repo <owner/repo>`) so it appears in the repo Projects tab.
+4. Verify cards are present with `gh project item-list ...` after adding issues/PRs.
+5. `gh project create` creates user-owned projects; visibility defaults are controlled in GitHub UI. If needed, set visibility manually in project Settings.
+6. Required auth scopes for project automation: `read:project` and `project` (`gh auth refresh -s read:project,project`).
+
 ## Labels And Handoff
 
 Default labels:
