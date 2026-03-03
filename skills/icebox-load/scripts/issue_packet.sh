@@ -815,7 +815,7 @@ usage: issue_packet.sh <command> [args]
 
 commands:
   create --backlog <id> [--title <text>] [--packet-id <id>] [--spec-path <path>]
-  load --issue <id> --backlog <id> [--adr-required yes|no] [--spec-path <path>]
+  load --issue <id> --backlog <id> [--adr-required yes|no] [--spec-path <path>] [--refresh-spec]
   ensure-labels
   transition --issue <id> --to <state> [--dry-run]
   validate-execute --issue <id>
@@ -926,21 +926,6 @@ ${risks}
 EOF
 }
 
-spec_needs_refresh() {
-  local spec_path="$1"
-  [[ ! -f "$spec_path" ]] && return 0
-  if rg -q "^- AC1:$|^- AC2:$|^- AC3:$|Define and deliver .*\\.$" "$spec_path"; then
-    return 0
-  fi
-  if rg -q "AC1: .*implemented per backlog description|docs/SUMMARY\\.md|docs/plan/BACKLOG\\.md" "$spec_path"; then
-    return 0
-  fi
-  if ! rg -q "^## Rust Implementation Plan" "$spec_path"; then
-    return 0
-  fi
-  return 1
-}
-
 upsert_spec() {
   local backlog="$1"
   local spec_path="$2"
@@ -951,8 +936,15 @@ upsert_spec() {
   local docs_block="$7"
   local ac1="$8"
   local ac2="$9"
+  local refresh_spec="${10:-false}"
   mkdir -p "$(dirname "$spec_path")"
-  if spec_needs_refresh "$spec_path"; then
+  if [[ -f "$spec_path" && "$refresh_spec" != "true" ]]; then
+    # Preserve curated packet specs by default; load should update issue metadata,
+    # not rewrite existing spec content unless explicitly requested.
+    return 0
+  fi
+
+  if [[ ! -f "$spec_path" || "$refresh_spec" == "true" ]]; then
     cat > "$spec_path" <<EOF
 # ${backlog} Execution Spec
 
@@ -1030,13 +1022,14 @@ EOF
 }
 
 load_issue() {
-  local issue="" backlog="" adr_required="no" spec_path=""
+  local issue="" backlog="" adr_required="no" spec_path="" refresh_spec="false"
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --issue) issue="$(normalize_issue "$2")"; shift 2 ;;
       --backlog) backlog="$2"; shift 2 ;;
       --adr-required) adr_required="$(echo "$2" | tr '[:upper:]' '[:lower:]')"; shift 2 ;;
       --spec-path) spec_path="$2"; shift 2 ;;
+      --refresh-spec) refresh_spec="true"; shift 1 ;;
       *) err "unknown arg: $1"; usage; return 1 ;;
     esac
   done
@@ -1114,7 +1107,7 @@ load_issue() {
 - [ ] docs/architecture/decisions/ADR-*.md (if ADR required)
 - [ ] docs/README.md (if user-facing behavior changed)"
 
-  upsert_spec "$backlog" "$spec_path" "$use_case" "$desc" "$tests_block_md" "$adr_required" "$docs_block" "$ac1" "$ac2"
+  upsert_spec "$backlog" "$spec_path" "$use_case" "$desc" "$tests_block_md" "$adr_required" "$docs_block" "$ac1" "$ac2" "$refresh_spec"
 
   local tmp
   tmp="$(mktemp)"
