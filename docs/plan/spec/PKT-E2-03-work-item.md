@@ -49,6 +49,13 @@
 - Security goal in scope: ensure at-rest private-key persistence is ciphertext-only for `local-enclave`.
 - Architecture alignment:
   - E2-03 consumes device-local wrapping capability and preserves portability boundaries from ADR-0002 (`K_identity` vs `K_device`).
+- Artifact contract:
+  - `enclave.keyref`: persisted label/reference only (not key bytes).
+  - `identity.pub`: persisted Ed25519 public-key bytes.
+  - `key.enc`: persisted wrapped private-key blob; treated as opaque storage format.
+- Known deferred hardening notes (tracked by backlog):
+  - Partial-artifact risk (for example `key.enc` created before all identity artifacts) is tolerated in E2-03 and tightened in E2-04.
+  - Residual plaintext-memory windows from intermediate buffers are deferred to dedicated memory-hardening work in E3-07 (`secrecy` + `Zeroize`).
 - Explicit non-goals for E2-03:
   - does not complete global "never plaintext on disk" verification controls (E2-04),
   - does not define paired/remote-signer transport protocol.

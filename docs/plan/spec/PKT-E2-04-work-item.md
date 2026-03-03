@@ -48,6 +48,10 @@
 - Security goal in scope: verify and enforce no-plaintext-on-disk contract for identity private key material.
 - Architecture alignment:
   - E2-04 protects `K_identity` private material from disk plaintext exposure while preserving `K_device` non-exportable semantics for wrapping.
+- Artifact contract under this hardening step:
+  - `enclave.keyref`: persisted key label/reference metadata only.
+  - `identity.pub`: persisted Ed25519 public-key bytes only.
+  - `key.enc`: only persisted private-key artifact; plaintext Ed25519 private bytes must not be written to disk.
 - Explicit non-goals for E2-04:
   - does not eliminate runtime in-memory plaintext windows during unwrap/use,
   - does not replace approval/session controls handled by broker policy lanes.

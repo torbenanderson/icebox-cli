@@ -213,6 +213,14 @@ These tests are public-release blockers and must pass on macOS CI before shippin
 | T-E2-34 | E2-34 | Device enrollment bindings preserve stable `agentId` identity while adding/removing per-device backend references |
 | T-E2-35 | E2-35 | Protected operation contract returns deterministic state: `ok`, `pending_approval`, `denied`, or `expired` |
 
+#### E2 Test-Harness Artifact Notes (Non-Production)
+
+- `ICEBOX_TEST_FAKE_ENCLAVE=1` is a test harness mode only.
+- In fake-enclave mode:
+  - `enclave.keyref` is still a label string, but no real hardware key is created.
+  - `key.enc` currently uses an internal test encoding: `fake-enclave-wrap-v1:` prefix plus byte-wise XOR payload.
+- This fake encoding is not a production format guarantee and must not be used as a compatibility contract for real local-enclave artifacts.
+
 ### E3 -- Encrypted Vault
 
 | Test ID | Backlog | Test Description |

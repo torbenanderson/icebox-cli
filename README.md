@@ -81,7 +81,21 @@ scripts/verify_secure_enclave_prereqs.sh target/release/icebox-cli
 
 The CLI runs and supports `--help`, `--version`, and `--debug`.
 
-`register-agent` is available for initial identity bootstrap (creates identity directory + `identity.pub`).
+`register-agent` is available for initial identity bootstrap (creates identity directory + `identity.pub`, `enclave.keyref`, and wrapped `key.enc`).
+
+### Identity Artifacts (`register-agent`)
+
+Under `~/.icebox/identities/<name>/` (or `$ICEBOX_HOME/identities/<name>/`), bootstrap writes:
+
+| File | Format | Purpose | Security |
+|---|---|---|---|
+| `enclave.keyref` | UTF-8 text label | Stable lookup label/reference for per-agent device wrapping key | Not key material |
+| `identity.pub` | 32-byte binary (Ed25519 public key) | Public identity key for verification/derivation flows | Safe to share |
+| `key.enc` | Binary wrapped blob | Wrapped Ed25519 private key bytes for local-enclave lane | Opaque private-key material (not plaintext) |
+
+Notes:
+- `identity.pub` is raw 32-byte Ed25519 in current MVP sequencing; multicodec-prefixed encoding is planned in E2-05.
+- `key.enc` is intentionally treated as opaque storage bytes. Its exact production encoding is backend-defined and not a stable public format contract.
 
 Credential storage and execution are not available yet. You cannot `add` or `run`, and secrets are not yet stored or injected.
 

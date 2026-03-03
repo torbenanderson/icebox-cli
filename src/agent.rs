@@ -8,7 +8,7 @@ use std::error::Error;
 use std::fmt::{Display, Formatter};
 use std::fs::{self, OpenOptions};
 use std::io::Write;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 /// Canonical identity name used by registration flows.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -104,6 +104,31 @@ fn enclave_err(op: &'static str, source: crate::enclave::EnclaveError) -> Regist
     }
 }
 
+fn cleanup_file_if_created(path: &Path, created: bool) -> Result<(), std::io::Error> {
+    if !created {
+        return Ok(());
+    }
+    match fs::remove_file(path) {
+        Ok(()) => Ok(()),
+        Err(err) if err.kind() == std::io::ErrorKind::NotFound => Ok(()),
+        Err(err) => Err(err),
+    }
+}
+
+fn force_key_enc_persist_failure() -> Result<(), RegisterAgentError> {
+    if std::env::var("ICEBOX_TEST_FORCE_KEY_ENC_PERSIST_ERROR")
+        .ok()
+        .as_deref()
+        == Some("1")
+    {
+        return Err(io_err(
+            "failed to create key.enc",
+            std::io::Error::other("forced key.enc persistence failure"),
+        ));
+    }
+    Ok(())
+}
+
 fn resolve_icebox_home() -> Result<PathBuf, RegisterAgentError> {
     if let Ok(override_home) = std::env::var("ICEBOX_HOME") {
         return Ok(PathBuf::from(override_home));
@@ -124,29 +149,65 @@ pub fn register_agent(raw_name: &str) -> Result<(), RegisterAgentError> {
     fs::create_dir_all(&agent_dir)
         .map_err(|err| io_err("failed to create agent directory", err))?;
 
-    let wrapping_key_ref = crate::enclave::create_wrapping_key(name.as_str())
-        .map_err(|err| enclave_err("failed to create enclave wrapping key", err))?;
     let key_ref_path = agent_dir.join("enclave.keyref");
-    let mut key_ref_out = OpenOptions::new()
-        .write(true)
-        .create_new(true)
-        .open(&key_ref_path)
-        .map_err(|err| io_err("failed to create enclave.keyref", err))?;
-    key_ref_out
-        .write_all(wrapping_key_ref.as_bytes())
-        .map_err(|err| io_err("failed to write enclave.keyref", err))?;
-
-    let signing_key = SigningKey::generate(&mut OsRng);
-    let public_key = signing_key.verifying_key();
+    let key_enc_path = agent_dir.join("key.enc");
     let identity_pub_path = agent_dir.join("identity.pub");
 
-    let mut out = OpenOptions::new()
-        .write(true)
-        .create_new(true)
-        .open(&identity_pub_path)
-        .map_err(|err| io_err("failed to create identity.pub", err))?;
-    out.write_all(public_key.as_bytes())
-        .map_err(|err| io_err("failed to write identity.pub", err))?;
+    let mut key_ref_created = false;
+    let mut key_enc_created = false;
+    let mut identity_pub_created = false;
+
+    let result = (|| -> Result<(), RegisterAgentError> {
+        let wrapping_key_ref = crate::enclave::create_wrapping_key(name.as_str())
+            .map_err(|err| enclave_err("failed to create enclave wrapping key", err))?;
+        let mut key_ref_out = OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .open(&key_ref_path)
+            .map_err(|err| io_err("failed to create enclave.keyref", err))?;
+        key_ref_created = true;
+        key_ref_out
+            .write_all(wrapping_key_ref.as_bytes())
+            .map_err(|err| io_err("failed to write enclave.keyref", err))?;
+
+        let signing_key = SigningKey::generate(&mut OsRng);
+        let wrapped_private_key =
+            crate::enclave::wrap_private_key(&wrapping_key_ref, &signing_key.to_bytes())
+                .map_err(|err| enclave_err("failed to wrap private key", err))?;
+
+        force_key_enc_persist_failure()?;
+        let mut key_enc_out = OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .open(&key_enc_path)
+            .map_err(|err| io_err("failed to create key.enc", err))?;
+        key_enc_created = true;
+        key_enc_out
+            .write_all(&wrapped_private_key)
+            .map_err(|err| io_err("failed to write key.enc", err))?;
+
+        let public_key = signing_key.verifying_key();
+        let mut out = OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .open(&identity_pub_path)
+            .map_err(|err| io_err("failed to create identity.pub", err))?;
+        identity_pub_created = true;
+        out.write_all(public_key.as_bytes())
+            .map_err(|err| io_err("failed to write identity.pub", err))?;
+
+        Ok(())
+    })();
+
+    if let Err(err) = result {
+        cleanup_file_if_created(&identity_pub_path, identity_pub_created)
+            .map_err(|cleanup_err| io_err("failed to clean identity.pub", cleanup_err))?;
+        cleanup_file_if_created(&key_enc_path, key_enc_created)
+            .map_err(|cleanup_err| io_err("failed to clean key.enc", cleanup_err))?;
+        cleanup_file_if_created(&key_ref_path, key_ref_created)
+            .map_err(|cleanup_err| io_err("failed to clean enclave.keyref", cleanup_err))?;
+        return Err(err);
+    }
 
     Ok(())
 }

@@ -98,8 +98,8 @@
 |---|---|---|
 | E2-01 | Generate keypair | As a user, I can run `icebox register-agent claw` to create an Ed25519 keypair and `~/.icebox/identities/claw/` directory (local lane baseline) |
 | E2-02 | Enclave wrapping key | Create a P-256 key inside the Secure Enclave (non-exportable, per-agent); used to encrypt the Ed25519 private key in `local-enclave` lane |
-| E2-03 | Wrap Ed25519 key | Encrypt the Ed25519 private key with the enclave P-256 key (`SecKeyCreateEncryptedData`); store as `key.enc` in `local-enclave` lane |
-| E2-04 | No plaintext key on disk | Ed25519 private key never written to disk in plaintext; only the enclave-wrapped `key.enc` blob exists in `local-enclave` lane |
+| E2-03 | Wrap Ed25519 key | Encrypt the Ed25519 private key with the enclave P-256 key (`SecKeyCreateEncryptedData`); store as `key.enc` in `local-enclave` lane. Partial-artifact risk (for example `key.enc` written before all identity artifacts) is accepted in this step and tightened in E2-04 hardening. |
+| E2-04 | No plaintext key on disk | Ed25519 private key never written to disk in plaintext; only the enclave-wrapped `key.enc` blob exists in `local-enclave` lane. Includes hardening/cleanup expectations for unsafe or partial persistence paths from earlier steps. |
 | E2-05 | Multicodec + DID compatibility | Public key stored as `identity.pub` in multicodec-prefixed binary format (`[0xed, 0x01] \|\| 32-byte Ed25519 pubkey`, 34 bytes total). `did:key` value and `pubkeyFingerprint` are stored in `manifest.json` as compatibility anchors; DID-facing commands remain Phase 1.5. Migration contract: accept legacy 32-byte raw `identity.pub` during transition, write 34-byte multicodec format going forward, and keep migration idempotent/deterministic. |
 | E2-06 | Agent manifest | `manifest.json` stores versioned identity metadata: `version`, immutable `agentId` (UUID/ULID), `type` ("agent"), `name`, `did` (compatibility anchor), `parent` (null in v1), `created`, `pubkeyFingerprint`, `enclaveKeyRef`, `derivationVersion` (`null` in MVP), plus reserved nullable forward-compat fields (`keyAlgorithm`, `curve`, `didMethod`, `derivationScheme`, `coinType`, `network`, `keyPurposes`). Unknown fields are preserved across read/write. |
 | E2-07 | Agent listing | `icebox list-agents` reads from `config.json` `agents` registry (`agentId`, `name`, `did`). No filesystem scan. Shows name, DID, and active status. Orphaned directories (not in registry) listed separately with a warning. |
@@ -135,7 +135,7 @@
 | E3-04 | Vault integrity | Tampered sealed blobs are detected and rejected (AEAD authentication) |
 | E3-05 | Empty vault | New vault with no secrets returns a clean state, not an error |
 | E3-06 | Unseal via enclave | Decryption requires the agent's Ed25519 private key, unwrapped from the Secure Enclave at moment of use |
-| E3-07 | `secrecy` + `Zeroize` | All secret buffers wrapped in `secrecy::Secret` with `Zeroize` on drop; `libc::mlock` pins key buffers. No GC in Rust -- all memory deterministically freed. |
+| E3-07 | `secrecy` + `Zeroize` | All secret buffers wrapped in `secrecy::Secret` with `Zeroize` on drop; `libc::mlock` pins key buffers. No GC in Rust -- all memory deterministically freed. This is the planned hardening point for residual plaintext-memory windows left by earlier bootstrap/wrap steps. |
 | E3-08 | `mlock` pinning | Secret buffers are `mlock`'d to prevent paging to swap/disk |
 | E3-09 | No secure temp | No temp files are created during vault decryption |
 | E3-10 | Vault version field | Every `vault.enc` includes `"version": 1` at top level for forward-compatible format upgrades |
