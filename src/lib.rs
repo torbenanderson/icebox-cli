@@ -6,6 +6,7 @@
 pub mod agent;
 pub mod config;
 pub mod did;
+mod enclave;
 mod error;
 mod hardening;
 pub mod runner;

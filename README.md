@@ -35,6 +35,20 @@ cargo install icebox-cli
 
 Requires **macOS** (Apple Silicon or Intel T2) for full security flow in MVP. `~/.icebox/` must be on a **local filesystem** -- not iCloud Drive, Dropbox, NFS, or any synced/network drive (see [Architecture](docs/architecture/README.md) and [Vault & Integrity](docs/architecture/vault-and-integrity.md)).
 
+### Secure Enclave Prerequisites (MVP)
+
+For real Secure Enclave key creation (`register-agent` local-enclave path), ensure:
+
+- Supported hardware (Apple Silicon, or Intel Mac with T2-class Secure Enclave support)
+- Signed binary with required entitlements (for example `keychain-access-groups`) and hardened runtime for release
+- Normal user Terminal context (not root/system daemon context)
+
+Quick local prereq check:
+
+```bash
+scripts/verify_secure_enclave_prereqs.sh target/release/icebox-cli
+```
+
 ### Environment
 
 - `ICEBOX_HOME`: override Icebox storage root (default: `~/.icebox`).

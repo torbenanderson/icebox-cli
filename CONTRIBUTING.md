@@ -42,6 +42,7 @@ Start here:
 
 ## Development and Test Expectations
 
+- Minimum supported Rust toolchain: `1.85` (matches `edition = "2024"` and `rust-version` in `Cargo.toml`).
 - Preferred local platform for full-flow testing: macOS.
 - Linux contributors can work on non-enclave paths (CLI/config/vault/crypto/schemas/docs).
 - Keep CI green:

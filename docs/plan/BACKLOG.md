@@ -19,8 +19,8 @@
 - E2-02 Enclave wrapping key
 - E2-03 Wrap Ed25519 key
 - E2-04 No plaintext key on disk
-- E2-09 Duplicate guard
 - E2-11 Active agent tracking (minimum usable config)
+- E2-09 Duplicate guard
 - E2-18 Agent name validation
 - E3-01 Vault creation
 - E3-02 Sealed-box encryption
@@ -74,7 +74,7 @@
 | E1-14 | Test scaffolding | Set up `tests/` directory, test helpers (temp enclave keys, temp `~/.icebox/`), CI test runner. See [TESTING.md](TESTING.md) |
 | E1-15 | Release pipeline | GitHub Actions: `cargo build --release` / `cargo-dist`, **Developer ID signed + notarized** macOS binary, `cargo install` compatible (unsigned, dev only), GitHub Releases page. Homebrew pre-built bottles follow after first stable release. Include tag-triggered release automation (`v*`) that runs validation, builds release artifacts, publishes checksums, and uploads assets to GitHub Releases. |
 | E1-16 | Install docs | Finalize install instructions in README (`cargo install` + binary download). Document that `cargo install` produces an unsigned binary with limited enclave access (dev only). |
-| E1-17 | Entitlements plist | Create `Entitlements.plist` with `com.apple.security.smartcard`, `com.apple.keychain-access-groups`, hardened runtime. Embedded during `codesign` step in release pipeline. |
+| E1-17 | Entitlements file | Create project entitlements file (for example `icebox-cli.entitlements`) with `com.apple.security.smartcard`, `com.apple.keychain-access-groups`, hardened runtime. Embedded during `codesign` step in release pipeline. |
 | E1-18 | Notarization | Integrate `xcrun notarytool` into release pipeline. Binary submitted to Apple for notarization after signing; stapled ticket attached to the distributed binary. |
 | E1-19 | Error code artifact | Publish machine-readable error-code registry at `docs/reference/error-codes.json` when external consumers need it; add a sync test with runtime code mapping before introducing code generation |
 | E1-20 | File permission baseline | Enforce owner-only filesystem modes for runtime artifacts: `~/.icebox/` + agent dirs `0700`; sensitive files (`config.json`, `manifest.json`, `identity.pub`, `key.enc`, `vault.enc`, `hmac.enc`) `0600`. Validate and fail closed on mismatch for security-critical operations. |
@@ -87,6 +87,8 @@
 | E1-27 | Conformance fixtures | Add golden fixtures for manifest/vault/bundle round-trips as merge gates across implementations |
 | E1-28 | JSON Schema CI gate | Add machine-validated JSON Schemas for manifest/config/vault/bundle-manifest and enforce schema + fixture validation in CI |
 | E1-29 | ADR process (forward-only) | Maintain lightweight architecture decision records under `docs/architecture/decisions/` for new decision-impacting changes (no historical backfill) |
+| E1-30 | Release enclave-signing verification gate | During release candidate validation, verify the distributed binary is signed with hardened runtime + required entitlements and passes real `register-agent` Secure Enclave key-creation flow on supported macOS hardware. Block public release on failure. |
+| E1-31 | Explicit developer software-backend mode (deferred) | Post-`v0.1.1`, add an explicit opt-in insecure/developer mode for unsupported hardware (for example `--developer-mode` / `--insecure-software-backend`) with fail-safe default disabled, prominent warnings, distinct capability/security labeling, and no enclave-grade security claims. |
 
 ## E2 -- Agent Identity
 
@@ -98,7 +100,7 @@
 | E2-02 | Enclave wrapping key | Create a P-256 key inside the Secure Enclave (non-exportable, per-agent); used to encrypt the Ed25519 private key in `local-enclave` lane |
 | E2-03 | Wrap Ed25519 key | Encrypt the Ed25519 private key with the enclave P-256 key (`SecKeyCreateEncryptedData`); store as `key.enc` in `local-enclave` lane |
 | E2-04 | No plaintext key on disk | Ed25519 private key never written to disk in plaintext; only the enclave-wrapped `key.enc` blob exists in `local-enclave` lane |
-| E2-05 | Multicodec + DID compatibility | Public key stored as `identity.pub` in multicodec-prefixed binary format (`[0xed, 0x01] \|\| 32-byte Ed25519 pubkey`, 34 bytes total). `did:key` value and `pubkeyFingerprint` are stored in `manifest.json` as compatibility anchors; DID-facing commands remain Phase 1.5 |
+| E2-05 | Multicodec + DID compatibility | Public key stored as `identity.pub` in multicodec-prefixed binary format (`[0xed, 0x01] \|\| 32-byte Ed25519 pubkey`, 34 bytes total). `did:key` value and `pubkeyFingerprint` are stored in `manifest.json` as compatibility anchors; DID-facing commands remain Phase 1.5. Migration contract: accept legacy 32-byte raw `identity.pub` during transition, write 34-byte multicodec format going forward, and keep migration idempotent/deterministic. |
 | E2-06 | Agent manifest | `manifest.json` stores versioned identity metadata: `version`, immutable `agentId` (UUID/ULID), `type` ("agent"), `name`, `did` (compatibility anchor), `parent` (null in v1), `created`, `pubkeyFingerprint`, `enclaveKeyRef`, `derivationVersion` (`null` in MVP), plus reserved nullable forward-compat fields (`keyAlgorithm`, `curve`, `didMethod`, `derivationScheme`, `coinType`, `network`, `keyPurposes`). Unknown fields are preserved across read/write. |
 | E2-07 | Agent listing | `icebox list-agents` reads from `config.json` `agents` registry (`agentId`, `name`, `did`). No filesystem scan. Shows name, DID, and active status. Orphaned directories (not in registry) listed separately with a warning. |
 | E2-08 | Agent removal | `icebox remove-agent <name>` removes agent directory + enclave wrapping key + removes entry from `config.json` `agents` array. If the removed agent was active, clears `activeAgentId`. |
@@ -269,4 +271,4 @@
 
 ---
 
-*Last updated: 2026-02-24*
+*Last updated: 2026-03-03*

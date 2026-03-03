@@ -3,7 +3,7 @@
 ## Objective
 
 - Deliver E2-02 (Enclave wrapping key).
-- Backlog contract: Create a P-256 key inside the Secure Enclave (non-exportable, per-agent); used to encrypt the Ed25519 private key
+- Backlog contract: Create a P-256 key inside the Secure Enclave (non-exportable, per-agent); used to encrypt the Ed25519 private key.
 
 ## Problem
 
@@ -14,18 +14,22 @@
 ## Scope
 
 - In scope:
-  - Create a P-256 key inside the Secure Enclave (non-exportable, per-agent); used to encrypt the Ed25519 private key
+  - Create a P-256 key inside the Secure Enclave (non-exportable, per-agent); used to encrypt the Ed25519 private key.
+  - Treat this wrapping key as device-branch (`K_device`) material in `local-enclave` lane (not portable identity-branch key material).
+  - Persist only stable key references/metadata needed by follow-on steps (for example `enclaveKeyRef`) and keep lane/backend compatibility fields ready for expansion (`identityLane`, `backendClass`, `wrappingScheme`).
 - Out of scope:
   - Unrelated backlog items outside E2-02
   - Cross-epic behavior changes not requested by E2-02
 
 ## Acceptance Criteria
 
-- AC1: `register-agent` creates a per-agent P-256 wrapping key in Secure Enclave-backed storage.
+- AC1: `register-agent` creates a per-agent P-256 wrapping key in Secure Enclave-backed storage for `local-enclave` lane.
 - AC2: Wrapping key material is non-exportable (no private key bytes are written to disk or returned through runtime/public API).
-- AC3: CLI output/errors are deterministic and user-safe.
-- AC4: Failure to create or access the wrapping key returns a deterministic structured runtime error and non-zero exit.
-- AC5: Changes are validated with mapped tests.
+- AC3: Wrapping key semantics follow dual-branch model: key is `K_device`-scoped and not treated as portable `K_identity` material.
+- AC4: Manifest/identity metadata remains lane-aware and ready for future backend/lane expansion (`enclaveKeyRef` present, reserved lane/backend fields not violated).
+- AC5: CLI output/errors are deterministic and user-safe.
+- AC6: Failure to create or access the wrapping key returns a deterministic structured runtime error and non-zero exit.
+- AC7: Changes are validated with mapped tests.
 
 ## Rust Implementation Plan
 
@@ -44,6 +48,15 @@
 ## Security/Runtime Notes
 
 - Security goal in scope: enforce hardware-backed, non-exportable wrapping-key creation per agent.
+- Architecture alignment:
+  - `K_identity` remains the logical portable identity branch.
+  - E2-02 creates only device-local `K_device` wrapping material for `local-enclave`.
+- Real Secure Enclave prerequisites (runtime verification):
+  - Supported Mac hardware (Apple Silicon or Intel Mac with T2/Touch Bar class enclave support).
+  - Code-signed binary with required entitlements (at minimum `keychain-access-groups`; hardened runtime expected for release).
+  - Run from normal user Terminal session (not root/system daemon context).
+- Diagnostic mapping requirement:
+  - `OSStatus -26276` should map to a clear actionable debug detail indicating hardware/signing/entitlement verification steps.
 - Explicit non-goals for E2-02:
   - does not yet persist the wrapped Ed25519 private key blob (E2-03),
   - does not yet complete no-plaintext-on-disk enforcement across the full flow (E2-04),
@@ -66,7 +79,7 @@
 ## Docs Impact
 
 - [x] docs/plan/spec/PKT-E2-02-work-item.md
-- [ ] docs/plan/TESTING.md (if test mappings are added/changed)
+- [x] docs/plan/TESTING.md (if test mappings are added/changed)
 - [ ] docs/architecture/decisions/ADR-*.md (if ADR required)
 - [ ] docs/README.md (if user-facing behavior changed)
 
@@ -75,10 +88,11 @@
 - `cargo fmt --check`
 - `cargo clippy -- -D warnings`
 - `cargo test`
+- `scripts/verify_secure_enclave_prereqs.sh target/release/icebox-cli` (real-device prereq check)
 
 ## Execution Notes
 
 - Commit split plan will be finalized in the issue `Execution Plan` comment during `execute`.
 
 ---
-*Last updated: 2026-02-24*
+*Last updated: 2026-03-03*

@@ -13,6 +13,9 @@ Icebox uses **Semantic Versioning (SemVer)** in `Cargo.toml`:
 
 - `Cargo.toml` uses plain SemVer (no `v` prefix): `0.1.0`
 - Git tags may use `v` prefix: `v0.1.0`
+- Crate edition is `2024` with explicit minimum supported Rust version in `Cargo.toml`:
+  - `rust-version = "1.85"`
+  - Toolchains older than `1.85` are unsupported.
 
 ## Pre-1.0 Rules (`0.x.y`)
 
@@ -86,4 +89,4 @@ SemVer Decision:
 
 ---
 
-*Last updated: 2026-02-16*
+*Last updated: 2026-03-03*

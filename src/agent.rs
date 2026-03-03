@@ -62,6 +62,13 @@ pub enum RegisterAgentError {
         /// Source I/O error.
         source: std::io::Error,
     },
+    /// Secure enclave operation failed.
+    Enclave {
+        /// User-facing operation label.
+        op: &'static str,
+        /// Source enclave error detail.
+        source: String,
+    },
 }
 
 impl Display for RegisterAgentError {
@@ -70,6 +77,7 @@ impl Display for RegisterAgentError {
             Self::InvalidName(err) => write!(f, "{err}"),
             Self::MissingHomeDir => f.write_str("could not resolve home directory"),
             Self::Io { op, source } => write!(f, "{op}: {source}"),
+            Self::Enclave { op, source } => write!(f, "{op}: {source}"),
         }
     }
 }
@@ -80,12 +88,20 @@ impl Error for RegisterAgentError {
             Self::InvalidName(err) => Some(err),
             Self::MissingHomeDir => None,
             Self::Io { source, .. } => Some(source),
+            Self::Enclave { .. } => None,
         }
     }
 }
 
 fn io_err(op: &'static str, source: std::io::Error) -> RegisterAgentError {
     RegisterAgentError::Io { op, source }
+}
+
+fn enclave_err(op: &'static str, source: crate::enclave::EnclaveError) -> RegisterAgentError {
+    RegisterAgentError::Enclave {
+        op,
+        source: source.to_string(),
+    }
 }
 
 fn resolve_icebox_home() -> Result<PathBuf, RegisterAgentError> {
@@ -107,6 +123,18 @@ pub fn register_agent(raw_name: &str) -> Result<(), RegisterAgentError> {
     let agent_dir = home.join("identities").join(name.as_str());
     fs::create_dir_all(&agent_dir)
         .map_err(|err| io_err("failed to create agent directory", err))?;
+
+    let wrapping_key_ref = crate::enclave::create_wrapping_key(name.as_str())
+        .map_err(|err| enclave_err("failed to create enclave wrapping key", err))?;
+    let key_ref_path = agent_dir.join("enclave.keyref");
+    let mut key_ref_out = OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .open(&key_ref_path)
+        .map_err(|err| io_err("failed to create enclave.keyref", err))?;
+    key_ref_out
+        .write_all(wrapping_key_ref.as_bytes())
+        .map_err(|err| io_err("failed to write enclave.keyref", err))?;
 
     let signing_key = SigningKey::generate(&mut OsRng);
     let public_key = signing_key.verifying_key();

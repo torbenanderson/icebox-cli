@@ -3,7 +3,7 @@
 ## Objective
 
 - Deliver E2-04 (No plaintext key on disk).
-- Backlog contract: Ed25519 private key never written to disk in plaintext; only the enclave-wrapped `key.enc` blob exists
+- Backlog contract: Ed25519 private key never written to disk in plaintext; only the enclave-wrapped `key.enc` blob exists.
 
 ## Problem
 
@@ -13,7 +13,9 @@
 ## Scope
 
 - In scope:
-  - Ed25519 private key never written to disk in plaintext; only the enclave-wrapped `key.enc` blob exists
+  - Ed25519 private key never written to disk in plaintext; only the enclave-wrapped `key.enc` blob exists.
+  - Enforce the disk boundary under dual-branch model: portable identity branch (`K_identity`) is never persisted as plaintext private key material; device-branch (`K_device`) wrapping artifacts remain non-exportable.
+  - Verify local-enclave artifact expectations (`key.enc` on disk, no plaintext private key spill files, deterministic fail-closed behavior on unsafe paths).
 - Out of scope:
   - Unrelated backlog items outside E2-04
   - Cross-epic behavior changes not requested by E2-04
@@ -22,9 +24,10 @@
 
 - AC1: Registration/wrapping flow never writes plaintext Ed25519 private-key bytes to disk in `local-enclave` lane.
 - AC2: Only wrapped blob artifacts (`key.enc`) are persisted for identity private-key material.
-- AC3: Unsafe persistence paths fail closed with deterministic runtime errors.
-- AC4: CLI output/errors are deterministic and user-safe.
-- AC5: Changes are validated with mapped tests.
+- AC3: Dual-branch boundary remains intact: no implementation path treats device wrapping artifacts as portable identity private-key export.
+- AC4: Unsafe persistence paths fail closed with deterministic runtime errors.
+- AC5: CLI output/errors are deterministic and user-safe.
+- AC6: Changes are validated with mapped tests.
 
 ## Rust Implementation Plan
 
@@ -43,6 +46,8 @@
 ## Security/Runtime Notes
 
 - Security goal in scope: verify and enforce no-plaintext-on-disk contract for identity private key material.
+- Architecture alignment:
+  - E2-04 protects `K_identity` private material from disk plaintext exposure while preserving `K_device` non-exportable semantics for wrapping.
 - Explicit non-goals for E2-04:
   - does not eliminate runtime in-memory plaintext windows during unwrap/use,
   - does not replace approval/session controls handled by broker policy lanes.
@@ -64,7 +69,7 @@
 ## Docs Impact
 
 - [x] docs/plan/spec/PKT-E2-04-work-item.md
-- [ ] docs/plan/TESTING.md (if test mappings are added/changed)
+- [x] docs/plan/TESTING.md (if test mappings are added/changed)
 - [ ] docs/architecture/decisions/ADR-*.md (if ADR required)
 - [ ] docs/README.md (if user-facing behavior changed)
 
@@ -79,4 +84,4 @@
 - Commit split plan will be finalized in the issue `Execution Plan` comment during `execute`.
 
 ---
-*Last updated: 2026-02-24*
+*Last updated: 2026-03-03*
