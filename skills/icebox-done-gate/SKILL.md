@@ -45,9 +45,10 @@ Use on requests like:
      - `Docs updated (paths):`
      - `Files added/changed (paths):`
      - `ADR link:` (default `n/a`, must be real if ADR required is yes)
-   - Optional packet-scope override (recommended when workspace has unrelated changes):
+   - Packet-scope override:
      - `--file-path <path>` (repeatable)
      - `--doc-path <path>` (repeatable)
+   - On `pkt/*` branches, packet-scope override is required to avoid branch-wide evidence bleed.
 3. Run docs closeout checklist (required before done transition):
    - Internal docs updated when impacted:
      - `docs/plan/**` (backlog/spec/testing/plan index)

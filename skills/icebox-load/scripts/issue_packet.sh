@@ -702,6 +702,12 @@ closeout_issue() {
   done
 
   [[ -z "$issue" ]] && { err "closeout requires --issue"; usage; return 1; }
+  local branch
+  branch="$(current_branch)"
+  if [[ "$branch" == pkt/* && "${#override_docs[@]}" -eq 0 && "${#override_files[@]}" -eq 0 ]]; then
+    err "on ${branch}, closeout requires packet-scoped paths; pass --file-path and/or --doc-path"
+    return 1
+  fi
   if [[ -z "$pr_link" ]]; then
     pr_link="$(ensure_pr_link_for_issue "$issue")" || return 1
   fi
@@ -722,6 +728,8 @@ closeout_issue() {
 
   if [[ "${#override_docs[@]}" -gt 0 ]]; then
     docs_paths="$(printf "%s\n" "${override_docs[@]}" | awk 'NF' | sort -u)"
+  elif [[ "${#override_files[@]}" -gt 0 ]]; then
+    docs_paths="$(printf "%s\n" "${override_files[@]}" | grep -E '^docs/' || true)"
   fi
   if [[ "${#override_files[@]}" -gt 0 ]]; then
     files_paths="$(printf "%s\n" "${override_files[@]}" | awk 'NF' | sort -u)"
@@ -737,7 +745,7 @@ closeout_issue() {
   else
     internal_docs_paths="$(echo "$docs_paths" | grep -E '^(docs/plan/|docs/architecture/)' || true)"
     external_docs_paths="$(echo "$docs_paths" | grep -Ev '^(docs/plan/|docs/architecture/)' || true)"
-    if echo "$paths" | grep -Eq '^README\.md$'; then
+    if echo "$files_paths" | grep -Eq '^README\.md$'; then
       external_docs_paths="$(printf "%s\n%s\n" "$external_docs_paths" "README.md" | awk 'NF' | sort -u)"
     fi
     [[ -z "$internal_docs_paths" ]] && internal_docs_paths="- none (not impacted)"
