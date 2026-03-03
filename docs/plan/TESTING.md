@@ -225,6 +225,9 @@ These tests are public-release blockers and must pass on macOS CI before shippin
 
 | Test ID | Backlog | Test Description |
 |---|---|---|
+| T-E3-21a | E3-21 | DID backend naming refactor keeps runtime behavior unchanged: backend resolution still returns deterministic identifiers and all existing E2/E3 tests continue to pass without command/output regressions |
+| T-E3-21b | E3-21 | Invalid/corrupt `config.json` paths map to dedicated runtime error code (not generic identity setup); duplicate/validation/parse failures remain distinguishable and deterministic |
+| T-E3-21c | E3-21 | `register-agent` refactor preserves cleanup invariants: failure in any artifact step leaves no partial unsafe state and does not write plaintext private key material |
 | T-E3-01 | E3-01 | First `add` creates `vault.enc` as valid JSON containing a sealed blob |
 | T-E3-02 | E3-02 | Seal/unseal round-trip: encrypt a secret, decrypt it, verify plaintext matches |
 | T-E3-03 | E3-03 | Two secrets sealed independently; decrypting one does not require or affect the other; each entry has unique immutable `entryId` |

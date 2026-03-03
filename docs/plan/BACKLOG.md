@@ -22,6 +22,7 @@
 - E2-11 Active agent tracking (minimum usable config)
 - E2-09 Duplicate guard
 - E2-18 Agent name validation
+- E3-21 Identity/config refactor baseline
 - E3-01 Vault creation
 - E3-02 Sealed-box encryption
 - E3-05 Empty vault
@@ -130,6 +131,7 @@
 
 | ID | Use Case | Description |
 |---|---|---|
+| E3-21 | Identity/config refactor baseline | Refactor identity/config foundations before broader E3 delivery: clarify DID backend naming (non-enclave behavior labels), tighten config-to-runtime error mapping (invalid config gets dedicated code path), split `register-agent` into smaller units, and reduce duplicate canonical-name scans with reusable/cached canonical sets. |
 | E3-01 | Vault creation | `~/.icebox/identities/<name>/vault.enc` is created on first use as a JSON file of sealed blobs |
 | E3-02 | Sealed-box encryption | Each secret is individually sealed via `crypto_box_seal` (Ed25519→X25519 + XSalsa20-Poly1305); wire-format compatible with libsodium |
 | E3-03 | Per-secret isolation | Each secret is an independent sealed blob with immutable `entryId`; no shared master key or KDF |
