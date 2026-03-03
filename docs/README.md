@@ -20,6 +20,10 @@ Use this file as the entrypoint for project docs.
 - [CI Process](plan/CI.md)
 - [Testing Plan](plan/TESTING.md)
 
+## Maintenance
+
+- [Maintenance Index](maintenance/) — Recurring tasks, dependency policy, calendar.
+
 ## Guides
 
 - [Backup & Recovery](guides/BACKUP.md)
@@ -57,8 +61,9 @@ cargo doc --workspace --all-features --no-deps
 - Planning/execution sequencing: `docs/plan/`
 - User/operator workflows: `docs/guides/`
 - Machine-readable and policy artifacts: `docs/reference/`
+- Recurring maintenance: `docs/maintenance/`
 
 
 ---
 
-*Last updated: 2026-02-24*
+*Last updated: 2026-03-03*

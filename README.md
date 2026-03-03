@@ -6,6 +6,8 @@ Secure credential broker for AI agents. Never expose API keys or passwords to [O
 
 > **WARNING -- ALPHA SOFTWARE**
 > Icebox is in early alpha. While it is designed to be a security product, it has **not yet been independently audited**. There may be bugs, incomplete implementations, or undiscovered vulnerabilities. **Do not rely on Icebox as your sole security layer for production secrets.** Use with caution, review the code, and report any issues you find.
+>
+> **Pre-MVP** — Not production-ready; not rolled out or released yet.
 
 ---
 
@@ -81,11 +83,11 @@ scripts/verify_secure_enclave_prereqs.sh target/release/icebox-cli
 
 The CLI runs and supports `--help`, `--version`, and `--debug`.
 
-`register-agent` is available for initial identity bootstrap (creates identity directory + `identity.pub`, `enclave.keyref`, and wrapped `key.enc`).
+`register-agent` is available for initial identity bootstrap (creates identity directory + `identity.pub`, `enclave.keyref`, wrapped `key.enc`, and updates `config.json`). Agent names must match `[a-z0-9-]{3,32}` (lowercase, 3–32 chars).
 
 ### Identity Artifacts (`register-agent`)
 
-Under `~/.icebox/identities/<name>/` (or `$ICEBOX_HOME/identities/<name>/`), bootstrap writes:
+Under `~/.icebox/` (or `$ICEBOX_HOME/`), bootstrap creates `config.json` (agent registry and `activeAgentId`) and under `identities/<name>/`:
 
 | File | Format | Purpose | Security |
 |---|---|---|---|
@@ -143,6 +145,7 @@ See `docs/architecture/platform-and-distribution.md` for the canonical platform 
 - Docs index: [docs/README.md](docs/README.md)
 - Architecture: [docs/architecture/README.md](docs/architecture/README.md)
 - Planning: [docs/plan/README.md](docs/plan/README.md)
+- Maintenance: [docs/maintenance/README.md](docs/maintenance/README.md)
 - Reference: [docs/reference/VERSIONING.md](docs/reference/VERSIONING.md), [docs/reference/error-codes.json](docs/reference/error-codes.json)
 - Guides: [docs/guides/BACKUP.md](docs/guides/BACKUP.md)
 - Contributing: [CONTRIBUTING.md](CONTRIBUTING.md)
@@ -191,19 +194,15 @@ cargo doc --workspace --all-features --no-deps
 
 ## First Run
 
-The first time you run Icebox, you'll be prompted to name your agent:
+To create your first agent, run:
 
-```
-Welcome to Icebox -- secure credential broker for AI agents.
-
-No agents registered yet.
-
-Enter a name for your first agent (e.g., claw, dev, my-openclaw):
-> claw
-Creating agent 'claw'...
+```bash
+icebox register-agent claw
 ```
 
-Each agent gets its own identity and vault. Use `--agent <name>` to target a specific command invocation, or `icebox use-agent <name>` to change the persistent default.
+This creates the agent identity, Secure Enclave wrapping key, and updates the config registry. Each agent gets its own identity and vault. Use `--agent <name>` to target a specific command invocation, or `icebox use-agent <name>` to change the persistent default.
+
+*(Interactive first-run prompt is planned in E2-10.)*
 
 ## Backup & Recovery
 
@@ -233,4 +232,4 @@ Approval/session note: protected-operation flows are moving toward explicit outc
 
 ---
 
-**Version:** 0.1 (MVP) | [icebox.my](https://www.icebox.my) | **Date:** February 2026
+**Version:** 0.1 (MVP) | [icebox.my](https://www.icebox.my) | **Date:** March 2026
