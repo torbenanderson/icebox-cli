@@ -144,11 +144,7 @@ fn enclave_err(op: &'static str, source: crate::enclave::EnclaveError) -> Regist
 }
 
 fn config_err(op: &'static str, source: crate::config::ConfigError) -> RegisterAgentError {
-    if matches!(
-        source,
-        crate::config::ConfigError::Validation { ref message }
-            if message == "duplicate agent name in config registry"
-    ) {
+    if matches!(source, crate::config::ConfigError::DuplicateAgentNames) {
         return RegisterAgentError::DuplicateRegistryNames;
     }
     if matches!(source, crate::config::ConfigError::Parse { .. }) {

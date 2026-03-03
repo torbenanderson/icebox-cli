@@ -67,10 +67,12 @@ pub enum ConfigError {
         /// Source serialization error.
         source: serde_json::Error,
     },
-    /// Config validation failed.
-    Validation {
-        /// User-facing validation message.
-        message: String,
+    /// Config contains duplicate agent names.
+    DuplicateAgentNames,
+    /// Config contains an invalid agent name.
+    InvalidAgentName {
+        /// Invalid stored name.
+        name: String,
     },
 }
 
@@ -80,7 +82,10 @@ impl Display for ConfigError {
             Self::Io { op, source } => write!(f, "{op}: {source}"),
             Self::Parse { source } => write!(f, "failed to parse config.json: {source}"),
             Self::Serialize { source } => write!(f, "failed to serialize config.json: {source}"),
-            Self::Validation { message } => write!(f, "{message}"),
+            Self::DuplicateAgentNames => f.write_str("duplicate agent name in config registry"),
+            Self::InvalidAgentName { name } => {
+                write!(f, "invalid agent name in config registry: {name}")
+            }
         }
     }
 }
@@ -91,7 +96,8 @@ impl std::error::Error for ConfigError {
             Self::Io { source, .. } => Some(source),
             Self::Parse { source } => Some(source),
             Self::Serialize { source } => Some(source),
-            Self::Validation { .. } => None,
+            Self::DuplicateAgentNames => None,
+            Self::InvalidAgentName { .. } => None,
         }
     }
 }
@@ -105,8 +111,8 @@ fn config_path(home: &Path) -> PathBuf {
 }
 
 fn canonical_agent_name(raw: &str) -> Result<String, ConfigError> {
-    let parsed = crate::agent::IdentityName::parse(raw).map_err(|_| ConfigError::Validation {
-        message: format!("invalid agent name in config registry: {raw}"),
+    let parsed = crate::agent::IdentityName::parse(raw).map_err(|_| ConfigError::InvalidAgentName {
+        name: raw.to_owned(),
     })?;
     Ok(parsed.as_str().to_owned())
 }
@@ -116,9 +122,7 @@ fn ensure_no_duplicate_agent_names(config: &RuntimeConfig) -> Result<(), ConfigE
     for agent in &config.agents {
         let canonical = canonical_agent_name(&agent.name)?;
         if !seen.insert(canonical) {
-            return Err(ConfigError::Validation {
-                message: "duplicate agent name in config registry".to_string(),
-            });
+            return Err(ConfigError::DuplicateAgentNames);
         }
     }
     Ok(())
@@ -161,9 +165,7 @@ pub fn append_agent_and_set_active(home: &Path, agent: AgentRecord) -> Result<()
     for existing in &config.agents {
         let existing_name = canonical_agent_name(&existing.name)?;
         if existing_name == candidate {
-            return Err(ConfigError::Validation {
-                message: format!("agent name already exists: {}", agent.name),
-            });
+            return Err(ConfigError::DuplicateAgentNames);
         }
     }
     config.active_agent_id = Some(agent.agent_id.clone());
