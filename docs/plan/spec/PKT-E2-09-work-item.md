@@ -16,6 +16,7 @@
   - Registering an agent name that already exists in the `agents` registry returns a clear error
   - Enforce duplicate-name guard at registration boundary and config-load validation boundary.
   - Duplicate detection is deterministic and case/format aligned with E2-18 canonical name parser.
+  - Duplicate checks must reuse `IdentityName::parse` (or a single shared equivalent) and compare canonical stored forms; do not implement a parallel parser.
 - Out of scope:
   - Unrelated backlog items outside E2-09
   - Cross-epic behavior changes not requested by E2-09
@@ -24,7 +25,7 @@
 
 - AC1: Registering an agent name that already exists in `agents` fails with deterministic clear error (no overwrite).
 - AC2: Config-load validation fails closed when `agents` already contains duplicate names.
-- AC3: Duplicate checks use the same canonical name rules used by E2-18.
+- AC3: Duplicate checks use canonical output from `IdentityName::parse` (or single shared equivalent), not duplicated validation logic.
 - AC4: CLI output/errors are deterministic and user-safe.
 - AC5: Changes are validated with mapped tests.
 
