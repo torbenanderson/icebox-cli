@@ -8,6 +8,7 @@ pub(crate) enum IceErrorCode {
     IdentitySetup,
     DuplicateAgentName,
     InvalidAgentName,
+    InvalidConfig,
 }
 
 impl IceErrorCode {
@@ -17,6 +18,7 @@ impl IceErrorCode {
             Self::IdentitySetup => "ICE-306",
             Self::DuplicateAgentName => "ICE-307",
             Self::InvalidAgentName => "ICE-308",
+            Self::InvalidConfig => "ICE-309",
         }
     }
 
@@ -26,6 +28,7 @@ impl IceErrorCode {
             Self::IdentitySetup => "Identity setup failed.",
             Self::DuplicateAgentName => "Agent already exists.",
             Self::InvalidAgentName => "Invalid agent name.",
+            Self::InvalidConfig => "Config is invalid.",
         }
     }
 }
@@ -59,7 +62,9 @@ pub(crate) fn format_runtime_error(
 ) -> String {
     if matches!(
         code,
-        IceErrorCode::DuplicateAgentName | IceErrorCode::InvalidAgentName
+        IceErrorCode::DuplicateAgentName
+            | IceErrorCode::InvalidAgentName
+            | IceErrorCode::InvalidConfig
     ) {
         if let Some(detail) = detail {
             return format!("[{}] {detail}", code.code());
@@ -140,6 +145,20 @@ mod tests {
         assert_eq!(
             rendered,
             "[ICE-308] Invalid agent name. Use [a-z0-9-]{3,32} and do not start with '-'."
+        );
+    }
+
+    #[test]
+    fn format_invalid_config_error_shows_friendly_detail_in_default_mode() {
+        let rendered = format_runtime_error(
+            IceErrorCode::InvalidConfig,
+            false,
+            Some("Config is invalid. Fix ~/.icebox/config.json or reinitialize."),
+        );
+
+        assert_eq!(
+            rendered,
+            "[ICE-309] Config is invalid. Fix ~/.icebox/config.json or reinitialize."
         );
     }
 }

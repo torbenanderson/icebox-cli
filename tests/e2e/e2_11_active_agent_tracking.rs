@@ -135,11 +135,10 @@ fn e2_11_register_agent_fails_closed_on_invalid_config_json() {
 
     assert_eq!(output.status.code(), Some(1));
     let stderr = String::from_utf8_lossy(&output.stderr);
-    assert!(stderr.contains("ICE-306"));
-    assert!(
-        !stderr.contains("failed to parse config.json"),
-        "default mode should not leak parse internals"
-    );
+    assert!(stderr.contains("ICE-309"));
+    assert!(stderr.contains(
+        "Config is invalid. Fix ~/.icebox/config.json or reinitialize."
+    ));
 
     assert!(
         !icebox_home.join("identities").join("claw").exists(),

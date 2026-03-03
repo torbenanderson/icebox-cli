@@ -75,6 +75,7 @@ fn run_from_args(args: Vec<std::ffi::OsString>) -> i32 {
                     agent::RegisterAgentError::DuplicateName { .. } => {
                         error::IceErrorCode::DuplicateAgentName
                     }
+                    agent::RegisterAgentError::InvalidConfig => error::IceErrorCode::InvalidConfig,
                     _ => error::IceErrorCode::IdentitySetup,
                 };
                 eprintln!(

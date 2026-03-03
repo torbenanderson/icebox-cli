@@ -75,6 +75,8 @@ pub enum RegisterAgentError {
         /// Existing canonical agent name.
         name: String,
     },
+    /// Config file is invalid and must be repaired.
+    InvalidConfig,
     /// Filesystem operation failed.
     Io {
         /// User-facing operation label.
@@ -102,6 +104,9 @@ impl Display for RegisterAgentError {
                 f,
                 "Agent {name} already exists. Choose a different name or remove the existing agent."
             ),
+            Self::InvalidConfig => {
+                f.write_str("Config is invalid. Fix ~/.icebox/config.json or reinitialize.")
+            }
             Self::Io { op, source } => write!(f, "{op}: {source}"),
             Self::Enclave { op, source } => write!(f, "{op}: {source}"),
         }
@@ -114,6 +119,7 @@ impl Error for RegisterAgentError {
             Self::InvalidName(err) => Some(err),
             Self::MissingHomeDir => None,
             Self::DuplicateName { .. } => None,
+            Self::InvalidConfig => None,
             Self::Io { source, .. } => Some(source),
             Self::Enclave { .. } => None,
         }
@@ -132,6 +138,9 @@ fn enclave_err(op: &'static str, source: crate::enclave::EnclaveError) -> Regist
 }
 
 fn config_err(op: &'static str, source: crate::config::ConfigError) -> RegisterAgentError {
+    if matches!(source, crate::config::ConfigError::Parse { .. }) {
+        return RegisterAgentError::InvalidConfig;
+    }
     RegisterAgentError::Io {
         op,
         source: std::io::Error::other(source.to_string()),
