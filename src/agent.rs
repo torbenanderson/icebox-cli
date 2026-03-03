@@ -21,6 +21,18 @@ impl IdentityName {
         if trimmed.is_empty() {
             return Err(IdentityNameError::Empty);
         }
+        if trimmed.len() < 3 || trimmed.len() > 32 {
+            return Err(IdentityNameError::InvalidFormat);
+        }
+        if trimmed.starts_with('-') {
+            return Err(IdentityNameError::InvalidFormat);
+        }
+        let valid = trimmed
+            .bytes()
+            .all(|byte| byte.is_ascii_lowercase() || byte.is_ascii_digit() || byte == b'-');
+        if !valid {
+            return Err(IdentityNameError::InvalidFormat);
+        }
 
         Ok(Self(trimmed.to_owned()))
     }
@@ -36,12 +48,15 @@ impl IdentityName {
 pub enum IdentityNameError {
     /// Name is empty after trimming whitespace.
     Empty,
+    /// Name does not match canonical policy.
+    InvalidFormat,
 }
 
 impl Display for IdentityNameError {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Empty => f.write_str("identity name cannot be empty"),
+            Self::InvalidFormat => f.write_str("identity name must match [a-z0-9-]{3,32}"),
         }
     }
 }
