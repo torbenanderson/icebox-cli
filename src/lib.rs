@@ -67,23 +67,38 @@ fn run_from_args(args: Vec<std::ffi::OsString>) -> i32 {
         Ok(cli) => match run_command(cli) {
             Ok(()) => 0,
             Err(err) => {
-                let detail = err.to_string();
-                let code = match &err {
-                    agent::RegisterAgentError::InvalidName(_) => {
-                        error::IceErrorCode::InvalidAgentName
+                let (code, detail) = match &err {
+                    agent::RegisterAgentError::InvalidName(_) => (
+                        error::IceErrorCode::InvalidAgentName,
+                        Some(err.to_string()),
+                    ),
+                    agent::RegisterAgentError::DuplicateName { .. } => (
+                        error::IceErrorCode::DuplicateAgentName,
+                        Some(err.to_string()),
+                    ),
+                    agent::RegisterAgentError::DuplicateRegistryNames => (
+                        error::IceErrorCode::DuplicateConfigAgentNames,
+                        Some(err.to_string()),
+                    ),
+                    agent::RegisterAgentError::InvalidConfig => {
+                        (error::IceErrorCode::InvalidConfig, Some(err.to_string()))
                     }
-                    agent::RegisterAgentError::DuplicateName { .. } => {
-                        error::IceErrorCode::DuplicateAgentName
-                    }
-                    agent::RegisterAgentError::DuplicateRegistryNames => {
-                        error::IceErrorCode::DuplicateConfigAgentNames
-                    }
-                    agent::RegisterAgentError::InvalidConfig => error::IceErrorCode::InvalidConfig,
-                    _ => error::IceErrorCode::IdentitySetup,
+                    agent::RegisterAgentError::Enclave { .. } => (
+                        error::IceErrorCode::EnclaveFailure,
+                        if debug_enabled {
+                            Some(err.to_string())
+                        } else {
+                            Some(
+                                "Secure Enclave operation failed. Check supported hardware and signing/entitlements."
+                                    .to_string(),
+                            )
+                        },
+                    ),
+                    _ => (error::IceErrorCode::IdentitySetup, Some(err.to_string())),
                 };
                 eprintln!(
                     "{}",
-                    error::format_runtime_error(code, debug_enabled, Some(detail.as_str()))
+                    error::format_runtime_error(code, debug_enabled, detail.as_deref())
                 );
                 1
             }

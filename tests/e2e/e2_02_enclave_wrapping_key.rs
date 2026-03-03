@@ -55,7 +55,10 @@ fn e2_02_register_agent_reports_deterministic_error_when_wrapping_key_creation_f
 
     assert_eq!(output.status.code(), Some(1));
     let stderr = String::from_utf8_lossy(&output.stderr);
-    assert!(stderr.contains("ICE-306"));
+    assert!(stderr.contains("ICE-311"));
+    assert!(stderr.contains(
+        "Secure Enclave operation failed. Check supported hardware and signing/entitlements."
+    ));
     assert!(!stderr.contains("forced enclave failure"));
 
     if icebox_home.exists() {

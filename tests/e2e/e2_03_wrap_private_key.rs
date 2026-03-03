@@ -52,7 +52,10 @@ fn e2_03_register_agent_reports_deterministic_error_on_wrap_failure() {
 
     assert_eq!(output.status.code(), Some(1));
     let stderr = String::from_utf8_lossy(&output.stderr);
-    assert!(stderr.contains("ICE-306"));
+    assert!(stderr.contains("ICE-311"));
+    assert!(stderr.contains(
+        "Secure Enclave operation failed. Check supported hardware and signing/entitlements."
+    ));
     assert!(!stderr.contains("forced enclave failure"));
 
     let key_enc_path = icebox_home.join("identities").join("claw").join("key.enc");

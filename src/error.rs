@@ -10,6 +10,7 @@ pub(crate) enum IceErrorCode {
     InvalidAgentName,
     InvalidConfig,
     DuplicateConfigAgentNames,
+    EnclaveFailure,
 }
 
 impl IceErrorCode {
@@ -21,6 +22,7 @@ impl IceErrorCode {
             Self::InvalidAgentName => "ICE-308",
             Self::InvalidConfig => "ICE-309",
             Self::DuplicateConfigAgentNames => "ICE-310",
+            Self::EnclaveFailure => "ICE-311",
         }
     }
 
@@ -32,6 +34,7 @@ impl IceErrorCode {
             Self::InvalidAgentName => "Invalid agent name.",
             Self::InvalidConfig => "Config is invalid.",
             Self::DuplicateConfigAgentNames => "Config has duplicate agent names.",
+            Self::EnclaveFailure => "Secure Enclave operation failed.",
         }
     }
 }
@@ -69,6 +72,7 @@ pub(crate) fn format_runtime_error(
             | IceErrorCode::InvalidAgentName
             | IceErrorCode::InvalidConfig
             | IceErrorCode::DuplicateConfigAgentNames
+            | IceErrorCode::EnclaveFailure
     ) {
         if let Some(detail) = detail {
             return format!("[{}] {detail}", code.code());
@@ -179,6 +183,22 @@ mod tests {
         assert_eq!(
             rendered,
             "[ICE-310] Config has duplicate agent names. Resolve duplicates in ~/.icebox/config.json and retry."
+        );
+    }
+
+    #[test]
+    fn format_enclave_failure_error_shows_friendly_detail_in_default_mode() {
+        let rendered = format_runtime_error(
+            IceErrorCode::EnclaveFailure,
+            false,
+            Some(
+                "Secure Enclave operation failed. Check supported hardware and signing/entitlements.",
+            ),
+        );
+
+        assert_eq!(
+            rendered,
+            "[ICE-311] Secure Enclave operation failed. Check supported hardware and signing/entitlements."
         );
     }
 }
