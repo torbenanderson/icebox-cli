@@ -4,6 +4,7 @@ mod e2_01_generate_keypair;
 mod e2_02_enclave_wrapping_key;
 mod e2_03_wrap_private_key;
 mod e2_04_no_plaintext_on_disk;
+mod e2_09_duplicate_guard;
 mod e2_11_active_agent_tracking;
 mod e2_18_agent_name_validation;
 

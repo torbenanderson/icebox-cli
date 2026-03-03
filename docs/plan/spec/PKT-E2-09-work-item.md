@@ -26,8 +26,9 @@
 - AC1: Registering an agent name that already exists in `agents` fails with deterministic clear error (no overwrite).
 - AC2: Config-load validation fails closed when `agents` already contains duplicate names.
 - AC3: Duplicate checks use canonical output from `IdentityName::parse` (or single shared equivalent), not duplicated validation logic.
-- AC4: CLI output/errors are deterministic and user-safe.
-- AC5: Changes are validated with mapped tests.
+- AC4: Duplicate-name registration path returns dedicated runtime code `ICE-307` with user-facing message: `Agent <name> already exists. Choose a different name or remove the existing agent.`
+- AC5: CLI output/errors are deterministic and user-safe.
+- AC6: Changes are validated with mapped tests.
 
 ## Rust Implementation Plan
 
@@ -48,6 +49,9 @@
 - Security goal in scope: prevent ambiguous identity selection caused by registry collisions.
 - Keep secret-handling boundaries unchanged unless explicitly in scope.
 - Preserve user-safe default errors (no sensitive internals in normal mode).
+- Error-surface contract in scope:
+  - default mode must surface actionable duplicate-name guidance (not generic identity-setup text),
+  - debug mode may include internal duplicate-validation detail, but no sensitive material.
 
 ## Test Mapping
 

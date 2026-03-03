@@ -1,6 +1,7 @@
 //! Runtime configuration model and persistence helpers.
 
 use serde::{Deserialize, Serialize};
+use std::collections::HashSet;
 use std::fmt::{Display, Formatter};
 use std::fs::{self, OpenOptions};
 use std::io::Write;
@@ -66,6 +67,11 @@ pub enum ConfigError {
         /// Source serialization error.
         source: serde_json::Error,
     },
+    /// Config validation failed.
+    Validation {
+        /// User-facing validation message.
+        message: String,
+    },
 }
 
 impl Display for ConfigError {
@@ -74,6 +80,7 @@ impl Display for ConfigError {
             Self::Io { op, source } => write!(f, "{op}: {source}"),
             Self::Parse { source } => write!(f, "failed to parse config.json: {source}"),
             Self::Serialize { source } => write!(f, "failed to serialize config.json: {source}"),
+            Self::Validation { message } => write!(f, "{message}"),
         }
     }
 }
@@ -84,6 +91,7 @@ impl std::error::Error for ConfigError {
             Self::Io { source, .. } => Some(source),
             Self::Parse { source } => Some(source),
             Self::Serialize { source } => Some(source),
+            Self::Validation { .. } => None,
         }
     }
 }
@@ -94,6 +102,26 @@ fn io_err(op: &'static str, source: std::io::Error) -> ConfigError {
 
 fn config_path(home: &Path) -> PathBuf {
     home.join("config.json")
+}
+
+fn canonical_agent_name(raw: &str) -> Result<String, ConfigError> {
+    let parsed = crate::agent::IdentityName::parse(raw).map_err(|_| ConfigError::Validation {
+        message: format!("invalid agent name in config registry: {raw}"),
+    })?;
+    Ok(parsed.as_str().to_owned())
+}
+
+fn ensure_no_duplicate_agent_names(config: &RuntimeConfig) -> Result<(), ConfigError> {
+    let mut seen = HashSet::new();
+    for agent in &config.agents {
+        let canonical = canonical_agent_name(&agent.name)?;
+        if !seen.insert(canonical) {
+            return Err(ConfigError::Validation {
+                message: "duplicate agent name in config registry".to_string(),
+            });
+        }
+    }
+    Ok(())
 }
 
 /// Loads config if present.
@@ -118,6 +146,7 @@ pub fn load_or_default(home: &Path) -> Result<RuntimeConfig, ConfigError> {
 /// Repairs stale `activeAgentId` selector drift and persists if repair occurred.
 pub fn load_or_default_with_repair(home: &Path) -> Result<RuntimeConfig, ConfigError> {
     let mut config = load_or_default(home)?;
+    ensure_no_duplicate_agent_names(&config)?;
     let repaired = repair_stale_active_agent_id(&mut config);
     if repaired {
         save(home, &config)?;
@@ -128,9 +157,30 @@ pub fn load_or_default_with_repair(home: &Path) -> Result<RuntimeConfig, ConfigE
 /// Appends a registry entry and updates active agent selector atomically.
 pub fn append_agent_and_set_active(home: &Path, agent: AgentRecord) -> Result<(), ConfigError> {
     let mut config = load_or_default_with_repair(home)?;
+    let candidate = canonical_agent_name(&agent.name)?;
+    for existing in &config.agents {
+        let existing_name = canonical_agent_name(&existing.name)?;
+        if existing_name == candidate {
+            return Err(ConfigError::Validation {
+                message: format!("agent name already exists: {}", agent.name),
+            });
+        }
+    }
     config.active_agent_id = Some(agent.agent_id.clone());
     config.agents.push(agent);
     save(home, &config)
+}
+
+/// Returns true when the canonicalized name already exists in registry.
+pub fn has_agent_name(home: &Path, name: &str) -> Result<bool, ConfigError> {
+    let config = load_or_default_with_repair(home)?;
+    let candidate = canonical_agent_name(name)?;
+    for existing in &config.agents {
+        if canonical_agent_name(&existing.name)? == candidate {
+            return Ok(true);
+        }
+    }
+    Ok(false)
 }
 
 fn repair_stale_active_agent_id(config: &mut RuntimeConfig) -> bool {

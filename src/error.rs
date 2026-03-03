@@ -6,6 +6,7 @@ use clap::error::ErrorKind;
 pub(crate) enum IceErrorCode {
     InputValidation,
     IdentitySetup,
+    DuplicateAgentName,
 }
 
 impl IceErrorCode {
@@ -13,6 +14,7 @@ impl IceErrorCode {
         match self {
             Self::InputValidation => "ICE-701",
             Self::IdentitySetup => "ICE-306",
+            Self::DuplicateAgentName => "ICE-307",
         }
     }
 
@@ -20,6 +22,7 @@ impl IceErrorCode {
         match self {
             Self::InputValidation => "Invalid input. See `--help` for usage.",
             Self::IdentitySetup => "Identity setup failed.",
+            Self::DuplicateAgentName => "Agent already exists.",
         }
     }
 }
@@ -51,6 +54,11 @@ pub(crate) fn format_runtime_error(
     debug_enabled: bool,
     detail: Option<&str>,
 ) -> String {
+    if matches!(code, IceErrorCode::DuplicateAgentName) {
+        if let Some(detail) = detail {
+            return format!("[{}] {detail}", code.code());
+        }
+    }
     if debug_enabled {
         match detail {
             Some(detail) => format!("[{}] {}\n{detail}", code.code(), code.message()),
@@ -97,5 +105,21 @@ mod tests {
         );
 
         assert_eq!(rendered, "[ICE-306] Identity setup failed.");
+    }
+
+    #[test]
+    fn format_duplicate_name_error_shows_friendly_detail_in_default_mode() {
+        let rendered = format_runtime_error(
+            IceErrorCode::DuplicateAgentName,
+            false,
+            Some(
+                "Agent claw already exists. Choose a different name or remove the existing agent.",
+            ),
+        );
+
+        assert_eq!(
+            rendered,
+            "[ICE-307] Agent claw already exists. Choose a different name or remove the existing agent."
+        );
     }
 }

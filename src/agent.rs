@@ -70,6 +70,11 @@ pub enum RegisterAgentError {
     InvalidName(IdentityNameError),
     /// Home directory could not be resolved.
     MissingHomeDir,
+    /// Agent name already exists in config registry.
+    DuplicateName {
+        /// Existing canonical agent name.
+        name: String,
+    },
     /// Filesystem operation failed.
     Io {
         /// User-facing operation label.
@@ -91,6 +96,10 @@ impl Display for RegisterAgentError {
         match self {
             Self::InvalidName(err) => write!(f, "{err}"),
             Self::MissingHomeDir => f.write_str("could not resolve home directory"),
+            Self::DuplicateName { name } => write!(
+                f,
+                "Agent {name} already exists. Choose a different name or remove the existing agent."
+            ),
             Self::Io { op, source } => write!(f, "{op}: {source}"),
             Self::Enclave { op, source } => write!(f, "{op}: {source}"),
         }
@@ -102,6 +111,7 @@ impl Error for RegisterAgentError {
         match self {
             Self::InvalidName(err) => Some(err),
             Self::MissingHomeDir => None,
+            Self::DuplicateName { .. } => None,
             Self::Io { source, .. } => Some(source),
             Self::Enclave { .. } => None,
         }
@@ -195,8 +205,13 @@ pub fn register_agent(raw_name: &str) -> Result<(), RegisterAgentError> {
     let name = IdentityName::parse(raw_name).map_err(RegisterAgentError::InvalidName)?;
     let home = resolve_icebox_home()?;
     let config_home = home.clone();
-    let _existing_config = crate::config::load_or_default_with_repair(&config_home)
+    let exists = crate::config::has_agent_name(&config_home, name.as_str())
         .map_err(|err| config_err("failed to load config.json", err))?;
+    if exists {
+        return Err(RegisterAgentError::DuplicateName {
+            name: name.as_str().to_owned(),
+        });
+    }
 
     let agent_dir = home.join("identities").join(name.as_str());
 

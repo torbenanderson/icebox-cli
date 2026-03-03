@@ -68,13 +68,15 @@ fn run_from_args(args: Vec<std::ffi::OsString>) -> i32 {
             Ok(()) => 0,
             Err(err) => {
                 let detail = err.to_string();
+                let code = match &err {
+                    agent::RegisterAgentError::DuplicateName { .. } => {
+                        error::IceErrorCode::DuplicateAgentName
+                    }
+                    _ => error::IceErrorCode::IdentitySetup,
+                };
                 eprintln!(
                     "{}",
-                    error::format_runtime_error(
-                        error::IceErrorCode::IdentitySetup,
-                        debug_enabled,
-                        Some(detail.as_str())
-                    )
+                    error::format_runtime_error(code, debug_enabled, Some(detail.as_str()))
                 );
                 1
             }
