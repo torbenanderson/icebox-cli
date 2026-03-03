@@ -111,9 +111,10 @@ fn config_path(home: &Path) -> PathBuf {
 }
 
 fn canonical_agent_name(raw: &str) -> Result<String, ConfigError> {
-    let parsed = crate::agent::IdentityName::parse(raw).map_err(|_| ConfigError::InvalidAgentName {
-        name: raw.to_owned(),
-    })?;
+    let parsed =
+        crate::agent::IdentityName::parse(raw).map_err(|_| ConfigError::InvalidAgentName {
+            name: raw.to_owned(),
+        })?;
     Ok(parsed.as_str().to_owned())
 }
 
