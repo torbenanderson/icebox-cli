@@ -6,7 +6,16 @@
     {
       "agentId": "01J2F0M0B6K8Y8S7R3C1A9X2ZD",
       "name": "claw",
-      "did": "did:key:z6Mkexample"
+      "did": "did:key:z6Mkexample",
+      "identityLane": "local-enclave",
+      "backendClass": "secure-enclave",
+      "deviceBindings": [
+        {
+          "deviceId": "macbookpro-2026",
+          "backendClass": "secure-enclave",
+          "status": "active"
+        }
+      ]
     }
   ],
   "createdByVersion": "0.1.1",

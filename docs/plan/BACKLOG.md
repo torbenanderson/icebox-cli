@@ -20,6 +20,7 @@
 - E2-03 Wrap Ed25519 key
 - E2-04 No plaintext key on disk
 - E2-11 Active agent tracking (minimum usable config)
+- E2-09 Duplicate guard
 - E2-18 Agent name validation
 - E3-01 Vault creation
 - E3-02 Sealed-box encryption
@@ -73,7 +74,7 @@
 | E1-14 | Test scaffolding | Set up `tests/` directory, test helpers (temp enclave keys, temp `~/.icebox/`), CI test runner. See [TESTING.md](TESTING.md) |
 | E1-15 | Release pipeline | GitHub Actions: `cargo build --release` / `cargo-dist`, **Developer ID signed + notarized** macOS binary, `cargo install` compatible (unsigned, dev only), GitHub Releases page. Homebrew pre-built bottles follow after first stable release. Include tag-triggered release automation (`v*`) that runs validation, builds release artifacts, publishes checksums, and uploads assets to GitHub Releases. |
 | E1-16 | Install docs | Finalize install instructions in README (`cargo install` + binary download). Document that `cargo install` produces an unsigned binary with limited enclave access (dev only). |
-| E1-17 | Entitlements plist | Create `Entitlements.plist` with `com.apple.security.smartcard`, `com.apple.keychain-access-groups`, hardened runtime. Embedded during `codesign` step in release pipeline. |
+| E1-17 | Entitlements file | Create project entitlements file (for example `icebox-cli.entitlements`) with `com.apple.security.smartcard`, `com.apple.keychain-access-groups`, hardened runtime. Embedded during `codesign` step in release pipeline. |
 | E1-18 | Notarization | Integrate `xcrun notarytool` into release pipeline. Binary submitted to Apple for notarization after signing; stapled ticket attached to the distributed binary. |
 | E1-19 | Error code artifact | Publish machine-readable error-code registry at `docs/reference/error-codes.json` when external consumers need it; add a sync test with runtime code mapping before introducing code generation |
 | E1-20 | File permission baseline | Enforce owner-only filesystem modes for runtime artifacts: `~/.icebox/` + agent dirs `0700`; sensitive files (`config.json`, `manifest.json`, `identity.pub`, `key.enc`, `vault.enc`, `hmac.enc`) `0600`. Validate and fail closed on mismatch for security-critical operations. |
@@ -86,16 +87,21 @@
 | E1-27 | Conformance fixtures | Add golden fixtures for manifest/vault/bundle round-trips as merge gates across implementations |
 | E1-28 | JSON Schema CI gate | Add machine-validated JSON Schemas for manifest/config/vault/bundle-manifest and enforce schema + fixture validation in CI |
 | E1-29 | ADR process (forward-only) | Maintain lightweight architecture decision records under `docs/architecture/decisions/` for new decision-impacting changes (no historical backfill) |
+| E1-30 | Release enclave-signing verification gate | During release candidate validation, verify the distributed binary is signed with hardened runtime + required entitlements and passes real `register-agent` Secure Enclave key-creation flow on supported macOS hardware. Block public release on failure. |
+| E1-31 | Explicit developer software-backend mode (deferred) | Post-`v0.1.1`, add an explicit opt-in insecure/developer mode for unsupported hardware (for example `--developer-mode` / `--insecure-software-backend`) with fail-safe default disabled, prominent warnings, distinct capability/security labeling, and no enclave-grade security claims. |
+| E1-32 | Docs site publishing | Two-step approach: (1) **Before MVP go-live**: Deploy mdBook + rustdoc to GitHub Pages via GitHub Actions (`peaceiris/actions-gh-pages`); configure repo Settings → Pages → GitHub Actions. (2) **Post-MVP** (optional): Add custom domain via CNAME if desired. |
 
 ## E2 -- Agent Identity
 
+> E2 supports two execution lanes: `local-enclave` (MVP-first) and `paired-remote-signer` (post-MVP). The logical identity contract stays the same across lanes; backend/device scheme differs.
+
 | ID | Use Case | Description |
 |---|---|---|
-| E2-01 | Generate keypair | As a user, I can run `icebox register-agent claw` to create an Ed25519 keypair and `~/.icebox/identities/claw/` directory |
-| E2-02 | Enclave wrapping key | Create a P-256 key inside the Secure Enclave (non-exportable, per-agent); used to encrypt the Ed25519 private key |
-| E2-03 | Wrap Ed25519 key | Encrypt the Ed25519 private key with the enclave P-256 key (`SecKeyCreateEncryptedData`); store as `key.enc` |
-| E2-04 | No plaintext key on disk | Ed25519 private key never written to disk in plaintext; only the enclave-wrapped `key.enc` blob exists |
-| E2-05 | Multicodec + DID compatibility | Public key stored as `identity.pub` in multicodec-prefixed binary format (`[0xed, 0x01] \|\| 32-byte Ed25519 pubkey`, 34 bytes total). `did:key` value and `pubkeyFingerprint` are stored in `manifest.json` as compatibility anchors; DID-facing commands remain Phase 1.5 |
+| E2-01 | Generate keypair | As a user, I can run `icebox register-agent claw` to create an Ed25519 keypair and `~/.icebox/identities/claw/` directory (local lane baseline) |
+| E2-02 | Enclave wrapping key | Create a P-256 key inside the Secure Enclave (non-exportable, per-agent); used to encrypt the Ed25519 private key in `local-enclave` lane |
+| E2-03 | Wrap Ed25519 key | Encrypt the Ed25519 private key with the enclave P-256 key (`SecKeyCreateEncryptedData`); store as `key.enc` in `local-enclave` lane. Partial-artifact risk (for example `key.enc` written before all identity artifacts) is accepted in this step and tightened in E2-04 hardening. |
+| E2-04 | No plaintext key on disk | Ed25519 private key never written to disk in plaintext; only the enclave-wrapped `key.enc` blob exists in `local-enclave` lane. Includes hardening/cleanup expectations for unsafe or partial persistence paths from earlier steps. |
+| E2-05 | Multicodec + DID compatibility | Public key stored as `identity.pub` in multicodec-prefixed binary format (`[0xed, 0x01] \|\| 32-byte Ed25519 pubkey`, 34 bytes total). `did:key` value and `pubkeyFingerprint` are stored in `manifest.json` as compatibility anchors; DID-facing commands remain Phase 1.5. Migration contract: accept legacy 32-byte raw `identity.pub` during transition, write 34-byte multicodec format going forward, and keep migration idempotent/deterministic. |
 | E2-06 | Agent manifest | `manifest.json` stores versioned identity metadata: `version`, immutable `agentId` (UUID/ULID), `type` ("agent"), `name`, `did` (compatibility anchor), `parent` (null in v1), `created`, `pubkeyFingerprint`, `enclaveKeyRef`, `derivationVersion` (`null` in MVP), plus reserved nullable forward-compat fields (`keyAlgorithm`, `curve`, `didMethod`, `derivationScheme`, `coinType`, `network`, `keyPurposes`). Unknown fields are preserved across read/write. |
 | E2-07 | Agent listing | `icebox list-agents` reads from `config.json` `agents` registry (`agentId`, `name`, `did`). No filesystem scan. Shows name, DID, and active status. Orphaned directories (not in registry) listed separately with a warning. |
 | E2-08 | Agent removal | `icebox remove-agent <name>` removes agent directory + enclave wrapping key + removes entry from `config.json` `agents` array. If the removed agent was active, clears `activeAgentId`. |
@@ -116,6 +122,9 @@
 | E2-30 | Identity type enum contract | `manifest.json` `type` is enum-based: MVP supports `agent`; reserves `human`, `robot`, `service`, `algorithm`. Unknown type fails safely with unsupported-type error until implemented |
 | E2-31 | Capability-first authorization | Operation eligibility is checked via explicit capability flags (`canHoldSecrets`, `canRunCommands`, `canSign`, `hasEnclaveBinding`) instead of branching on `type` |
 | E2-32 | Internal identity naming | Keep CLI/user UX `agent` terms in MVP, but use neutral `identity` terminology in internal domain/service layers |
+| E2-33 | Identity lane metadata | Persist explicit identity operation lane metadata (`local-enclave`, `paired-remote-signer`) with fail-safe behavior for unknown lanes |
+| E2-34 | Device enrollment bindings | Track per-device backend bindings for an identity without changing identity primary keys (`agentId`) |
+| E2-35 | Approval/session states | Broker/CLI contract returns deterministic approval states (`ok`, `pending_approval`, `denied`, `expired`) for protected operations |
 
 ## E3 -- Encrypted Vault
 
@@ -127,7 +136,7 @@
 | E3-04 | Vault integrity | Tampered sealed blobs are detected and rejected (AEAD authentication) |
 | E3-05 | Empty vault | New vault with no secrets returns a clean state, not an error |
 | E3-06 | Unseal via enclave | Decryption requires the agent's Ed25519 private key, unwrapped from the Secure Enclave at moment of use |
-| E3-07 | `secrecy` + `Zeroize` | All secret buffers wrapped in `secrecy::Secret` with `Zeroize` on drop; `libc::mlock` pins key buffers. No GC in Rust -- all memory deterministically freed. |
+| E3-07 | `secrecy` + `Zeroize` | All secret buffers wrapped in `secrecy::Secret` with `Zeroize` on drop; `libc::mlock` pins key buffers. No GC in Rust -- all memory deterministically freed. This is the planned hardening point for residual plaintext-memory windows left by earlier bootstrap/wrap steps. |
 | E3-08 | `mlock` pinning | Secret buffers are `mlock`'d to prevent paging to swap/disk |
 | E3-09 | No secure temp | No temp files are created during vault decryption |
 | E3-10 | Vault version field | Every `vault.enc` includes `"version": 1` at top level for forward-compatible format upgrades |
@@ -263,4 +272,4 @@
 
 ---
 
-*Last updated: 2026-02-20*
+*Last updated: 2026-03-03*

@@ -59,6 +59,12 @@
 - ADR required? (no):
 - Rationale: keep in spec unless long-lived cross-feature decision exists.
 
+## As-Built (Delivered)
+
+- Modules: `src/agent.rs`, `src/config.rs`, `src/vault.rs`, `src/runner.rs`, `src/did.rs`.
+- Enclave split: `src/did/enclave_darwin.rs` (macOS) and `src/did/enclave_stub.rs` (non-macOS); scaffold returns backend name only (no FFI in E1-03). Security.framework integration delivered in E2-02 via `src/enclave.rs`.
+- Tests: `tests/integration/e1_03_project_structure.rs` (modules compile, empty-name rejection).
+
 ## Deferred Design Notes
 
 - Enclave backend placement is intentionally scoped under `did` for MVP (`src/did.rs` + platform-gated enclave files).
@@ -87,4 +93,4 @@
 
 ---
 
-*Last updated: 2026-02-18*
+*Last updated: 2026-03-03*

@@ -1,9 +1,9 @@
-# E1-07 Execution Spec
+# E1-01 Execution Spec
 
 ## Objective
 
-- Deliver E1-07 (Disable core dumps).
-- Backlog contract: Set `RLIMIT_CORE = 0` at process start to prevent secret leakage via crash dumps
+- Deliver E1-01 (Cargo init).
+- Backlog contract: `cargo init` (icebox-cli crate)
 
 ## Problem
 
@@ -12,27 +12,21 @@
 ## Scope
 
 - In scope:
-  - Set `RLIMIT_CORE = 0` at process start to prevent secret leakage via crash dumps
+  - `cargo init` (icebox-cli crate)
 - Out of scope:
-  - Unrelated backlog items outside E1-07
-  - Cross-epic behavior changes not requested by E1-07
+  - Unrelated backlog items outside E1-01
+  - Cross-epic behavior changes not requested by E1-01
 
 ## Acceptance Criteria
 
-- AC1: E1-07 behavior matches backlog description: Set `RLIMIT_CORE = 0` at process start to prevent secret leakage via crash dumps
-- AC2: CLI output/errors are deterministic and user-safe.
+- AC1: Running `cargo init` for `icebox-cli` yields a valid Rust binary crate scaffold with `Cargo.toml` and `src/main.rs`.
+- AC2: Scaffold creation is non-interactive and reproducible for the same inputs.
 - AC3: Changes are validated with mapped tests.
 
 ## Rust Implementation Plan
 
 - Crate/module touch points:
-  - `src/lib.rs` (startup hardening gate) and `src/hardening.rs` (core-dump limit logic).
-- Unix runtime hardening implementation:
-  - use `rustix::process::{getrlimit, setrlimit}` with `Resource::Core`.
-  - set soft core limit (`current`) to `0` and preserve existing hard limit (`maximum`).
-  - on `setrlimit` failure, return deterministic `CoreDumpHardeningError::SetLimit(errno)`.
-- Non-Unix behavior:
-  - no-op return `Ok(())` to keep cross-platform startup behavior deterministic.
+  - `src/main.rs` (CLI wiring) and focused domain module(s) only.
 - Keep interfaces explicit:
   - prefer small pure functions for parsing/validation paths.
   - avoid hidden global state.
@@ -52,7 +46,11 @@
 ## Test Mapping
 
 - Linked tests from `docs/plan/TESTING.md`:
-- T-E1-07
+- `T-E1-01`: Cargo scaffold validation for manifest/bin presence and invalid-manifest failure path.
+- Scaffold-only validation mapping (no runtime feature code in scope):
+  - verify `Cargo.toml` exists and package name is `icebox-cli`
+  - verify `src/main.rs` exists
+  - run `cargo check`
 - Add at least:
   - one happy-path test
   - one failure-path test
@@ -64,8 +62,8 @@
 
 ## Docs Impact
 
-- [x] docs/plan/spec/PKT-E1-07-work-item.md
-- [ ] docs/plan/TESTING.md (if test mappings are added/changed)
+- [x] docs/plan/spec/PKT-E1-01-work-item.md
+- [x] docs/plan/TESTING.md (if test mappings are added/changed)
 - [ ] docs/architecture/decisions/ADR-*.md (if ADR required)
 - [ ] docs/README.md (if user-facing behavior changed)
 
@@ -79,6 +77,7 @@
 
 - Commit split plan will be finalized in the issue `Execution Plan` comment during `execute`.
 
----
+## As-Built (Delivered)
 
-*Last updated: 2026-02-19*
+- `Cargo.toml` with package name `icebox-cli`; `src/main.rs` thin entrypoint.
+- Tests: `tests/integration/e1_01_cargo_init.rs` (scaffold manifest/main, missing-manifest failure).

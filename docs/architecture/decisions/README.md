@@ -22,8 +22,9 @@ Lightweight ADR log for new architecture decisions going forward.
 ## Index
 
 - [ADR-0001 Brokered Secret Execution Boundary](ADR-0001-brokered-secret-execution.md)
+- [ADR-0002 Dual-Branch Identity And Device Model](ADR-0002-dual-branch-identity-device-model.md)
 
 
 ---
 
-*Last updated: 2026-02-20*
+*Last updated: 2026-02-24*

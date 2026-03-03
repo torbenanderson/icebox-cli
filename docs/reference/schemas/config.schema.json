@@ -39,6 +39,35 @@
           "did": {
             "type": "string",
             "minLength": 1
+          },
+          "identityLane": {
+            "type": ["string", "null"],
+            "enum": ["local-enclave", "paired-remote-signer", null]
+          },
+          "backendClass": {
+            "type": ["string", "null"]
+          },
+          "deviceBindings": {
+            "type": ["array", "null"],
+            "items": {
+              "type": "object",
+              "required": ["deviceId", "backendClass"],
+              "properties": {
+                "deviceId": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "backendClass": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "status": {
+                  "type": "string",
+                  "enum": ["active", "revoked", "pending"]
+                }
+              },
+              "additionalProperties": true
+            }
           }
         },
         "additionalProperties": true

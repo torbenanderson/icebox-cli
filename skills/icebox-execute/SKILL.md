@@ -90,9 +90,13 @@ Automation check command:
    - Require evidence links/notes for:
      - PR link
      - tests run
-     - docs updated
+     - docs updated (internal + external/public classification)
      - files added/changed (paths)
      - ADR link (if required)
+   - Docs closeout must explicitly account for:
+     - Internal docs impact (`docs/plan/**`, `docs/architecture/**`) or `none (not impacted)`
+     - External/public docs impact (`README.md`, `docs/README.md`, mdBook pages) or `none (not impacted)`
+     - mdBook sync (`docs/SUMMARY.md`, `docs/book.toml` when structure/metadata changes)
    - Validate with:
      - `skills/icebox-load/scripts/issue_packet.sh validate-closeout --issue <id>`
 10. State transitions

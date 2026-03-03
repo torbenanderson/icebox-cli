@@ -15,6 +15,8 @@ Start here:
 - `docs/plan/README.md`
 - `docs/reference/DOCS_GOVERNANCE.md`
 
+**New contributor?** For a curated list of good first tasks (mostly docs/planning), see [OpenClaw Community On-Ramp](.github/OPENCLAW_COMMUNITY_ONRAMP.md).
+
 ## Ways to Contribute
 
 - Clarify architecture and security docs.
@@ -42,6 +44,7 @@ Start here:
 
 ## Development and Test Expectations
 
+- Minimum supported Rust toolchain: `1.85` (matches `edition = "2024"` and `rust-version` in `Cargo.toml`).
 - Preferred local platform for full-flow testing: macOS.
 - Linux contributors can work on non-enclave paths (CLI/config/vault/crypto/schemas/docs).
 - Keep CI green:

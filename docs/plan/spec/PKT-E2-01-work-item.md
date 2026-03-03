@@ -1,27 +1,29 @@
-# E1-02 Execution Spec
+# E2-01 Execution Spec
 
 ## Objective
 
-- Deliver E1-02 (CLI scaffolding).
-- Backlog contract: Set up `src/main.rs` with `clap`
+- Deliver E2-01 (Generate keypair).
+- Backlog contract: As a user, I can run `icebox register-agent claw` to create an Ed25519 keypair and `~/.icebox/identities/claw/` directory
 
 ## Problem
 
-- Why this exists: implement the backlog contract in a way that is testable, deterministic, and easy to extend.
+- E2-01 establishes the identity branch bootstrap in `local-enclave` lane.
+- Without deterministic keypair/bootstrap behavior, downstream wrapping (`E2-02/E2-03`) and registry tracking (`E2-11`) cannot be validated safely.
+- This item must remain lane-compatible so paired/remote-signer mode can reuse the same identity metadata contract later.
 
 ## Scope
 
 - In scope:
-  - Set up `src/main.rs` with `clap`
+  - As a user, I can run `icebox register-agent claw` to create an Ed25519 keypair and `~/.icebox/identities/claw/` directory
 - Out of scope:
-  - Unrelated backlog items outside E1-02
-  - Cross-epic behavior changes not requested by E1-02
+  - Unrelated backlog items outside E2-01
+  - Cross-epic behavior changes not requested by E2-01
 
 ## Acceptance Criteria
 
-- AC1: `src/main.rs` is scaffolded to use `clap` for top-level CLI parsing.
-- AC2: Running `cargo run -- --help` succeeds and shows CLI help output.
-- AC3: CLI help includes standard project metadata (repository link).
+- AC1: `register-agent` in `local-enclave` lane creates `~/.icebox/identities/<name>/` and writes `identity.pub`.
+- AC2: Ed25519 key generation uses OS-backed CSPRNG (`rand_core::OsRng`).
+- AC3: Runtime errors are deterministic and user-safe in default mode.
 - AC4: Changes are validated with mapped tests.
 
 ## Rust Implementation Plan
@@ -41,18 +43,14 @@
 ## Security/Runtime Notes
 
 - Keep secret-handling boundaries unchanged unless explicitly in scope.
+- Generate Ed25519 keypairs with `rand_core::OsRng` (OS-backed CSPRNG); do not use `thread_rng()` for key material.
 - Preserve direct-exec/no-shell guarantees where relevant.
 - Preserve user-safe default errors (no sensitive internals in normal mode).
 
 ## Test Mapping
 
 - Linked tests from `docs/plan/TESTING.md`:
-- `T-E1-02`: CLI scaffolding compiles with `clap`, `--help` output path is wired, and help metadata includes repository information.
-- Scaffold-only validation mapping (no runtime feature code in scope):
-  - verify `Cargo.toml` includes `clap` dependency and compiles
-  - verify `src/main.rs` contains clap parser scaffolding
-  - run `cargo check`
-  - run `cargo run -- --help`
+- T-E2-01
 - Add at least:
   - one happy-path test
   - one failure-path test
@@ -64,21 +62,20 @@
 
 ## Docs Impact
 
-- [x] docs/plan/spec/PKT-E1-02-work-item.md
-- [x] docs/plan/TESTING.md (if test mappings are added/changed)
+- [x] docs/plan/spec/PKT-E2-01-work-item.md
+- [ ] docs/plan/TESTING.md (if test mappings are added/changed)
 - [ ] docs/architecture/decisions/ADR-*.md (if ADR required)
 - [ ] docs/README.md (if user-facing behavior changed)
 
 ## Validation Commands
 
-- `cargo check`
-- `cargo run -- --help`
+- `cargo fmt --check`
+- `cargo clippy -- -D warnings`
+- `cargo test`
 
 ## Execution Notes
 
 - Commit split plan will be finalized in the issue `Execution Plan` comment during `execute`.
 
-
 ---
-
-*Last updated: 2026-02-18*
+*Last updated: 2026-02-24*

@@ -159,19 +159,25 @@ These tests are public-release blockers and must pass on macOS CI before shippin
 | T-E1-27 | E1-27 | Golden fixture suite for manifest/vault/bundle passes byte-for-byte conformance checks |
 | T-E1-28 | E1-28 | CI validates JSON Schemas against metaschema and validates fixtures against manifest/config/vault/bundle-manifest schemas |
 | T-E1-29 | E1-29 | Decision-impacting PRs include ADR entries using `docs/architecture/decisions/ADR-TEMPLATE.md` and link affected docs/backlog/tests |
+| T-E1-30 | E1-30 | Release candidate gate verifies signed binary has hardened runtime and required entitlements, then runs real `register-agent` Secure Enclave key creation on supported macOS hardware; public release is blocked on failure |
+| T-E1-31a | E1-31 | Default behavior on unsupported/non-enclave backend remains fail-closed; registration does not silently fall back to insecure software backend |
+| T-E1-31b | E1-31 | Explicit developer/insecure backend mode requires clear opt-in flag, emits prominent security warning, and marks runtime/backend metadata as non-enclave security level |
+| T-E1-31c | E1-31 | In developer/insecure backend mode, CLI/docs surfaces never claim enclave-grade guarantees and support diagnostics distinguish this mode from secure local-enclave lane |
 
 ### E2 -- Agent Identity
 
 | Test ID | Backlog | Test Description |
 |---|---|---|
-| T-E2-01 | E2-01 | `register-agent` creates `~/.icebox/identities/<name>/` with `identity.pub`, `key.enc`, `vault.enc`, `manifest.json` |
-| T-E2-02 | E2-02 | A P-256 wrapping key is created in the Secure Enclave; verify via Security.framework query |
-| T-E2-03 | E2-03 | `key.enc` exists and is a valid enclave-encrypted blob; no plaintext Ed25519 key on disk |
-| T-E2-04 | E2-04 | Ed25519 private key never written to disk in plaintext; grep agent dir for raw key bytes |
+| T-E2-01 | E2-01 | `register-agent` creates `~/.icebox/identities/<name>/` and writes `identity.pub` (happy path); when identity setup fails, command exits non-zero with structured runtime error code |
+| T-E2-02 | E2-02 | Happy path: `register-agent` creates a per-agent P-256 Secure Enclave wrapping key in `local-enclave` lane and records stable key-reference metadata; verify via Security.framework query. Failure path: forced key creation/access failure returns deterministic structured runtime error and non-zero exit. Non-exportability check: private key bytes are not returned via runtime/public API and are not written to disk. |
+| T-E2-03 | E2-03 | Happy path: Ed25519 private key is wrapped with the E2-02 device-branch key and persisted as non-empty `key.enc` blob parseable by expected unwrap format; manifest linkage (`enclaveKeyRef`) remains coherent. Failure path: wrapping error returns deterministic structured runtime error and non-zero exit with no plaintext key spill. |
+| T-E2-04 | E2-04 | Happy path: registration/wrap flow writes no plaintext Ed25519 private-key material to disk; only wrapped `key.enc` exists for identity private-key persistence in `local-enclave` lane. Failure path: any unsafe persistence attempt fails closed with deterministic structured runtime error; scan checks confirm no plaintext key bytes in agent artifacts. |
 | T-E2-05a | E2-05 | `identity.pub` is exactly 34 bytes: first two bytes are `0xed 0x01` (Ed25519 multicodec varint), remaining 32 bytes are a valid Ed25519 public key |
 | T-E2-05b | E2-05 | `manifest.json` `did` field equals `did:key:z` + base58btc encoding of the 34-byte `identity.pub` contents. Verified against W3C did:key test vectors |
 | T-E2-05c | E2-05 | `manifest.json` `pubkeyFingerprint` equals lowercase hex SHA-256 of the 34-byte `identity.pub` contents |
 | T-E2-05d | E2-05 | Cross-library round-trip: Icebox-generated `did:key` string is parseable by a reference JavaScript did:key resolver; extracted public key matches `identity.pub` bytes |
+| T-E2-05e | E2-05 | Legacy compatibility: 32-byte `identity.pub` (raw Ed25519) is accepted in read path during migration window and does not panic/fail unexpectedly |
+| T-E2-05f | E2-05 | Migration behavior: legacy 32-byte `identity.pub` upgrades to 34-byte multicodec format (`0xed01` prefix) deterministically; re-running migration is idempotent |
 | T-E2-06 | E2-06 | `manifest.json` contains required v1 fields including immutable `agentId` plus reserved nullable fields (`keyAlgorithm`, `curve`, `didMethod`, `derivationScheme`, `coinType`, `network`, `keyPurposes`); unknown fields survive read/write round-trip |
 | T-E2-07a | E2-07 | `icebox list-agents` reads from `config.json` `agents` array and returns all registered entries with `agentId`, name, and DID |
 | T-E2-07b | E2-07 | If an agent directory exists in `identities/` but has no entry in `agents`, `list-agents` shows it as "unregistered" with a warning |
@@ -203,6 +209,17 @@ These tests are public-release blockers and must pass on macOS CI before shippin
 | T-E2-30b | E2-30 | Unknown `type` fails safely with deterministic unsupported-type error (no fallback to `agent`) |
 | T-E2-31 | E2-31 | Authorization checks use capability flags; disabling `canRunCommands` blocks `run` even when `type` is `agent` |
 | T-E2-32 | E2-32 | Internal identity resolution/services remain type-neutral while CLI continues to accept `agent`-named commands |
+| T-E2-33 | E2-33 | Manifest/config lane metadata supports `local-enclave` and `paired-remote-signer`; unknown lane fails with deterministic unsupported-lane error |
+| T-E2-34 | E2-34 | Device enrollment bindings preserve stable `agentId` identity while adding/removing per-device backend references |
+| T-E2-35 | E2-35 | Protected operation contract returns deterministic state: `ok`, `pending_approval`, `denied`, or `expired` |
+
+#### E2 Test-Harness Artifact Notes (Non-Production)
+
+- `ICEBOX_TEST_FAKE_ENCLAVE=1` is a test harness mode only.
+- In fake-enclave mode:
+  - `enclave.keyref` is still a label string, but no real hardware key is created.
+  - `key.enc` currently uses an internal test encoding: `fake-enclave-wrap-v1:` prefix plus byte-wise XOR payload.
+- This fake encoding is not a production format guarantee and must not be used as a compatibility contract for real local-enclave artifacts.
 
 ### E3 -- Encrypted Vault
 
@@ -384,4 +401,4 @@ Dedicated tests that verify hardening guarantees:
 
 ---
 
-*Last updated: 2026-02-20*
+*Last updated: 2026-03-03*

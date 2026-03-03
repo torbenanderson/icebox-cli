@@ -4,6 +4,16 @@
 
 - macOS is the primary target for Secure Enclave integration.
 - Non-macOS builds use enclave stubs for non-enclave test paths.
+- Logical model is platform-stable, backend scheme is platform-specific.
+
+## Lane Model (Cross-Platform)
+
+- `local-enclave` lane:
+  - local backend executes wrap/unwrap/sign operations.
+  - MVP implementation target starts on macOS.
+- `paired-remote-signer` lane (post-MVP):
+  - paired device/service performs key operations and returns results.
+  - desktop/CLI path does not receive raw long-lived private key bytes in this mode.
 
 ## Linux Strategy (Planning Status)
 
@@ -17,6 +27,7 @@
 2. OS keyring path (for example Secret Service/libsecret-backed envelope key storage).
 3. Software-only fallback (passphrase-protected local key material) for CI/dev workflows with reduced security guarantees.
 4. External hardware token path (for example YubiKey via PIV/PKCS#11), subject to UX/security evaluation.
+5. Mobile-paired signing/unwrap proxy path for approval-first workflows.
 
 ### Acceptance Bar For Linux Full-Flow Support
 
@@ -48,4 +59,4 @@
 
 ---
 
-*Last updated: 2026-02-16*
+*Last updated: 2026-02-24*

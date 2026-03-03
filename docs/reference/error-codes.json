@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated": "2026-02-16",
+  "updated": "2026-02-24",
   "codes": [
     {
       "code": "ICE-101",
@@ -36,6 +36,46 @@
       "code": "ICE-301",
       "category": "agent_not_found",
       "message": "Agent not found. Run `icebox list-agents` to see registered agents."
+    },
+    {
+      "code": "ICE-302",
+      "category": "capability_missing",
+      "message": "Operation not allowed for this identity capability set."
+    },
+    {
+      "code": "ICE-303",
+      "category": "policy_not_allowlisted",
+      "message": "Operation blocked by policy allowlist."
+    },
+    {
+      "code": "ICE-304",
+      "category": "backend_attestation",
+      "message": "Device/backend identity or attestation check failed."
+    },
+    {
+      "code": "ICE-305",
+      "category": "unsafe_mode_blocked",
+      "message": "Unsafe operation mode is blocked by policy."
+    },
+    {
+      "code": "ICE-306",
+      "category": "identity_setup",
+      "message": "Identity setup failed."
+    },
+    {
+      "code": "ICE-307",
+      "category": "approval_pending",
+      "message": "Operation is pending user approval."
+    },
+    {
+      "code": "ICE-308",
+      "category": "approval_expired",
+      "message": "Approval session expired. Re-approve to continue."
+    },
+    {
+      "code": "ICE-309",
+      "category": "identity_lane_unsupported",
+      "message": "Identity lane is unsupported by this build or backend."
     },
     {
       "code": "ICE-401",

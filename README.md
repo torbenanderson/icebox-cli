@@ -35,11 +35,34 @@ cargo install icebox-cli
 
 Requires **macOS** (Apple Silicon or Intel T2) for full security flow in MVP. `~/.icebox/` must be on a **local filesystem** -- not iCloud Drive, Dropbox, NFS, or any synced/network drive (see [Architecture](docs/architecture/README.md) and [Vault & Integrity](docs/architecture/vault-and-integrity.md)).
 
+### Secure Enclave Prerequisites (MVP)
+
+For real Secure Enclave key creation (`register-agent` local-enclave path), ensure:
+
+- Supported hardware (Apple Silicon, or Intel Mac with T2-class Secure Enclave support)
+- Signed binary with required entitlements (for example `keychain-access-groups`) and hardened runtime for release
+- Normal user Terminal context (not root/system daemon context)
+
+Quick local prereq check:
+
+```bash
+scripts/verify_secure_enclave_prereqs.sh target/release/icebox-cli
+```
+
+### Environment
+
+- `ICEBOX_HOME`: override Icebox storage root (default: `~/.icebox`).
+- Example:
+  ```bash
+  ICEBOX_HOME=/tmp/icebox-dev icebox-cli register-agent claw
+  ```
+
 ## Key Features (MVP)
 
 | Feature | Description | Status |
 |---|---|---|
 | **Agent Identity** | `icebox register-agent claw` -- creates Ed25519 keypair (Secure Enclave-wrapped) + isolated vault per agent | Planned |
+| **Identity Lanes** | `local-enclave` (MVP-first) and `paired-remote-signer` (post-MVP) share identity contract with backend-specific implementation | Planned |
 | **Recovery Model (MVP)** | If a device is lost, regenerate provider API keys/tokens and re-add them to a new agent. Seed-based recovery is deferred. | MVP |
 | **Seed Backup (Optional)** | `icebox register-agent claw --seed` -- 24-word recovery phrase for portability/cross-device recovery ([guide](docs/guides/BACKUP.md)) | Phase 1.5 |
 | **Secure Vault** | Per-agent encrypted vault (`~/.icebox/identities/<name>/vault.enc`) using `crypto_box_seal` (libsodium-compatible) | Planned |
@@ -54,11 +77,29 @@ Requires **macOS** (Apple Silicon or Intel T2) for full security flow in MVP. `~
 
 ## Current State
 
-**v0.1.0-alpha** -- E1 bootstrap foundation only.
+**v0.1.0-alpha** -- E1 foundation + initial E2 identity bootstrap (`register-agent`).
 
 The CLI runs and supports `--help`, `--version`, and `--debug`.
 
-No credential storage or execution yet. You cannot `register-agent`, `add`, or `run`, and secrets are not yet stored or injected.
+`register-agent` is available for initial identity bootstrap (creates identity directory + `identity.pub`, `enclave.keyref`, and wrapped `key.enc`).
+
+### Identity Artifacts (`register-agent`)
+
+Under `~/.icebox/identities/<name>/` (or `$ICEBOX_HOME/identities/<name>/`), bootstrap writes:
+
+| File | Format | Purpose | Security |
+|---|---|---|---|
+| `enclave.keyref` | UTF-8 text label | Stable lookup label/reference for per-agent device wrapping key | Not key material |
+| `identity.pub` | 32-byte binary (Ed25519 public key) | Public identity key for verification/derivation flows | Safe to share |
+| `key.enc` | Binary wrapped blob | Wrapped Ed25519 private key bytes for local-enclave lane | Opaque private-key material (not plaintext) |
+
+Notes:
+- `identity.pub` is raw 32-byte Ed25519 in current MVP sequencing; multicodec-prefixed encoding is planned in E2-05.
+- `key.enc` is intentionally treated as opaque storage bytes. Its exact production encoding is backend-defined and not a stable public format contract.
+
+Credential storage and execution are not available yet. You cannot `add` or `run`, and secrets are not yet stored or injected.
+
+Current implementation lane: `local-enclave` bootstrap path only.
 
 ## Non-Functional Requirements
 
@@ -86,6 +127,16 @@ See `docs/architecture/platform-and-distribution.md` for the canonical platform 
 | **Phase 1.5** | DID support (`did:key` + `did:web`) + seed backup (`--seed`, recovery, export/import) |
 | **Phase 2** | Unix socket server + OpenClaw skill integration |
 | **Phase 3** | Browser extension (token-based login) |
+
+## Project Management
+
+- **Repository:** [github.com/torbenanderson/icebox-cli](https://github.com/torbenanderson/icebox-cli)
+- **Issues:** [GitHub Issues](https://github.com/torbenanderson/icebox-cli/issues)
+- **Pull requests:** [GitHub Pull Requests](https://github.com/torbenanderson/icebox-cli/pulls)
+- **Releases:** [GitHub Releases](https://github.com/torbenanderson/icebox-cli/releases)
+- **Roadmap:** [docs/plan/ROADMAP.md](docs/plan/ROADMAP.md) | [Backlog](docs/plan/BACKLOG.md)
+- **Architecture decisions:** [docs/architecture/decisions/](docs/architecture/decisions/README.md)
+- **Discussion log:** [docs/process/DISCUSSION_LOG.md](docs/process/DISCUSSION_LOG.md)
 
 ## Documentation
 
@@ -173,6 +224,8 @@ icebox run openai "curl ..." --debug
 ## Trust Boundary
 
 `icebox run` should execute trusted commands only. Icebox controls secret handling in its own process and avoids persisting secrets in agent state, but the executed subprocess still receives the injected credential and can exfiltrate it via stdout/stderr, files, or network.
+
+Approval/session note: protected-operation flows are moving toward explicit outcomes (`ok`, `pending_approval`, `denied`, `expired`) as broker/mobile lanes are introduced.
 
 ## License
 
