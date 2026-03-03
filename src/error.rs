@@ -161,12 +161,12 @@ mod tests {
         let rendered = format_runtime_error(
             IceErrorCode::InvalidConfig,
             false,
-            Some("Config is invalid. Fix ~/.icebox/config.json or reinitialize."),
+            Some("Config is invalid. Fix /tmp/test/config.json or reinitialize."),
         );
 
         assert_eq!(
             rendered,
-            "[ICE-309] Config is invalid. Fix ~/.icebox/config.json or reinitialize."
+            "[ICE-309] Config is invalid. Fix /tmp/test/config.json or reinitialize."
         );
     }
 
@@ -176,13 +176,13 @@ mod tests {
             IceErrorCode::DuplicateConfigAgentNames,
             false,
             Some(
-                "Config has duplicate agent names. Resolve duplicates in ~/.icebox/config.json and retry.",
+                "Config has duplicate agent names. Resolve duplicates in /tmp/test/config.json and retry.",
             ),
         );
 
         assert_eq!(
             rendered,
-            "[ICE-310] Config has duplicate agent names. Resolve duplicates in ~/.icebox/config.json and retry."
+            "[ICE-310] Config has duplicate agent names. Resolve duplicates in /tmp/test/config.json and retry."
         );
     }
 

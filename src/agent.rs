@@ -76,9 +76,15 @@ pub enum RegisterAgentError {
         name: String,
     },
     /// Config contains duplicate agent names.
-    DuplicateRegistryNames,
+    DuplicateRegistryNames {
+        /// Resolved config path.
+        path: PathBuf,
+    },
     /// Config file is invalid and must be repaired.
-    InvalidConfig,
+    InvalidConfig {
+        /// Resolved config path.
+        path: PathBuf,
+    },
     /// Filesystem operation failed.
     Io {
         /// User-facing operation label.
@@ -106,12 +112,16 @@ impl Display for RegisterAgentError {
                 f,
                 "Agent {name} already exists. Choose a different name or remove the existing agent."
             ),
-            Self::DuplicateRegistryNames => f.write_str(
-                "Config has duplicate agent names. Resolve duplicates in ~/.icebox/config.json and retry.",
+            Self::DuplicateRegistryNames { path } => write!(
+                f,
+                "Config has duplicate agent names. Resolve duplicates in {} and retry.",
+                path.display()
             ),
-            Self::InvalidConfig => {
-                f.write_str("Config is invalid. Fix ~/.icebox/config.json or reinitialize.")
-            }
+            Self::InvalidConfig { path } => write!(
+                f,
+                "Config is invalid. Fix {} or reinitialize.",
+                path.display()
+            ),
             Self::Io { op, source } => write!(f, "{op}: {source}"),
             Self::Enclave { op, source } => write!(f, "{op}: {source}"),
         }
@@ -124,8 +134,8 @@ impl Error for RegisterAgentError {
             Self::InvalidName(err) => Some(err),
             Self::MissingHomeDir => None,
             Self::DuplicateName { .. } => None,
-            Self::DuplicateRegistryNames => None,
-            Self::InvalidConfig => None,
+            Self::DuplicateRegistryNames { .. } => None,
+            Self::InvalidConfig { .. } => None,
             Self::Io { source, .. } => Some(source),
             Self::Enclave { .. } => None,
         }
@@ -143,12 +153,20 @@ fn enclave_err(op: &'static str, source: crate::enclave::EnclaveError) -> Regist
     }
 }
 
-fn config_err(op: &'static str, source: crate::config::ConfigError) -> RegisterAgentError {
+fn config_err(
+    op: &'static str,
+    source: crate::config::ConfigError,
+    config_path: &Path,
+) -> RegisterAgentError {
     if matches!(source, crate::config::ConfigError::DuplicateAgentNames) {
-        return RegisterAgentError::DuplicateRegistryNames;
+        return RegisterAgentError::DuplicateRegistryNames {
+            path: config_path.to_path_buf(),
+        };
     }
     if matches!(source, crate::config::ConfigError::Parse { .. }) {
-        return RegisterAgentError::InvalidConfig;
+        return RegisterAgentError::InvalidConfig {
+            path: config_path.to_path_buf(),
+        };
     }
     RegisterAgentError::Io {
         op,
@@ -225,8 +243,9 @@ pub fn register_agent(raw_name: &str) -> Result<(), RegisterAgentError> {
     let name = IdentityName::parse(raw_name).map_err(RegisterAgentError::InvalidName)?;
     let home = resolve_icebox_home()?;
     let config_home = home.clone();
+    let config_path = config_home.join("config.json");
     let exists = crate::config::has_agent_name(&config_home, name.as_str())
-        .map_err(|err| config_err("failed to load config.json", err))?;
+        .map_err(|err| config_err("failed to load config.json", err, &config_path))?;
     if exists {
         return Err(RegisterAgentError::DuplicateName {
             name: name.as_str().to_owned(),
@@ -292,7 +311,7 @@ pub fn register_agent(raw_name: &str) -> Result<(), RegisterAgentError> {
             did: did_from_public_key(&public_key_bytes),
         };
         crate::config::append_agent_and_set_active(&config_home, agent_record)
-            .map_err(|err| config_err("failed to persist config.json", err))?;
+            .map_err(|err| config_err("failed to persist config.json", err, &config_path))?;
 
         Ok(())
     })();

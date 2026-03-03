@@ -136,9 +136,11 @@ fn e2_11_register_agent_fails_closed_on_invalid_config_json() {
     assert_eq!(output.status.code(), Some(1));
     let stderr = String::from_utf8_lossy(&output.stderr);
     assert!(stderr.contains("ICE-309"));
-    assert!(stderr.contains(
-        "Config is invalid. Fix ~/.icebox/config.json or reinitialize."
-    ));
+    let expected = format!(
+        "Config is invalid. Fix {} or reinitialize.",
+        icebox_home.join("config.json").display()
+    );
+    assert!(stderr.contains(&expected));
 
     assert!(
         !icebox_home.join("identities").join("claw").exists(),
