@@ -89,6 +89,7 @@
 | E1-29 | ADR process (forward-only) | Maintain lightweight architecture decision records under `docs/architecture/decisions/` for new decision-impacting changes (no historical backfill) |
 | E1-30 | Release enclave-signing verification gate | During release candidate validation, verify the distributed binary is signed with hardened runtime + required entitlements and passes real `register-agent` Secure Enclave key-creation flow on supported macOS hardware. Block public release on failure. |
 | E1-31 | Explicit developer software-backend mode (deferred) | Post-`v0.1.1`, add an explicit opt-in insecure/developer mode for unsupported hardware (for example `--developer-mode` / `--insecure-software-backend`) with fail-safe default disabled, prominent warnings, distinct capability/security labeling, and no enclave-grade security claims. |
+| E1-32 | Docs site publishing | Two-step approach: (1) **Before MVP go-live**: Deploy mdBook + rustdoc to GitHub Pages via GitHub Actions (`peaceiris/actions-gh-pages`); configure repo Settings → Pages → GitHub Actions. (2) **Post-MVP** (optional): Add custom domain via CNAME if desired. |
 
 ## E2 -- Agent Identity
 
