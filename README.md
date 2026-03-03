@@ -128,6 +128,16 @@ See `docs/architecture/platform-and-distribution.md` for the canonical platform 
 | **Phase 2** | Unix socket server + OpenClaw skill integration |
 | **Phase 3** | Browser extension (token-based login) |
 
+## Project Management
+
+- **Repository:** [github.com/torbenanderson/icebox-cli](https://github.com/torbenanderson/icebox-cli)
+- **Issues:** [GitHub Issues](https://github.com/torbenanderson/icebox-cli/issues)
+- **Pull requests:** [GitHub Pull Requests](https://github.com/torbenanderson/icebox-cli/pulls)
+- **Releases:** [GitHub Releases](https://github.com/torbenanderson/icebox-cli/releases)
+- **Roadmap:** [docs/plan/ROADMAP.md](docs/plan/ROADMAP.md) | [Backlog](docs/plan/BACKLOG.md)
+- **Architecture decisions:** [docs/architecture/decisions/](docs/architecture/decisions/README.md)
+- **Discussion log:** [docs/process/DISCUSSION_LOG.md](docs/process/DISCUSSION_LOG.md)
+
 ## Documentation
 
 - Docs index: [docs/README.md](docs/README.md)

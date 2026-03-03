@@ -1,19 +1,18 @@
 # OpenClaw Community On-Ramp
 
-This page is the fastest path for new contributors to start useful work.
+This page is the fastest path for new contributors to start useful work. For full workflow, PR guidelines, and security expectations, see [CONTRIBUTING.md](../CONTRIBUTING.md).
 
 ## Start Here
 
 1. Read `README.md` (trust boundary + MVP scope).
-2. Read `CONTRIBUTING.md` and `SECURITY.md`.
+2. Read [CONTRIBUTING.md](../CONTRIBUTING.md) and [SECURITY.md](../SECURITY.md).
 3. Pick one issue from the queue below.
 
 ## Working Rules (MVP)
 
 - Keep changes small and scoped to one backlog item.
 - Prefer docs/tests/contracts first when implementation is not ready.
-- For security-sensitive changes, document threat-model impact in the PR.
-- If you find a vulnerability, use private reporting (`SECURITY.md`).
+- For details on PR workflow, security-sensitive changes, and vulnerability reporting, see [CONTRIBUTING.md](../CONTRIBUTING.md).
 
 ## First 5 Community Issues
 
@@ -96,8 +95,4 @@ This page is the fastest path for new contributors to start useful work.
 - `planning`
 - `help wanted`
 
-## PR Expectations
-
-- Link backlog IDs where possible (for example `E3-13`).
-- Include file references for changed contracts.
-- Keep PR descriptions concrete: what changed, why, and how validated.
+For PR expectations (backlog links, file references, concrete descriptions), see [CONTRIBUTING.md](../CONTRIBUTING.md#pr-guidelines).

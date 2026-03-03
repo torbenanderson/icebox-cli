@@ -15,6 +15,8 @@ Start here:
 - `docs/plan/README.md`
 - `docs/reference/DOCS_GOVERNANCE.md`
 
+**New contributor?** For a curated list of good first tasks (mostly docs/planning), see [OpenClaw Community On-Ramp](.github/OPENCLAW_COMMUNITY_ONRAMP.md).
+
 ## Ways to Contribute
 
 - Clarify architecture and security docs.
