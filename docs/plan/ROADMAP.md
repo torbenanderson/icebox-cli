@@ -4,6 +4,12 @@
 
 ---
 
+## Current Progress
+
+**Pre-MVP** — E1 foundation complete. E2 `register-agent` bootstrap in progress: E2-01 (keypair), E2-02 (enclave wrapping), E2-03 (wrap key), E2-04 (no plaintext on disk), E2-09 (duplicate guard), E2-11 (active agent tracking, `config.json`), E2-18 (agent name validation). E3–E5 (vault, secrets, run) not yet implemented.
+
+---
+
 ## Timeline
 
 ```mermaid
@@ -13,22 +19,22 @@ gantt
     axisFormat %b %Y
 
     section Phase 1 (MVP)
-    E1 · Project Bootstrap           :e1, 2026-02, 2026-03
-    E2 · Agent Identity              :e2, after e1, 2026-04
-    E3 · Encrypted Vault             :e3, after e2, 2026-05
-    E4 · Secret Management           :e4, after e3, 2026-05
-    E5 · Secure Run                  :e5, after e4, 2026-06
+    E1 Project Bootstrap             :done, e1, 2026-02, 2026-03
+    E2 Agent Identity               :active, e2, after e1, 2026-04
+    E3 Encrypted Vault              :e3, after e2, 2026-05
+    E4 Secret Management            :e4, after e3, 2026-06
+    E5 Secure Run                   :e5, after e4, 2026-07
 
     section Phase 1.5
-    E7 · DID Support                 :e7, after e5, 2026-08
-    E7.5 · Seed Backup & Portability  :e75, after e5, 2026-08
+    E7 DID Support                  :e7, after e5, 2026-08
+    E7.5 Seed Backup and Portability :e75, after e5, 2026-08
 
     section Phase 2
-    E8 · Socket Server               :e8, after e7, 2026-10
-    E9 · OpenClaw Skill              :e9, after e8, 2026-10
+    E8 Socket Server                :e8, after e7, 2026-10
+    E9 OpenClaw Skill               :e9, after e8, 2026-11
 
     section Phase 3
-    E10 · Browser Extension          :e10, after e9, 2026-12
+    E10 Browser Extension           :e10, after e9, 2026-12
 ```
 
 ## Epics
@@ -76,4 +82,4 @@ gantt
 
 ---
 
-*Last updated: 2026-02-24*
+*Last updated: 2026-03-03*
