@@ -20,7 +20,7 @@
 ## Acceptance Criteria
 
 - AC1: E3-21 behavior matches backlog description: Refactor identity/config foundations before broader E3 delivery: clarify DID backend naming (non-enclave behavior labels), tighten config-to-runtime error mapping (invalid config gets dedicated code path), split `register-agent` into smaller units, and reduce duplicate canonical-name scans with reusable/cached canonical sets.
-- AC2: CLI output/errors are deterministic and user-safe.
+- AC2: Invalid/corrupt config mapping reaches the dedicated runtime invalid-config code path (`ICE-309`), with deterministic user-safe messaging.
 - AC3: Changes are validated with mapped tests.
 
 ## Rust Implementation Plan
@@ -74,3 +74,10 @@
 ## Execution Notes
 
 - Commit split plan will be finalized in the issue `Execution Plan` comment during `execute`.
+- Implementation details completed in this packet:
+  - DID internal backend modules renamed to backend-oriented names (`backend_darwin`, `backend_stub`) with no runtime output change.
+  - `register-agent` flow decomposed into focused helpers with centralized cleanup guard (`RegistrationCleanup`), preserving no-plaintext and partial-artifact cleanup invariants.
+  - Config error mapping centralized via `RegisterAgentError::from_config_error(...)` to avoid ad-hoc mapping branches.
+  - Canonical-name lookup consolidated in config layer via reusable canonical-name set helper.
+  - Shared formatting/id helpers centralized in `src/util.rs` (`bytes_to_hex`, `generate_agent_id`).
+  - Added regression coverage for invalid stored config agent names mapping to `ICE-309`.

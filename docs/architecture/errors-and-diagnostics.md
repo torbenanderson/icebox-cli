@@ -27,7 +27,7 @@
 - `ICE-306`: identity setup failure.
 - `ICE-307`: approval pending.
 - `ICE-308`: approval session expired.
-- `ICE-309`: identity lane/backend unsupported.
+- `ICE-309`: invalid config.
 
 ## Related Docs
 
@@ -37,4 +37,4 @@
 
 ---
 
-*Last updated: 2026-02-24*
+*Last updated: 2026-03-03*

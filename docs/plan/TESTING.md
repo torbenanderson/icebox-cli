@@ -46,7 +46,7 @@
 | macOS (Apple Silicon) | macOS | **All tests** including enclave integration, entitlement checks, Keychain ACL tests | Nothing |
 | Linux (Ubuntu) | Linux | Vault crypto, sealed-box interop, DID derivation, CLI parsing, config, multicodec encoding | Enclave tests (`#[cfg(target_os = "macos")]`), TMPDIR `statfs` tests, Security.framework tests |
 
-Tests in `tests/` that require the enclave use `#[cfg(target_os = "macos")]` and are automatically excluded on Linux. The stub (`enclave_stub.rs`, `#[cfg(not(target_os = "macos"))]`) compiles on Linux and returns descriptive errors, allowing non-enclave code paths to be tested.
+Tests in `tests/` that require the enclave use `#[cfg(target_os = "macos")]` and are automatically excluded on Linux. The stub (`backend_stub.rs`, `#[cfg(not(target_os = "macos"))]`) compiles on Linux and returns descriptive errors, allowing non-enclave code paths to be tested.
 
 For local development on macOS, `cargo test` runs everything. On Linux, the same command compiles the stub and runs all non-enclave tests.
 
@@ -54,10 +54,10 @@ For local development on macOS, `cargo test` runs everything. On Linux, the same
 
 | Runner | Must include | Must skip |
 |--------|--------------|-----------|
-| **macOS** | All tests: unit, integration, E2E, system, security, enclave. `enclave_darwin.rs` compiled and exercised. Entitlement/Keychain/Security.framework tests. | Nothing. |
-| **Linux** | Unit, integration, E2E, system, security tests that do not touch enclave. Vault crypto, sealed-box, DID derivation, CLI, config. `enclave_stub.rs` compiled. | Any code or test behind `#[cfg(target_os = "macos")]`. Enclave integration. TMPDIR `statfs` tests. Security.framework / Keychain tests. |
+| **macOS** | All tests: unit, integration, E2E, system, security, enclave. `backend_darwin.rs` compiled and exercised. Entitlement/Keychain/Security.framework tests. | Nothing. |
+| **Linux** | Unit, integration, E2E, system, security tests that do not touch enclave. Vault crypto, sealed-box, DID derivation, CLI, config. `backend_stub.rs` compiled. | Any code or test behind `#[cfg(target_os = "macos")]`. Enclave integration. TMPDIR `statfs` tests. Security.framework / Keychain tests. |
 
-**Source contract:** Enclave code lives in `enclave_darwin.rs` with `#[cfg(target_os = "macos")]`; non-macOS builds use `enclave_stub.rs` with `#[cfg(not(target_os = "macos"))]`. CI workflows must not attempt to run macOS-only tests on Linux.
+**Source contract:** Enclave code lives in `backend_darwin.rs` with `#[cfg(target_os = "macos")]`; non-macOS builds use `backend_stub.rs` with `#[cfg(not(target_os = "macos"))]`. CI workflows must not attempt to run macOS-only tests on Linux.
 
 ### Test Levels
 
@@ -93,7 +93,7 @@ Common commands for local development and CI parity:
 | `cargo audit` | Check dependencies against RustSec advisory database. Install: `cargo install cargo-audit --locked`. |
 | `cargo llvm-cov --summary-only` | Code coverage summary (which lines ran during tests). Install: `cargo install cargo-llvm-cov --locked`. |
 | `cargo llvm-cov --html` | Generate HTML coverage report in `target/llvm-cov/html/index.html`. |
-| `cargo mutants` | Mutation testing: mutate code and verify tests catch changes. Install: `cargo install cargo-mutants --locked`. On macOS, `enclave_stub` is not compiled; run on Linux (or in CI) to cover stub mutations. |
+| `cargo mutants` | Mutation testing: mutate code and verify tests catch changes. Install: `cargo install cargo-mutants --locked`. On macOS, `backend_stub` is not compiled; run on Linux (or in CI) to cover stub mutations. |
 
 ### Phase 1 Vertical Slice Gate
 
@@ -136,7 +136,7 @@ These tests are public-release blockers and must pass on macOS CI before shippin
 |---|---|---|
 | T-E1-01 | E1-01 | Integration tests verify Cargo scaffold happy path (`Cargo.toml` + `src/main.rs` exist, package name is `icebox-cli`) and failure path (`cargo metadata` fails for missing manifest path) |
 | T-E1-02 | E1-02 | CLI scaffolding is wired with `clap`; E2E tests verify happy path (`--help` exits 0 with usage text) and failure path (unknown flag exits 2 with argument error) |
-| T-E1-03 | E1-03 | Project structure modules exist and compile (`agent`, `config`, `vault`, `runner`, `did`) including platform-gated enclave split (`enclave_darwin.rs` on macOS and `enclave_stub.rs` elsewhere) |
+| T-E1-03 | E1-03 | Project structure modules exist and compile (`agent`, `config`, `vault`, `runner`, `did`) including platform-gated enclave split (`backend_darwin.rs` on macOS and `backend_stub.rs` elsewhere) |
 | T-E1-04 | E1-04 | CI workflows validate push/PR gates on macOS and Linux; happy path: merge-blocking jobs pass (`check`, `fmt`, `clippy -D warnings`, `test`) and enhancement jobs/reporting run as configured, failure path: any merge-blocking check marks workflow red and blocks merge until fixed |
 | T-E1-06 | E1-06 | `icebox --version` outputs version string, commit hash, and build date |
 | T-E1-07 | E1-07 | Runtime hardening sets `RLIMIT_CORE=0` at startup (happy path) and returns a deterministic error when setting the limit fails (failure path) |

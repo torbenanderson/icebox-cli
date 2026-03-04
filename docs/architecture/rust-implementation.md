@@ -19,8 +19,8 @@ icebox-cli/
 │   │   ├── mod.rs
 │   │   ├── identity.rs
 │   │   ├── enclave.rs      # Enclave trait/interface (platform-independent)
-│   │   ├── enclave_darwin.rs # Secure Enclave FFI (macOS only)
-│   │   ├── enclave_stub.rs # Non-macOS stub
+│   │   ├── backend_darwin.rs # Secure Enclave backend boundary (macOS only)
+│   │   ├── backend_stub.rs # Non-macOS backend stub
 │   │   └── did.rs          # did:key derivation (Phase 1.5)
 │   ├── vault/              # Sealed-box crypto, vault logic
 │   │   ├── mod.rs
