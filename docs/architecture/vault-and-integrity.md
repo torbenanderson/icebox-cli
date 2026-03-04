@@ -55,6 +55,17 @@ Empty vault: `seq: 0`, `hmac: null`, `entries: []`. First secret adds one entry 
 
 Optional identity self-description (`identity_pubkey`, etc.) is deferred per [ADR-0003](decisions/ADR-0003-defer-vault-reseal-and-provenance.md).
 
+## How Sealed Entries Work
+
+Icebox does not create or store a separate long-term key per secret entry.
+
+- Each identity has one long-term keypair used for vault sealing/unsealing operations.
+- On each `crypto_box_seal` call, libsodium creates a fresh ephemeral keypair for that entry.
+- The ephemeral public key is embedded in the sealed blob; the ephemeral private key is discarded after sealing.
+- At unseal time, Icebox uses the identity private key plus the embedded ephemeral public key to derive the shared key and decrypt.
+
+This gives per-entry cryptographic isolation while keeping operational key management simple: one identity private key unlocks all entries for that identity.
+
 ## Write Safety
 
 - File lock during read-modify-write cycles.
@@ -102,4 +113,4 @@ Implement one canonical function for load validation and keep checks centralized
 
 ---
 
-*Last updated: 2026-03-02*
+*Last updated: 2026-03-03*

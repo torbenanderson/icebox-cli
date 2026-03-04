@@ -154,6 +154,9 @@
 | E3-20 | Schema migration contract | Implement explicit vault schema migrators (`from_version` -> `to_version`) with atomic writeback, unsupported-version fail (`ICE-202`), idempotency guarantees, and fixture-based migration tests |
 | E3-22 | Vault envelope identity metadata (post-MVP) | Add optional self-description metadata fields in vault envelope (for example identity public-key reference) with explicit anti-drift rules and migration guards. Defer from MVP to keep envelope minimal. |
 | E3-23 | Vault write provenance (post-MVP) | Add optional authenticated provenance layer for vault writes (for example signature/attestation metadata) when auditability is required. Keep `crypto_box_seal` anonymous-sender semantics in MVP. |
+| E3-24 | Sealed-entry associated-data envelope (post-MVP) | Evaluate and add explicit associated-data contract for sealed entries when structured metadata binding is required; include migration and compatibility rules. |
+| E3-25 | Vault backup/recovery UX guardrails (post-MVP) | Add explicit UX/docs/runtime warnings and guidance for backup and key-rotation consequences (vault unreadable without matching identity private key). |
+| E3-26 | Cipher-suite re-evaluation (post-MVP) | Re-evaluate vault sealing cipher choices (including XChaCha20-Poly1305 paths) after MVP stability; keep current libsodium sealed-box compatibility until an explicit migration plan exists. |
 
 ## E4 -- Secret Management
 
