@@ -59,7 +59,7 @@
 ## Docs Impact
 
 - [x] docs/plan/spec/PKT-E3-11-work-item.md
-- [ ] docs/plan/TESTING.md (if test mappings are added/changed)
+- [x] docs/plan/TESTING.md (if test mappings are added/changed)
 - [ ] docs/architecture/decisions/ADR-*.md (if ADR required)
 - [ ] docs/README.md (if user-facing behavior changed)
 
@@ -73,6 +73,7 @@
 
 - Commit split plan will be finalized in the issue `Execution Plan` comment during `execute`.
 - Status note: Core atomic-write behavior has already been implemented in `src/vault.rs` during E3-01/E3-02 execution (`vault.enc.tmp` write + `std::fs::rename` replace). When executing E3-11 formally, focus is to validate/expand dedicated E3-11 test coverage and closeout evidence rather than re-implementing the write path.
+- Validation note: packet coverage now includes success-path replace semantics (no lingering `vault.enc.tmp`) and failure-path temp-create error that preserves existing vault bytes.
 
 ---
 *Last updated: 2026-03-03*
