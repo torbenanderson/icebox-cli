@@ -61,7 +61,7 @@
 ## Docs Impact
 
 - [x] docs/plan/spec/PKT-E3-10-work-item.md
-- [ ] docs/plan/TESTING.md (if test mappings are added/changed)
+- [x] docs/plan/TESTING.md (if test mappings are added/changed)
 - [ ] docs/architecture/decisions/ADR-*.md (if ADR required)
 - [ ] docs/README.md (if user-facing behavior changed)
 
@@ -74,6 +74,7 @@
 ## Execution Notes
 
 - Commit split plan will be finalized in the issue `Execution Plan` comment during `execute`.
+- Runtime status note: `load_or_create_vault` now rejects non-`1` vault versions explicitly and tests cover both missing `version` (parse failure) and unknown version values (deterministic version error).
 
 ---
 *Last updated: 2026-03-03*

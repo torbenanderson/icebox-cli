@@ -237,7 +237,7 @@ These tests are public-release blockers and must pass on macOS CI before shippin
 | T-E3-07 | E3-07 | Secret buffers are wrapped in `secrecy::Secret` with `Zeroize`; verify zeroization on drop (test helper) |
 | T-E3-08 | E3-08 | Secret buffers are `mlock`'d (verify via `libc::mlock` on key buffers) |
 | T-E3-09 | E3-09 | No temp files exist in `$TMPDIR` or agent directory during or after vault operations |
-| T-E3-10 | E3-10 | `vault.enc` contains `"version": 1` field; parser rejects vault with missing/unknown version |
+| T-E3-10 | E3-10 | `vault.enc` with valid `version: 1` loads successfully; parser rejects vault with missing version and rejects unknown version values |
 | T-E3-11 | E3-11 | Vault write creates `vault.enc.tmp` first, then renames atomically; interrupted write doesn't corrupt vault |
 | T-E3-12 | E3-12 | Concurrent Icebox processes acquire flock and do not corrupt vault during simultaneous writes |
 | T-E3-13a | E3-13 | Manually corrupt `vault.enc` JSON (truncate, add garbage); verify vault load returns `ICE-201` (parse failure) |
