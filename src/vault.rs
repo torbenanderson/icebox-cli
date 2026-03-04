@@ -449,6 +449,79 @@ mod tests {
     }
 
     #[test]
+    fn e3_11_atomic_write_replaces_file_and_cleans_tmp() {
+        let root = temp_path("icebox-e3-11-atomic-replace");
+        fs::create_dir_all(&root).expect("temp root should be creatable");
+        let vault_path = root.join("vault.enc");
+
+        fs::write(
+            &vault_path,
+            br#"{"format":"icebox.vault.legacy-v1","version":1,"entries":[{"service":"old","sealedBlob":"blob-old"}]}"#,
+        )
+        .expect("initial vault should be writable");
+
+        let updated = VaultFile {
+            format: "icebox.vault.legacy-v1".to_owned(),
+            version: 1,
+            entries: vec![VaultEntry {
+                service: "new".to_owned(),
+                sealed_blob: "blob-new".to_owned(),
+            }],
+        };
+        save_vault(&vault_path, &updated).expect("save_vault should succeed");
+
+        let loaded = load_or_create_vault(&vault_path).expect("updated vault should load");
+        assert_eq!(loaded.entries.len(), 1);
+        assert_eq!(loaded.entries[0].service, "new");
+        assert_eq!(loaded.entries[0].sealed_blob, "blob-new");
+        assert!(
+            !vault_path.with_extension("enc.tmp").exists(),
+            "vault.enc.tmp should not remain after successful replace"
+        );
+
+        fs::remove_dir_all(&root).expect("temp cleanup should succeed");
+    }
+
+    #[test]
+    fn e3_11_tmp_create_failure_preserves_existing_vault() {
+        let root = temp_path("icebox-e3-11-tmp-failure");
+        fs::create_dir_all(&root).expect("temp root should be creatable");
+        let vault_path = root.join("vault.enc");
+        fs::write(
+            &vault_path,
+            br#"{"format":"icebox.vault.legacy-v1","version":1,"entries":[{"service":"stable","sealedBlob":"blob-stable"}]}"#,
+        )
+        .expect("initial vault should be writable");
+        let original = fs::read(&vault_path).expect("initial vault should be readable");
+
+        let tmp_path = vault_path.with_extension("enc.tmp");
+        fs::create_dir_all(&tmp_path).expect("tmp path blocker directory should be creatable");
+
+        let updated = VaultFile {
+            format: "icebox.vault.legacy-v1".to_owned(),
+            version: 1,
+            entries: vec![VaultEntry {
+                service: "new".to_owned(),
+                sealed_blob: "blob-new".to_owned(),
+            }],
+        };
+
+        let err = save_vault(&vault_path, &updated).expect_err("save should fail");
+        match err {
+            VaultError::Io { op, .. } => assert_eq!(op, "failed to create vault.enc.tmp"),
+            other => panic!("expected Io create-temp error, got: {other}"),
+        }
+
+        let after = fs::read(&vault_path).expect("original vault should remain readable");
+        assert_eq!(
+            original, after,
+            "existing vault bytes should remain unchanged when tmp creation fails"
+        );
+
+        fs::remove_dir_all(&root).expect("temp cleanup should succeed");
+    }
+
+    #[test]
     fn vault_deserialize_backfills_missing_format_for_legacy_files() {
         let parsed: VaultFile =
             serde_json::from_str(r#"{"version":1,"entries":[]}"#).expect("vault json should parse");
