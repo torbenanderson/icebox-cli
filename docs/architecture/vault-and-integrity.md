@@ -7,6 +7,53 @@
 - Independent sealed entries keyed by service.
 - Each entry has immutable `entryId` for stable identity across updates/migrations.
 - Versioned schema with monotonic `seq`.
+- Recovery boundary (MVP): encrypted vault contents are non-recoverable without the corresponding identity private key material.
+
+## Vault Envelope (v1)
+
+The envelope allows format evolution without breaking old vaults. Machine-readable schema: [vault.schema.json](../reference/schemas/vault.schema.json).
+
+**Top-level fields:**
+
+| Field | Purpose |
+|-------|---------|
+| `format` | Constant `"icebox.vault"` — format identifier |
+| `schemaVersion` | Schema contract version (integer, ≥1) |
+| `version` | Envelope/data version for migrations |
+| `seq` | Monotonic sequence for rollback detection (`ICE-203`) |
+| `hmac` | Hex HMAC-SHA256 tag over vault body (excludes `hmac` field) |
+| `entries` | Array of sealed secret entries |
+| `createdByVersion` | CLI version that created this vault |
+| `lastMigratedByVersion` | CLI version that last migrated (null if never) |
+
+**Entry fields:**
+
+| Field | Purpose |
+|-------|---------|
+| `entryId` | Immutable UUID/ULID — stable across renames/updates |
+| `service` | Service label (e.g. `openai`, `aws`) — unique per vault |
+| `sealedBlob` | Base64 ciphertext from `crypto_box_seal` |
+| `created` | RFC3339 timestamp when entry was added |
+| `updated` | RFC3339 or null — set on value change |
+
+**Example (minimal):**
+
+```json
+{
+  "format": "icebox.vault",
+  "schemaVersion": 1,
+  "version": 1,
+  "seq": 0,
+  "hmac": null,
+  "entries": [],
+  "createdByVersion": "0.1.0",
+  "lastMigratedByVersion": null
+}
+```
+
+Empty vault: `seq: 0`, `hmac: null`, `entries: []`. First secret adds one entry and sets `hmac` after HMAC key exists (E3-16).
+
+Optional identity self-description (`identity_pubkey`, etc.) is deferred per [ADR-0003](decisions/ADR-0003-defer-vault-reseal-and-provenance.md).
 
 ## Write Safety
 
@@ -55,4 +102,4 @@ Implement one canonical function for load validation and keep checks centralized
 
 ---
 
-*Last updated: 2026-02-16*
+*Last updated: 2026-03-02*
