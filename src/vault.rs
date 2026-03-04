@@ -345,7 +345,8 @@ mod tests {
     #[test]
     fn e3_05_missing_vault_returns_empty_clean_state() {
         let vault_path = temp_path("icebox-e3-05-empty").join("vault.enc");
-        let loaded = load_or_create_vault(&vault_path).expect("missing vault should load as default");
+        let loaded =
+            load_or_create_vault(&vault_path).expect("missing vault should load as default");
         assert_eq!(loaded.format, VAULT_FORMAT);
         assert_eq!(loaded.version, 1);
         assert!(loaded.entries.is_empty());
