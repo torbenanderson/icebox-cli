@@ -9,6 +9,7 @@ mod e2_11_active_agent_tracking;
 mod e2_18_agent_name_validation;
 mod e3_01_vault_creation;
 mod e3_02_sealed_box;
+mod e3_12_file_locking;
 
 #[test]
 fn e2e_layout_smoke() {

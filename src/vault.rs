@@ -5,12 +5,14 @@ use base64::engine::general_purpose::STANDARD as BASE64_STANDARD;
 use crypto_box::PublicKey as X25519PublicKey;
 use ed25519_dalek::VerifyingKey;
 use rand_core::OsRng;
+use rustix::fs::{FlockOperation, flock};
 use serde::{Deserialize, Serialize};
 use std::error::Error;
 use std::fmt::{Display, Formatter};
 use std::fs::{self, OpenOptions};
 use std::io::Write;
 use std::path::{Path, PathBuf};
+use std::time::Duration;
 
 const VAULT_VERSION: u16 = 1;
 const VAULT_FORMAT: &str = "icebox.vault.legacy-v1";
@@ -164,6 +166,10 @@ fn crypto_err(op: &'static str, source: impl ToString) -> VaultError {
     }
 }
 
+fn errno_to_io(err: rustix::io::Errno) -> std::io::Error {
+    std::io::Error::from_raw_os_error(err.raw_os_error())
+}
+
 fn resolve_icebox_home() -> Result<PathBuf, VaultError> {
     if let Ok(override_home) = std::env::var("ICEBOX_HOME") {
         return Ok(PathBuf::from(override_home));
@@ -265,6 +271,42 @@ fn save_vault(path: &Path, vault: &VaultFile) -> Result<(), VaultError> {
     Ok(())
 }
 
+fn maybe_hold_vault_lock_for_test() {
+    let Some(raw) = std::env::var("ICEBOX_TEST_HOLD_VAULT_LOCK_MS").ok() else {
+        return;
+    };
+    let Ok(ms) = raw.parse::<u64>() else {
+        return;
+    };
+    if ms > 0 {
+        std::thread::sleep(Duration::from_millis(ms));
+    }
+}
+
+fn with_vault_write_lock<T, F>(vault_path: &Path, action: F) -> Result<T, VaultError>
+where
+    F: FnOnce() -> Result<T, VaultError>,
+{
+    let lock_path = vault_path.with_extension("enc.lock");
+    let lock_file = OpenOptions::new()
+        .write(true)
+        .create(true)
+        .truncate(false)
+        .open(&lock_path)
+        .map_err(|err| io_err("failed to open vault.enc.lock", err))?;
+
+    flock(&lock_file, FlockOperation::LockExclusive)
+        .map_err(|err| io_err("failed to lock vault.enc.lock", errno_to_io(err)))?;
+    maybe_hold_vault_lock_for_test();
+
+    let result = action();
+
+    flock(&lock_file, FlockOperation::Unlock)
+        .map_err(|err| io_err("failed to unlock vault.enc.lock", errno_to_io(err)))?;
+
+    result
+}
+
 pub fn add_secret_to_active_agent(service: &str, secret_value: &str) -> Result<(), VaultError> {
     let trimmed_service = service.trim();
     if trimmed_service.is_empty() {
@@ -284,21 +326,23 @@ pub fn add_secret_to_active_agent(service: &str, secret_value: &str) -> Result<(
     let sealed_blob = BASE64_STANDARD.encode(sealed);
 
     let vault_path = agent_dir.join("vault.enc");
-    let mut vault = load_or_create_vault(&vault_path)?;
-    if let Some(existing) = vault
-        .entries
-        .iter_mut()
-        .find(|entry| entry.service == trimmed_service)
-    {
-        existing.sealed_blob = sealed_blob;
-    } else {
-        vault.entries.push(VaultEntry {
-            service: trimmed_service.to_owned(),
-            sealed_blob,
-        });
-    }
+    with_vault_write_lock(&vault_path, || {
+        let mut vault = load_or_create_vault(&vault_path)?;
+        if let Some(existing) = vault
+            .entries
+            .iter_mut()
+            .find(|entry| entry.service == trimmed_service)
+        {
+            existing.sealed_blob = sealed_blob;
+        } else {
+            vault.entries.push(VaultEntry {
+                service: trimmed_service.to_owned(),
+                sealed_blob,
+            });
+        }
 
-    save_vault(&vault_path, &vault)
+        save_vault(&vault_path, &vault)
+    })
 }
 
 #[cfg(test)]
