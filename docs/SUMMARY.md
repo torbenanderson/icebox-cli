@@ -29,6 +29,7 @@
   - [Calendar](maintenance/CALENDAR.md)
   - [Log](maintenance/LOG.md)
   - [Dependencies](maintenance/DEPENDENCIES.md)
+  - [Refactor Backlog](maintenance/REFACTOR_BACKLOG.md)
 - [Guides](guides/BACKUP.md)
 - [Process](process/README.md)
   - [Discussion Proposals](process/DISCUSSION_PROPOSALS.md)
