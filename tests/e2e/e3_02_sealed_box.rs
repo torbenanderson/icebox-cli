@@ -40,6 +40,9 @@ fn decrypt_sealed_blob_with_fake_identity(
     let key_enc = fs::read(key_enc_path).expect("key.enc should be readable");
     let ed25519_private = decode_fake_wrapped_private_key(&key_enc);
     let signing_key = SigningKey::from_bytes(&ed25519_private);
+    // Convert Ed25519 signing-key scalar bytes to X25519 secret key material.
+    // This follows the ed25519-dalek pairing contract with to_montgomery()
+    // and is intended to be libsodium-compatible for sealed-box interop.
     let x25519_secret = X25519SecretKey::from(signing_key.to_scalar_bytes());
 
     let sealed = BASE64_STANDARD
