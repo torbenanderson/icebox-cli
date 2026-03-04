@@ -12,8 +12,11 @@ Lightweight log of completed work and decisions. Append when tasks are done.
 
 ## Entries
 
-_(No entries yet. Add first entry when initial maintenance work is completed.)_
+### 2026-03-02 — Refactor backlog added
+
+- **Task:** Added [REFACTOR_BACKLOG.md](REFACTOR_BACKLOG.md) to maintenance with src/ LOC reduction opportunities (~60–70 lines): thiserror, enclave force-failure consolidation, RegistrationCleanup, cleanup_file_if_created, config save.
+- **Notes:** Wired into maintenance README scope and SUMMARY. Low-priority; consider during dependency or error-handling touch points.
 
 ---
 
-*Last updated: 2026-03-03*
+*Last updated: 2026-03-02*

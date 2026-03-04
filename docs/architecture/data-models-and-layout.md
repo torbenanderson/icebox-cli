@@ -33,6 +33,7 @@
   - `wrappingScheme`
   - `backendClass`
   - `identityLane`
+  - `approvalBackend` (future: `passkey`, `webauthn`, etc.; `null` in MVP)
 - Unknown fields must be preserved across read/write cycles.
 - Unknown `type` must fail safely as unsupported until explicitly implemented.
 
@@ -81,4 +82,4 @@
 
 ---
 
-*Last updated: 2026-02-24*
+*Last updated: 2026-03-02*

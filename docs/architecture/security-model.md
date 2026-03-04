@@ -28,6 +28,24 @@ assets, boundaries, and required controls, and links to deeper subsystem specs.
 - Boundary C: Local filesystem.
   - Security assumptions require local, owner-only storage semantics.
 
+```mermaid
+flowchart TB
+    subgraph A["Boundary A: Icebox process"]
+        ICEBOX["icebox CLI\n- Enclave unwrap\n- Vault load/verify\n- Secret injection"]
+    end
+
+    subgraph B["Boundary B: Spawned subprocess"]
+        SUB["User command\n(trusted by user)\nMay exfiltrate secrets"]
+    end
+
+    subgraph C["Boundary C: Local filesystem"]
+        FILES["~/.icebox/identities/<name>/\nkey.enc, vault.enc, hmac.enc\n(owner-only, 0600)"]
+    end
+
+    ICEBOX -->|"run: inject env only"| SUB
+    ICEBOX <-->|"read/write sealed blobs"| FILES
+```
+
 ## Threat Model
 
 ### In Scope
@@ -75,6 +93,28 @@ assets, boundaries, and required controls, and links to deeper subsystem specs.
 - No outbound network from `icebox` process in MVP.
 - Owner-only path/file mode requirements (`0700` dirs, `0600` sensitive files).
 
+### Key Protection Flow (Local Lane)
+
+```mermaid
+flowchart LR
+    subgraph REG["Registration"]
+        ED["Ed25519 keypair\n(in memory)"]
+        ENC["Enclave P-256\nwrap"]
+        KENC["key.enc\n(on disk)"]
+        ED --> ENC --> KENC
+    end
+
+    subgraph RUNTIME["Runtime (add/run)"]
+        UNWRAP["Unwrap at\noperation time"]
+        SEAL["Seal vault entries\ncrypto_box_seal"]
+        WIPE["Wipe plaintext\nfrom memory"]
+        KENC -.->|"load"| UNWRAP
+        UNWRAP --> SEAL --> WIPE
+    end
+```
+
+Plaintext private key exists only transiently in Icebox process memory during unwrap. Never persisted to disk.
+
 ## Residual Risk
 
 - Trusted subprocesses can exfiltrate injected secrets via network/files/stdout/stderr.
@@ -103,4 +143,4 @@ assets, boundaries, and required controls, and links to deeper subsystem specs.
 
 ---
 
-*Last updated: 2026-02-24*
+*Last updated: 2026-03-02*

@@ -46,7 +46,7 @@
 | macOS (Apple Silicon) | macOS | **All tests** including enclave integration, entitlement checks, Keychain ACL tests | Nothing |
 | Linux (Ubuntu) | Linux | Vault crypto, sealed-box interop, DID derivation, CLI parsing, config, multicodec encoding | Enclave tests (`#[cfg(target_os = "macos")]`), TMPDIR `statfs` tests, Security.framework tests |
 
-Tests in `tests/` that require the enclave use `#[cfg(target_os = "macos")]` and are automatically excluded on Linux. The stub (`enclave_stub.rs`, `#[cfg(not(target_os = "macos"))]`) compiles on Linux and returns descriptive errors, allowing non-enclave code paths to be tested.
+Tests in `tests/` that require the enclave use `#[cfg(target_os = "macos")]` and are automatically excluded on Linux. The stub (`backend_stub.rs`, `#[cfg(not(target_os = "macos"))]`) compiles on Linux and returns descriptive errors, allowing non-enclave code paths to be tested.
 
 For local development on macOS, `cargo test` runs everything. On Linux, the same command compiles the stub and runs all non-enclave tests.
 
@@ -54,10 +54,10 @@ For local development on macOS, `cargo test` runs everything. On Linux, the same
 
 | Runner | Must include | Must skip |
 |--------|--------------|-----------|
-| **macOS** | All tests: unit, integration, E2E, system, security, enclave. `enclave_darwin.rs` compiled and exercised. Entitlement/Keychain/Security.framework tests. | Nothing. |
-| **Linux** | Unit, integration, E2E, system, security tests that do not touch enclave. Vault crypto, sealed-box, DID derivation, CLI, config. `enclave_stub.rs` compiled. | Any code or test behind `#[cfg(target_os = "macos")]`. Enclave integration. TMPDIR `statfs` tests. Security.framework / Keychain tests. |
+| **macOS** | All tests: unit, integration, E2E, system, security, enclave. `backend_darwin.rs` compiled and exercised. Entitlement/Keychain/Security.framework tests. | Nothing. |
+| **Linux** | Unit, integration, E2E, system, security tests that do not touch enclave. Vault crypto, sealed-box, DID derivation, CLI, config. `backend_stub.rs` compiled. | Any code or test behind `#[cfg(target_os = "macos")]`. Enclave integration. TMPDIR `statfs` tests. Security.framework / Keychain tests. |
 
-**Source contract:** Enclave code lives in `enclave_darwin.rs` with `#[cfg(target_os = "macos")]`; non-macOS builds use `enclave_stub.rs` with `#[cfg(not(target_os = "macos"))]`. CI workflows must not attempt to run macOS-only tests on Linux.
+**Source contract:** Enclave code lives in `backend_darwin.rs` with `#[cfg(target_os = "macos")]`; non-macOS builds use `backend_stub.rs` with `#[cfg(not(target_os = "macos"))]`. CI workflows must not attempt to run macOS-only tests on Linux.
 
 ### Test Levels
 
@@ -93,7 +93,7 @@ Common commands for local development and CI parity:
 | `cargo audit` | Check dependencies against RustSec advisory database. Install: `cargo install cargo-audit --locked`. |
 | `cargo llvm-cov --summary-only` | Code coverage summary (which lines ran during tests). Install: `cargo install cargo-llvm-cov --locked`. |
 | `cargo llvm-cov --html` | Generate HTML coverage report in `target/llvm-cov/html/index.html`. |
-| `cargo mutants` | Mutation testing: mutate code and verify tests catch changes. Install: `cargo install cargo-mutants --locked`. On macOS, `enclave_stub` is not compiled; run on Linux (or in CI) to cover stub mutations. |
+| `cargo mutants` | Mutation testing: mutate code and verify tests catch changes. Install: `cargo install cargo-mutants --locked`. On macOS, `backend_stub` is not compiled; run on Linux (or in CI) to cover stub mutations. |
 
 ### Phase 1 Vertical Slice Gate
 
@@ -136,7 +136,7 @@ These tests are public-release blockers and must pass on macOS CI before shippin
 |---|---|---|
 | T-E1-01 | E1-01 | Integration tests verify Cargo scaffold happy path (`Cargo.toml` + `src/main.rs` exist, package name is `icebox-cli`) and failure path (`cargo metadata` fails for missing manifest path) |
 | T-E1-02 | E1-02 | CLI scaffolding is wired with `clap`; E2E tests verify happy path (`--help` exits 0 with usage text) and failure path (unknown flag exits 2 with argument error) |
-| T-E1-03 | E1-03 | Project structure modules exist and compile (`agent`, `config`, `vault`, `runner`, `did`) including platform-gated enclave split (`enclave_darwin.rs` on macOS and `enclave_stub.rs` elsewhere) |
+| T-E1-03 | E1-03 | Project structure modules exist and compile (`agent`, `config`, `vault`, `runner`, `did`) including platform-gated enclave split (`backend_darwin.rs` on macOS and `backend_stub.rs` elsewhere) |
 | T-E1-04 | E1-04 | CI workflows validate push/PR gates on macOS and Linux; happy path: merge-blocking jobs pass (`check`, `fmt`, `clippy -D warnings`, `test`) and enhancement jobs/reporting run as configured, failure path: any merge-blocking check marks workflow red and blocks merge until fixed |
 | T-E1-06 | E1-06 | `icebox --version` outputs version string, commit hash, and build date |
 | T-E1-07 | E1-07 | Runtime hardening sets `RLIMIT_CORE=0` at startup (happy path) and returns a deterministic error when setting the limit fails (failure path) |
@@ -228,18 +228,19 @@ These tests are public-release blockers and must pass on macOS CI before shippin
 | T-E3-21a | E3-21 | DID backend naming refactor keeps runtime behavior unchanged: backend resolution still returns deterministic identifiers and all existing E2/E3 tests continue to pass without command/output regressions |
 | T-E3-21b | E3-21 | Invalid/corrupt `config.json` paths map to dedicated runtime error code (not generic identity setup); duplicate/validation/parse failures remain distinguishable and deterministic |
 | T-E3-21c | E3-21 | `register-agent` refactor preserves cleanup invariants: failure in any artifact step leaves no partial unsafe state and does not write plaintext private key material |
-| T-E3-01 | E3-01 | First `add` creates `vault.enc` as valid JSON containing a sealed blob |
-| T-E3-02 | E3-02 | Seal/unseal round-trip: encrypt a secret, decrypt it, verify plaintext matches |
+| T-E3-01 | E3-01 | First `add` creates `vault.enc` as valid JSON containing format/version/encrypted entry; failure paths include missing `identity.pub` and missing active agent (`ICE-201` in MVP mapping) |
+| T-E3-02 | E3-02 | Seal/unseal round-trip: encrypt a secret, decrypt it, verify plaintext matches; include interop check that Ed25519→X25519 conversion used by runtime remains libsodium-compatible; tampered on-disk sealed blob fails decryption |
 | T-E3-03 | E3-03 | Two secrets sealed independently; decrypting one does not require or affect the other; each entry has unique immutable `entryId` |
 | T-E3-04 | E3-04 | Tampered vault blob (flipped bit) is detected and rejected with an AEAD error |
-| T-E3-05 | E3-05 | Empty vault returns clean state (empty list, no error) |
+| T-E3-05 | E3-05 | Vault load path returns clean default state for missing `vault.enc` (empty entries, no error) and returns deterministic parse failure for invalid JSON fixture |
 | T-E3-06 | E3-06 | Decryption fails gracefully when the wrong agent's key is used |
 | T-E3-07 | E3-07 | Secret buffers are wrapped in `secrecy::Secret` with `Zeroize`; verify zeroization on drop (test helper) |
 | T-E3-08 | E3-08 | Secret buffers are `mlock`'d (verify via `libc::mlock` on key buffers) |
 | T-E3-09 | E3-09 | No temp files exist in `$TMPDIR` or agent directory during or after vault operations |
-| T-E3-10 | E3-10 | `vault.enc` contains `"version": 1` field; parser rejects vault with missing/unknown version |
-| T-E3-11 | E3-11 | Vault write creates `vault.enc.tmp` first, then renames atomically; interrupted write doesn't corrupt vault |
-| T-E3-12 | E3-12 | Concurrent Icebox processes acquire flock and do not corrupt vault during simultaneous writes |
+| T-E3-10 | E3-10 | `vault.enc` with valid `version: 1` loads successfully; parser rejects vault with missing version and rejects unknown version values |
+| T-E3-11 | E3-11 | Vault write creates `vault.enc.tmp` first and atomically replaces `vault.enc`; success leaves no temp file, and temp-create failure path preserves existing vault bytes |
+| T-E3-12 | E3-12 | Concurrent `add` operations are serialized by advisory `flock` on `vault.enc.lock` and do not corrupt vault; lock-path open failure returns deterministic vault error |
+| T-E3-29 | E3-29 | Refactor preserves existing lock semantics: concurrent add serialization and lock-open failure behavior remain unchanged; when action + unlock both fail, the primary action error remains surfaced |
 | T-E3-13a | E3-13 | Manually corrupt `vault.enc` JSON (truncate, add garbage); verify vault load returns `ICE-201` (parse failure) |
 | T-E3-13b | E3-13 | Remove required top-level fields (`version`, `seq`, `entries`) from `vault.enc`; verify `ICE-202` error |
 | T-E3-13c | E3-13 | Replace a vault entry's `sealedBlob` with a different base64 blob; verify AEAD rejection on unseal |

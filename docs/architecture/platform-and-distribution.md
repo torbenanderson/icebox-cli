@@ -26,8 +26,9 @@
 1. TPM-backed wrapping path (TPM 2.0 + local sealed key workflow).
 2. OS keyring path (for example Secret Service/libsecret-backed envelope key storage).
 3. Software-only fallback (passphrase-protected local key material) for CI/dev workflows with reduced security guarantees.
-4. External hardware token path (for example YubiKey via PIV/PKCS#11), subject to UX/security evaluation.
+4. External hardware token path (for example YubiKey via PIV/PKCS#11 or WebAuthn/passkey), subject to UX/security evaluation.
 5. Mobile-paired signing/unwrap proxy path for approval-first workflows.
+6. WebAuthn/passkey as approval second factor (identity-level 2FA; sealing key remains Ed25519).
 
 ### Acceptance Bar For Linux Full-Flow Support
 
@@ -59,4 +60,4 @@
 
 ---
 
-*Last updated: 2026-02-24*
+*Last updated: 2026-03-02*

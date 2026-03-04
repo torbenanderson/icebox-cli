@@ -10,6 +10,7 @@ Maintenance covers:
 - **Audits** — `cargo audit`, mutation testing, security reviews.
 - **Releases** — Pre-release checklist, version bumps, changelog.
 - **Docs & tooling** — Schema sync, mdBook, CI workflow updates.
+- **Refactors** — Optional src/ LOC reductions. See [REFACTOR_BACKLOG.md](REFACTOR_BACKLOG.md).
 
 ## How to Use
 
@@ -18,6 +19,7 @@ Maintenance covers:
 | [CALENDAR.md](CALENDAR.md) | Recurring tasks and cadence. Add new tasks here as they are identified. |
 | [LOG.md](LOG.md) | Lightweight log of completed work and decisions. Append when work is done. |
 | [DEPENDENCIES.md](DEPENDENCIES.md) | Dependabot PR priority, merge order, and policy. |
+| [REFACTOR_BACKLOG.md](REFACTOR_BACKLOG.md) | Optional src/ LOC reductions and quality improvements. Consider during maintenance passes. |
 
 **Add a task:** Edit `CALENDAR.md` — define cadence and owner if known.
 

@@ -3,7 +3,7 @@
 //! Command naming can remain "agent" while internal types stay identity-neutral.
 
 use ed25519_dalek::SigningKey;
-use rand_core::{OsRng, RngCore};
+use rand_core::OsRng;
 use std::error::Error;
 use std::fmt::{Display, Formatter};
 use std::fs::{self, OpenOptions};
@@ -153,24 +153,23 @@ fn enclave_err(op: &'static str, source: crate::enclave::EnclaveError) -> Regist
     }
 }
 
-fn config_err(
-    op: &'static str,
-    source: crate::config::ConfigError,
-    config_path: &Path,
-) -> RegisterAgentError {
-    if matches!(source, crate::config::ConfigError::DuplicateAgentNames) {
-        return RegisterAgentError::DuplicateRegistryNames {
-            path: config_path.to_path_buf(),
-        };
-    }
-    if matches!(source, crate::config::ConfigError::Parse { .. }) {
-        return RegisterAgentError::InvalidConfig {
-            path: config_path.to_path_buf(),
-        };
-    }
-    RegisterAgentError::Io {
-        op,
-        source: std::io::Error::other(source.to_string()),
+impl RegisterAgentError {
+    fn from_config_error(
+        op: &'static str,
+        source: crate::config::ConfigError,
+        config_path: &Path,
+    ) -> Self {
+        match source {
+            crate::config::ConfigError::DuplicateAgentNames => Self::DuplicateRegistryNames {
+                path: config_path.to_path_buf(),
+            },
+            crate::config::ConfigError::Parse { .. }
+            | crate::config::ConfigError::Serialize { .. }
+            | crate::config::ConfigError::InvalidAgentName { .. } => Self::InvalidConfig {
+                path: config_path.to_path_buf(),
+            },
+            crate::config::ConfigError::Io { source, .. } => Self::Io { op, source },
+        }
     }
 }
 
@@ -182,6 +181,39 @@ fn cleanup_file_if_created(path: &Path, created: bool) -> Result<(), std::io::Er
         Ok(()) => Ok(()),
         Err(err) if err.kind() == std::io::ErrorKind::NotFound => Ok(()),
         Err(err) => Err(err),
+    }
+}
+
+#[derive(Debug)]
+struct RegistrationCleanup {
+    key_ref_path: PathBuf,
+    key_enc_path: PathBuf,
+    identity_pub_path: PathBuf,
+    key_ref_created: bool,
+    key_enc_created: bool,
+    identity_pub_created: bool,
+}
+
+impl RegistrationCleanup {
+    fn new(key_ref_path: PathBuf, key_enc_path: PathBuf, identity_pub_path: PathBuf) -> Self {
+        Self {
+            key_ref_path,
+            key_enc_path,
+            identity_pub_path,
+            key_ref_created: false,
+            key_enc_created: false,
+            identity_pub_created: false,
+        }
+    }
+
+    fn cleanup_on_error(&self) -> Result<(), RegisterAgentError> {
+        cleanup_file_if_created(&self.identity_pub_path, self.identity_pub_created)
+            .map_err(|cleanup_err| io_err("failed to clean identity.pub", cleanup_err))?;
+        cleanup_file_if_created(&self.key_enc_path, self.key_enc_created)
+            .map_err(|cleanup_err| io_err("failed to clean key.enc", cleanup_err))?;
+        cleanup_file_if_created(&self.key_ref_path, self.key_ref_created)
+            .map_err(|cleanup_err| io_err("failed to clean enclave.keyref", cleanup_err))?;
+        Ok(())
     }
 }
 
@@ -199,40 +231,93 @@ fn force_key_enc_persist_failure() -> Result<(), RegisterAgentError> {
     Ok(())
 }
 
-fn resolve_icebox_home() -> Result<PathBuf, RegisterAgentError> {
-    if let Ok(override_home) = std::env::var("ICEBOX_HOME") {
-        return Ok(PathBuf::from(override_home));
-    }
-
-    let home = std::env::var_os("HOME").ok_or(RegisterAgentError::MissingHomeDir)?;
-    Ok(PathBuf::from(home).join(".icebox"))
+fn write_new_file(
+    path: &Path,
+    bytes: &[u8],
+    create_op: &'static str,
+    write_op: &'static str,
+) -> Result<(), RegisterAgentError> {
+    let mut out = OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .open(path)
+        .map_err(|err| io_err(create_op, err))?;
+    out.write_all(bytes).map_err(|err| io_err(write_op, err))
 }
 
-fn bytes_to_hex(bytes: &[u8]) -> String {
-    const HEX: &[u8; 16] = b"0123456789abcdef";
-    let mut out = String::with_capacity(bytes.len() * 2);
-    for byte in bytes {
-        out.push(HEX[(byte >> 4) as usize] as char);
-        out.push(HEX[(byte & 0x0f) as usize] as char);
-    }
-    out
+fn create_wrapping_key_ref(
+    name: &IdentityName,
+    cleanup: &mut RegistrationCleanup,
+) -> Result<String, RegisterAgentError> {
+    let wrapping_key_ref = crate::enclave::create_wrapping_key(name.as_str())
+        .map_err(|err| enclave_err("failed to create enclave wrapping key", err))?;
+    write_new_file(
+        &cleanup.key_ref_path,
+        wrapping_key_ref.as_bytes(),
+        "failed to create enclave.keyref",
+        "failed to write enclave.keyref",
+    )?;
+    cleanup.key_ref_created = true;
+    Ok(wrapping_key_ref)
 }
 
-fn generate_agent_id() -> String {
-    let mut random = [0u8; 16];
-    OsRng.fill_bytes(&mut random);
-    format!(
-        "{}-{}-{}-{}-{}",
-        bytes_to_hex(&random[0..4]),
-        bytes_to_hex(&random[4..6]),
-        bytes_to_hex(&random[6..8]),
-        bytes_to_hex(&random[8..10]),
-        bytes_to_hex(&random[10..16]),
+fn create_wrapped_private_key(
+    wrapping_key_ref: &str,
+) -> Result<(SigningKey, Vec<u8>), RegisterAgentError> {
+    let signing_key = SigningKey::generate(&mut OsRng);
+    let wrapped_private_key =
+        crate::enclave::wrap_private_key(wrapping_key_ref, &signing_key.to_bytes())
+            .map_err(|err| enclave_err("failed to wrap private key", err))?;
+    Ok((signing_key, wrapped_private_key))
+}
+
+fn persist_wrapped_private_key(
+    wrapped_private_key: &[u8],
+    cleanup: &mut RegistrationCleanup,
+) -> Result<(), RegisterAgentError> {
+    force_key_enc_persist_failure()?;
+    write_new_file(
+        &cleanup.key_enc_path,
+        wrapped_private_key,
+        "failed to create key.enc",
+        "failed to write key.enc",
+    )?;
+    cleanup.key_enc_created = true;
+    Ok(())
+}
+
+fn persist_identity_public_key(
+    signing_key: &SigningKey,
+    cleanup: &mut RegistrationCleanup,
+) -> Result<[u8; 32], RegisterAgentError> {
+    let public_key_bytes = signing_key.verifying_key().to_bytes();
+    write_new_file(
+        &cleanup.identity_pub_path,
+        &public_key_bytes,
+        "failed to create identity.pub",
+        "failed to write identity.pub",
+    )?;
+    cleanup.identity_pub_created = true;
+    Ok(public_key_bytes)
+}
+
+fn persist_agent_registry_entry(
+    config_home: &Path,
+    config_path: &Path,
+    config: &mut crate::config::RuntimeConfig,
+    name: &IdentityName,
+    public_key_bytes: &[u8; 32],
+) -> Result<(), RegisterAgentError> {
+    let agent_record = crate::config::AgentRecord {
+        agent_id: crate::util::generate_agent_id(),
+        name: name.as_str().to_owned(),
+        did: crate::did::did_from_public_key(public_key_bytes),
+    };
+    crate::config::append_agent_and_set_active_in_memory(config_home, config, agent_record).map_err(
+        |err| {
+            RegisterAgentError::from_config_error("failed to persist config.json", err, config_path)
+        },
     )
-}
-
-fn did_from_public_key(public_key: &[u8; 32]) -> String {
-    format!("did:key:ed25519-raw:{}", bytes_to_hex(public_key))
 }
 
 /// Registers an agent by generating a new Ed25519 keypair and writing identity artifacts.
@@ -241,90 +326,132 @@ fn did_from_public_key(public_key: &[u8; 32]) -> String {
 /// `~/.icebox/identities/<name>/` (or `$ICEBOX_HOME/identities/<name>/`).
 pub fn register_agent(raw_name: &str) -> Result<(), RegisterAgentError> {
     let name = IdentityName::parse(raw_name).map_err(RegisterAgentError::InvalidName)?;
-    let home = resolve_icebox_home()?;
+    let home =
+        crate::util::resolve_icebox_home().map_err(|_| RegisterAgentError::MissingHomeDir)?;
     let config_home = home.clone();
     let config_path = config_home.join("config.json");
-    let exists = crate::config::has_agent_name(&config_home, name.as_str())
-        .map_err(|err| config_err("failed to load config.json", err, &config_path))?;
+    let mut config = crate::config::load_or_default_with_repair(&config_home).map_err(|err| {
+        RegisterAgentError::from_config_error("failed to load config.json", err, &config_path)
+    })?;
+    let exists =
+        crate::config::has_agent_name_in_config(&config, name.as_str()).map_err(|err| {
+            RegisterAgentError::from_config_error("failed to load config.json", err, &config_path)
+        })?;
     if exists {
         return Err(RegisterAgentError::DuplicateName {
             name: name.as_str().to_owned(),
         });
     }
 
-    let agent_dir = home.join("identities").join(name.as_str());
+    let agent_dir = crate::util::agent_dir(&home, name.as_str());
 
-    let key_ref_path = agent_dir.join("enclave.keyref");
-    let key_enc_path = agent_dir.join("key.enc");
-    let identity_pub_path = agent_dir.join("identity.pub");
-
-    let mut key_ref_created = false;
-    let mut key_enc_created = false;
-    let mut identity_pub_created = false;
+    let mut cleanup = RegistrationCleanup::new(
+        agent_dir.join("enclave.keyref"),
+        agent_dir.join("key.enc"),
+        agent_dir.join("identity.pub"),
+    );
 
     let result = (|| -> Result<(), RegisterAgentError> {
         fs::create_dir_all(&agent_dir)
             .map_err(|err| io_err("failed to create agent directory", err))?;
 
-        let wrapping_key_ref = crate::enclave::create_wrapping_key(name.as_str())
-            .map_err(|err| enclave_err("failed to create enclave wrapping key", err))?;
-        let mut key_ref_out = OpenOptions::new()
-            .write(true)
-            .create_new(true)
-            .open(&key_ref_path)
-            .map_err(|err| io_err("failed to create enclave.keyref", err))?;
-        key_ref_created = true;
-        key_ref_out
-            .write_all(wrapping_key_ref.as_bytes())
-            .map_err(|err| io_err("failed to write enclave.keyref", err))?;
-
-        let signing_key = SigningKey::generate(&mut OsRng);
-        let wrapped_private_key =
-            crate::enclave::wrap_private_key(&wrapping_key_ref, &signing_key.to_bytes())
-                .map_err(|err| enclave_err("failed to wrap private key", err))?;
-
-        force_key_enc_persist_failure()?;
-        let mut key_enc_out = OpenOptions::new()
-            .write(true)
-            .create_new(true)
-            .open(&key_enc_path)
-            .map_err(|err| io_err("failed to create key.enc", err))?;
-        key_enc_created = true;
-        key_enc_out
-            .write_all(&wrapped_private_key)
-            .map_err(|err| io_err("failed to write key.enc", err))?;
-
-        let public_key = signing_key.verifying_key();
-        let public_key_bytes = public_key.to_bytes();
-        let mut out = OpenOptions::new()
-            .write(true)
-            .create_new(true)
-            .open(&identity_pub_path)
-            .map_err(|err| io_err("failed to create identity.pub", err))?;
-        identity_pub_created = true;
-        out.write_all(&public_key_bytes)
-            .map_err(|err| io_err("failed to write identity.pub", err))?;
-
-        let agent_record = crate::config::AgentRecord {
-            agent_id: generate_agent_id(),
-            name: name.as_str().to_owned(),
-            did: did_from_public_key(&public_key_bytes),
-        };
-        crate::config::append_agent_and_set_active(&config_home, agent_record)
-            .map_err(|err| config_err("failed to persist config.json", err, &config_path))?;
-
+        let wrapping_key_ref = create_wrapping_key_ref(&name, &mut cleanup)?;
+        let (signing_key, wrapped_private_key) = create_wrapped_private_key(&wrapping_key_ref)?;
+        persist_wrapped_private_key(&wrapped_private_key, &mut cleanup)?;
+        let public_key_bytes = persist_identity_public_key(&signing_key, &mut cleanup)?;
+        persist_agent_registry_entry(
+            &config_home,
+            &config_path,
+            &mut config,
+            &name,
+            &public_key_bytes,
+        )?;
         Ok(())
     })();
 
     if let Err(err) = result {
-        cleanup_file_if_created(&identity_pub_path, identity_pub_created)
-            .map_err(|cleanup_err| io_err("failed to clean identity.pub", cleanup_err))?;
-        cleanup_file_if_created(&key_enc_path, key_enc_created)
-            .map_err(|cleanup_err| io_err("failed to clean key.enc", cleanup_err))?;
-        cleanup_file_if_created(&key_ref_path, key_ref_created)
-            .map_err(|cleanup_err| io_err("failed to clean enclave.keyref", cleanup_err))?;
+        cleanup.cleanup_on_error()?;
         return Err(err);
     }
 
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn config_error_duplicate_maps_to_duplicate_registry_names() {
+        let err = RegisterAgentError::from_config_error(
+            "failed to persist config.json",
+            crate::config::ConfigError::DuplicateAgentNames,
+            Path::new("/tmp/config.json"),
+        );
+        assert!(matches!(
+            err,
+            RegisterAgentError::DuplicateRegistryNames { .. }
+        ));
+    }
+
+    #[test]
+    fn config_error_parse_maps_to_invalid_config() {
+        let parse_err = serde_json::from_str::<serde_json::Value>("{")
+            .expect_err("fixture should produce parse error");
+        let err = RegisterAgentError::from_config_error(
+            "failed to load config.json",
+            crate::config::ConfigError::Parse { source: parse_err },
+            Path::new("/tmp/config.json"),
+        );
+        assert!(matches!(err, RegisterAgentError::InvalidConfig { .. }));
+    }
+
+    #[test]
+    fn config_error_serialize_maps_to_invalid_config() {
+        struct FailSerialize;
+        impl serde::Serialize for FailSerialize {
+            fn serialize<S>(&self, _serializer: S) -> Result<S::Ok, S::Error>
+            where
+                S: serde::Serializer,
+            {
+                Err(serde::ser::Error::custom("intentional serialize failure"))
+            }
+        }
+
+        let fake_serialize_err =
+            serde_json::to_vec(&FailSerialize).expect_err("fixture should produce serialize error");
+        let err = RegisterAgentError::from_config_error(
+            "failed to persist config.json",
+            crate::config::ConfigError::Serialize {
+                source: fake_serialize_err,
+            },
+            Path::new("/tmp/config.json"),
+        );
+        assert!(matches!(err, RegisterAgentError::InvalidConfig { .. }));
+    }
+
+    #[test]
+    fn config_error_invalid_name_maps_to_invalid_config() {
+        let err = RegisterAgentError::from_config_error(
+            "failed to load config.json",
+            crate::config::ConfigError::InvalidAgentName {
+                name: "Bad_Name".to_owned(),
+            },
+            Path::new("/tmp/config.json"),
+        );
+        assert!(matches!(err, RegisterAgentError::InvalidConfig { .. }));
+    }
+
+    #[test]
+    fn config_error_io_maps_to_io() {
+        let err = RegisterAgentError::from_config_error(
+            "failed to persist config.json",
+            crate::config::ConfigError::Io {
+                op: "failed to replace config.json",
+                source: std::io::Error::new(std::io::ErrorKind::PermissionDenied, "denied"),
+            },
+            Path::new("/tmp/config.json"),
+        );
+        assert!(matches!(err, RegisterAgentError::Io { .. }));
+    }
 }

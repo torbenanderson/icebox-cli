@@ -11,6 +11,7 @@ pub(crate) enum IceErrorCode {
     InvalidConfig,
     DuplicateConfigAgentNames,
     EnclaveFailure,
+    VaultOperation,
 }
 
 impl IceErrorCode {
@@ -23,6 +24,7 @@ impl IceErrorCode {
             Self::InvalidConfig => "ICE-309",
             Self::DuplicateConfigAgentNames => "ICE-310",
             Self::EnclaveFailure => "ICE-311",
+            Self::VaultOperation => "ICE-201",
         }
     }
 
@@ -35,6 +37,7 @@ impl IceErrorCode {
             Self::InvalidConfig => "Config is invalid.",
             Self::DuplicateConfigAgentNames => "Config has duplicate agent names.",
             Self::EnclaveFailure => "Secure Enclave operation failed.",
+            Self::VaultOperation => "Vault operation failed.",
         }
     }
 }
@@ -73,6 +76,7 @@ pub(crate) fn format_runtime_error(
             | IceErrorCode::InvalidConfig
             | IceErrorCode::DuplicateConfigAgentNames
             | IceErrorCode::EnclaveFailure
+            | IceErrorCode::VaultOperation
     ) {
         if let Some(detail) = detail {
             return format!("[{}] {detail}", code.code());
@@ -199,6 +203,20 @@ mod tests {
         assert_eq!(
             rendered,
             "[ICE-311] Secure Enclave operation failed. Check supported hardware and signing/entitlements."
+        );
+    }
+
+    #[test]
+    fn format_vault_operation_error_shows_friendly_detail_in_default_mode() {
+        let rendered = format_runtime_error(
+            IceErrorCode::VaultOperation,
+            false,
+            Some("No active agent configured. Register an agent first."),
+        );
+
+        assert_eq!(
+            rendered,
+            "[ICE-201] No active agent configured. Register an agent first."
         );
     }
 }

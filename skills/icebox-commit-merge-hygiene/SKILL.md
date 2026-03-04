@@ -14,7 +14,7 @@ Route by intent using trigger words:
 1. `commit` flow (default):
    - trigger words: `commit`, `commit message`, `message for commit`, `write commit`
 2. `pr` flow:
-   - trigger words: `pr`, `pull request`, `pr prompt`, `pr body`, `pr title`
+   - trigger words: `pr`, `pull request`, `pr prompt`, `pr body`, `pr title`, `pr quality report`, `coverage report`
 3. `merge` flow:
    - trigger words: `merge`, `merge message`, `merge commit`, `squash message`
 
@@ -104,6 +104,42 @@ Optional for epic/milestone PRs:
    - short copy-ready note with "what this is / what this isn't / how to try / what's next"
 
 Use imperative, testable statements. Avoid narrative prose.
+
+## PR Quality Report Standard
+
+Use this when the user asks for a PR quality/coverage status update or report comment.
+
+Required sections (in order):
+
+1. `Definitions`
+   - Distinguish:
+     - `Test coverage`: required tests/scenarios executed and pass status.
+     - `Code coverage`: measured executed code percentages.
+2. `RAG legend`
+   - `GREEN`: meets expected target for PR scope.
+   - `AMBER`: acceptable with known gaps.
+   - `RED`: below threshold or missing evidence.
+3. `Status summary`
+   - `Test coverage status: <RAG>`
+   - `Code coverage status: <RAG>`
+4. `Test Coverage (execution)`
+   - workflow name, pass/fail, run URL.
+5. `Requirement/Scenario Coverage (scope)`
+   - packet/scope statement, key happy/failure path confirmation.
+6. `Code Coverage (measurement)`
+   - workflow name, pass/fail, run URL, artifact URL.
+   - include totals: regions/functions/lines.
+7. `Touched-module snapshot`
+   - include key modules touched in PR with concise metrics.
+8. `Follow-up focus`
+   - concrete next improvements (1-3 bullets).
+
+Formatting rules:
+
+1. Keep report concise and scannable.
+2. Avoid mixing test execution and coverage metrics in one bullet.
+3. Prefer links to workflow runs/artifacts as evidence.
+4. If a metric is unavailable, state `missing` and set RAG to `RED` for that section.
 
 ## Commit Splitting Rules
 

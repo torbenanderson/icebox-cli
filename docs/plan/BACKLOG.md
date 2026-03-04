@@ -23,8 +23,7 @@
 - E2-09 Duplicate guard
 - E2-18 Agent name validation
 - E3-21 Identity/config refactor baseline
-- E3-01 Vault creation
-- E3-02 Sealed-box encryption
+- E3-01 + E3-02 Vault creation + sealed-box encryption (combined execution unit)
 - E3-05 Empty vault
 - E3-10 Vault version field
 - E3-11 Atomic vault writes
@@ -126,6 +125,7 @@
 | E2-33 | Identity lane metadata | Persist explicit identity operation lane metadata (`local-enclave`, `paired-remote-signer`) with fail-safe behavior for unknown lanes |
 | E2-34 | Device enrollment bindings | Track per-device backend bindings for an identity without changing identity primary keys (`agentId`) |
 | E2-35 | Approval/session states | Broker/CLI contract returns deterministic approval states (`ok`, `pending_approval`, `denied`, `expired`) for protected operations |
+| E2-36 | Passkey/WebAuthn approval (post-MVP) | Identity-level second factor: user authenticates with passkey before enclave unwrap; passkey signs assertion, Icebox verifies. Sealing key remains Ed25519. Reserved `approvalBackend` in manifest. |
 
 ## E3 -- Encrypted Vault
 
@@ -144,6 +144,7 @@
 | E3-10 | Vault version field | Every `vault.enc` includes `"version": 1` at top level for forward-compatible format upgrades |
 | E3-11 | Atomic vault writes | Vault updates written to `vault.enc.tmp` then atomically renamed via `std::fs::rename`; prevents corruption on crash |
 | E3-12 | File locking | Advisory `flock` on `vault.enc.lock` during read-modify-write cycles; prevents concurrent process corruption |
+| E3-29 | Vault locking/error-path refactor cleanup | Refactor vault lock/error-path internals after E3 core execution: centralize lock lifecycle helper boundaries and normalize lock/open/unlock error mapping while preserving E3-10/11/12 behavior and test outcomes |
 | E3-13 | Vault load validation | Implement the [Vault Load Validation Pipeline](../architecture/vault-and-integrity.md) — single canonical function, steps 1-5 at load time, 6-7 at unseal. Reject with `ICE-201` / `ICE-202` / `ICE-203` / `ICE-204` / `ICE-205` per spec (`ICE-203` reserved for rollback via `seq`; `ICE-205` for entry-structure/uniqueness validation failures). Enforce unique service names on load and write path |
 | E3-14 | Filesystem check | On startup, `statfs` the `~/.icebox/` directory. If the filesystem type matches a known network/synced FS (NFS, SMB, CIFS, or known cloud-sync FUSE types), print a stderr warning. `--require-local-fs` hard-fails |
 | E3-15 | HMAC key generation | At `register-agent` time, generate a random 256-bit HMAC key in `secrecy::Secret`, encrypt via Secure Enclave P-256 key (`SecKeyCreateEncryptedData`), store as `hmac.enc` in agent directory, wipe plaintext from memory. |
@@ -152,6 +153,13 @@
 | E3-18 | HMAC key recovery | Phase 1.5. `recover-agent` generates a new `hmac.enc` (new random HMAC key, encrypted by the new enclave key). First vault write after recovery establishes HMAC baseline. |
 | E3-19 | Strict list integrity mode | `icebox list --strict` performs HMAC verification before output; default `list` remains non-enclave/non-strict |
 | E3-20 | Schema migration contract | Implement explicit vault schema migrators (`from_version` -> `to_version`) with atomic writeback, unsupported-version fail (`ICE-202`), idempotency guarantees, and fixture-based migration tests |
+| E3-22 | Vault envelope identity metadata (post-MVP) | Add optional self-description metadata fields in vault envelope (for example identity public-key reference) with explicit anti-drift rules and migration guards. Defer from MVP to keep envelope minimal. |
+| E3-23 | Vault write provenance (post-MVP) | Add optional authenticated provenance layer for vault writes (for example signature/attestation metadata) when auditability is required. Keep `crypto_box_seal` anonymous-sender semantics in MVP. |
+| E3-24 | Sealed-entry associated-data envelope (post-MVP) | Evaluate and add explicit associated-data contract for sealed entries when structured metadata binding is required; include migration and compatibility rules. |
+| E3-25 | Vault backup/recovery UX guardrails (post-MVP) | Add explicit UX/docs/runtime warnings and guidance for backup and key-rotation consequences (vault unreadable without matching identity private key). |
+| E3-26 | Cipher-suite re-evaluation (post-MVP) | Re-evaluate vault sealing cipher choices (including XChaCha20-Poly1305 paths) after MVP stability; keep current libsodium sealed-box compatibility until an explicit migration plan exists. |
+| E3-27 | Vault error-code split + typed validation mapping (post-MVP) | Replace MVP broad `ICE-201` vault mapping with granular typed-path mapping at runtime boundary: `ICE-201` parse/corruption, `ICE-202` schema/version, `ICE-205` entry structure/uniqueness, planned `ICE-206` precondition/missing-dependency failures; include fixture-based tests for each code path. |
+| E3-28 | Ed25519->X25519 interop contract verification (post-MVP) | Add explicit fixture/vector tests comparing runtime Ed25519->X25519 conversion assumptions (`to_scalar_bytes` + `to_montgomery`) against libsodium-compatible behavior to lock portability expectations across implementations. |
 
 ## E4 -- Secret Management
 
