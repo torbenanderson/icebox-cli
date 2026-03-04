@@ -13,6 +13,12 @@
 
 The envelope allows format evolution without breaking old vaults. Machine-readable schema: [vault.schema.json](../reference/schemas/vault.schema.json).
 
+MVP note:
+
+- Current runtime write format is a minimal legacy envelope marker: `format: "icebox.vault.legacy-v1"` with `version` and `entries`.
+- The full schema envelope shown below (`format: "icebox.vault"` plus `schemaVersion`, `seq`, `createdByVersion`, etc.) is the target contract for migration/hardening phases.
+- Migration work should treat missing/legacy markers as deterministic upgrade inputs (see E3-20 planning notes).
+
 **Top-level fields:**
 
 | Field | Purpose |
