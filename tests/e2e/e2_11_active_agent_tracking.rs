@@ -149,3 +149,43 @@ fn e2_11_register_agent_fails_closed_on_invalid_config_json() {
 
     fs::remove_dir_all(&icebox_home).expect("temp ICEBOX_HOME cleanup should succeed");
 }
+
+#[test]
+fn e2_11_register_agent_fails_closed_on_invalid_config_agent_name() {
+    let icebox_home = temp_path("icebox-e2-11-invalid-agent-name");
+    fs::create_dir_all(&icebox_home).expect("ICEBOX_HOME directory should be creatable");
+    fs::write(
+        icebox_home.join("config.json"),
+        r#"{
+  "schemaVersion": 1,
+  "activeAgentId": "agent-1",
+  "agents": [
+    { "agentId": "agent-1", "name": "Bad_Name", "did": "did:key:one" }
+  ]
+}"#,
+    )
+    .expect("config fixture should be writable");
+
+    let output = Command::new(env!("CARGO_BIN_EXE_icebox-cli"))
+        .arg("register-agent")
+        .arg("claw")
+        .env("ICEBOX_HOME", &icebox_home)
+        .env("ICEBOX_TEST_FAKE_ENCLAVE", "1")
+        .output()
+        .expect("failed to run icebox-cli register-agent");
+
+    assert_eq!(output.status.code(), Some(1));
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(stderr.contains("ICE-309"));
+    let expected = format!(
+        "Config is invalid. Fix {} or reinitialize.",
+        icebox_home.join("config.json").display()
+    );
+    assert!(stderr.contains(&expected));
+    assert!(
+        !icebox_home.join("identities").join("claw").exists(),
+        "identity artifacts should not be created when config validation fails"
+    );
+
+    fs::remove_dir_all(&icebox_home).expect("temp ICEBOX_HOME cleanup should succeed");
+}

@@ -10,6 +10,7 @@ mod enclave;
 mod error;
 mod hardening;
 pub mod runner;
+mod util;
 pub mod vault;
 
 use clap::{Parser, error::ErrorKind};

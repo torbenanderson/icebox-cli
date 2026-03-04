@@ -118,6 +118,15 @@ fn canonical_agent_name(raw: &str) -> Result<String, ConfigError> {
     Ok(parsed.as_str().to_owned())
 }
 
+fn canonical_agent_names(config: &RuntimeConfig) -> Result<HashSet<String>, ConfigError> {
+    let mut names = HashSet::with_capacity(config.agents.len());
+    for agent in &config.agents {
+        let canonical = canonical_agent_name(&agent.name)?;
+        names.insert(canonical);
+    }
+    Ok(names)
+}
+
 fn ensure_no_duplicate_agent_names(config: &RuntimeConfig) -> Result<(), ConfigError> {
     let mut seen = HashSet::new();
     for agent in &config.agents {
@@ -163,11 +172,9 @@ pub fn load_or_default_with_repair(home: &Path) -> Result<RuntimeConfig, ConfigE
 pub fn append_agent_and_set_active(home: &Path, agent: AgentRecord) -> Result<(), ConfigError> {
     let mut config = load_or_default_with_repair(home)?;
     let candidate = canonical_agent_name(&agent.name)?;
-    for existing in &config.agents {
-        let existing_name = canonical_agent_name(&existing.name)?;
-        if existing_name == candidate {
-            return Err(ConfigError::DuplicateAgentNames);
-        }
+    let existing_names = canonical_agent_names(&config)?;
+    if existing_names.contains(&candidate) {
+        return Err(ConfigError::DuplicateAgentNames);
     }
     config.active_agent_id = Some(agent.agent_id.clone());
     config.agents.push(agent);
@@ -178,12 +185,7 @@ pub fn append_agent_and_set_active(home: &Path, agent: AgentRecord) -> Result<()
 pub fn has_agent_name(home: &Path, name: &str) -> Result<bool, ConfigError> {
     let config = load_or_default_with_repair(home)?;
     let candidate = canonical_agent_name(name)?;
-    for existing in &config.agents {
-        if canonical_agent_name(&existing.name)? == candidate {
-            return Ok(true);
-        }
-    }
-    Ok(false)
+    Ok(canonical_agent_names(&config)?.contains(&candidate))
 }
 
 fn repair_stale_active_agent_id(config: &mut RuntimeConfig) -> bool {
