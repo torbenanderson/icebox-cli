@@ -94,6 +94,9 @@ mod platform {
     use std::ffi::c_void;
     use std::ptr;
 
+    // Secure Enclave key creation is unavailable for this runtime context.
+    const ERR_SEC_ENCLAVE_KEYGEN_UNAVAILABLE: isize = -26276;
+
     pub(crate) fn create_wrapping_key(key_ref: &str) -> Result<(), EnclaveError> {
         let key_type_attr = unsafe { CFString::wrap_under_get_rule(kSecAttrKeyType) };
         let key_type_ec = unsafe { CFString::wrap_under_get_rule(kSecAttrKeyTypeECSECPrimeRandom) };
@@ -134,7 +137,7 @@ mod platform {
             if error.code() == errSecDuplicateItem as isize {
                 return Ok(());
             }
-            if error.code() == -26276 {
+            if error.code() == ERR_SEC_ENCLAVE_KEYGEN_UNAVAILABLE {
                 return Err(EnclaveError::Platform(
                     "secure enclave key generation failed (OSStatus -26276): check supported hardware and code-signing entitlements".to_string(),
                 ));

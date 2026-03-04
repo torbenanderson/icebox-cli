@@ -171,21 +171,35 @@ pub fn load_or_default_with_repair(home: &Path) -> Result<RuntimeConfig, ConfigE
 /// Appends a registry entry and updates active agent selector atomically.
 pub fn append_agent_and_set_active(home: &Path, agent: AgentRecord) -> Result<(), ConfigError> {
     let mut config = load_or_default_with_repair(home)?;
+    append_agent_and_set_active_in_memory(home, &mut config, agent)
+}
+
+/// Appends a registry entry using a caller-provided repaired config context.
+pub fn append_agent_and_set_active_in_memory(
+    home: &Path,
+    config: &mut RuntimeConfig,
+    agent: AgentRecord,
+) -> Result<(), ConfigError> {
     let candidate = canonical_agent_name(&agent.name)?;
-    let existing_names = canonical_agent_names(&config)?;
+    let existing_names = canonical_agent_names(config)?;
     if existing_names.contains(&candidate) {
         return Err(ConfigError::DuplicateAgentNames);
     }
     config.active_agent_id = Some(agent.agent_id.clone());
     config.agents.push(agent);
-    save(home, &config)
+    save(home, config)
 }
 
 /// Returns true when the canonicalized name already exists in registry.
 pub fn has_agent_name(home: &Path, name: &str) -> Result<bool, ConfigError> {
     let config = load_or_default_with_repair(home)?;
+    has_agent_name_in_config(&config, name)
+}
+
+/// Returns true when the canonicalized name exists in a loaded config.
+pub fn has_agent_name_in_config(config: &RuntimeConfig, name: &str) -> Result<bool, ConfigError> {
     let candidate = canonical_agent_name(name)?;
-    Ok(canonical_agent_names(&config)?.contains(&candidate))
+    Ok(canonical_agent_names(config)?.contains(&candidate))
 }
 
 fn repair_stale_active_agent_id(config: &mut RuntimeConfig) -> bool {

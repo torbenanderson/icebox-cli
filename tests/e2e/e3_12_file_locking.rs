@@ -128,3 +128,50 @@ fn e3_12_add_fails_when_vault_lock_path_is_unopenable() {
 
     fs::remove_dir_all(&icebox_home).expect("temp ICEBOX_HOME cleanup should succeed");
 }
+
+#[test]
+fn e3_12_primary_vault_error_is_preserved_when_unlock_also_fails() {
+    let icebox_home = temp_path("icebox-e3-12-unlock-mask");
+
+    let register = Command::new(env!("CARGO_BIN_EXE_icebox-cli"))
+        .arg("register-agent")
+        .arg("claw")
+        .env("ICEBOX_HOME", &icebox_home)
+        .env("ICEBOX_TEST_FAKE_ENCLAVE", "1")
+        .output()
+        .expect("failed to run register-agent");
+    assert!(
+        register.status.success(),
+        "register-agent should succeed: {}",
+        String::from_utf8_lossy(&register.stderr)
+    );
+
+    let vault_path = icebox_home
+        .join("identities")
+        .join("claw")
+        .join("vault.enc");
+    fs::write(&vault_path, b"{").expect("broken vault fixture should be written");
+
+    let add = Command::new(env!("CARGO_BIN_EXE_icebox-cli"))
+        .arg("add")
+        .arg("openai")
+        .arg("sk-test")
+        .env("ICEBOX_HOME", &icebox_home)
+        .env("ICEBOX_TEST_FORCE_VAULT_UNLOCK_ERROR", "1")
+        .output()
+        .expect("failed to run add");
+
+    assert_eq!(add.status.code(), Some(1));
+    let stderr = String::from_utf8_lossy(&add.stderr);
+    assert!(stderr.contains("ICE-201"));
+    assert!(
+        stderr.contains("failed to parse"),
+        "stderr should keep primary parse error: {stderr}"
+    );
+    assert!(
+        !stderr.contains("failed to unlock vault.enc.lock"),
+        "unlock error should not replace primary action error: {stderr}"
+    );
+
+    fs::remove_dir_all(&icebox_home).expect("temp ICEBOX_HOME cleanup should succeed");
+}

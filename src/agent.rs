@@ -231,15 +231,6 @@ fn force_key_enc_persist_failure() -> Result<(), RegisterAgentError> {
     Ok(())
 }
 
-fn resolve_icebox_home() -> Result<PathBuf, RegisterAgentError> {
-    if let Ok(override_home) = std::env::var("ICEBOX_HOME") {
-        return Ok(PathBuf::from(override_home));
-    }
-
-    let home = std::env::var_os("HOME").ok_or(RegisterAgentError::MissingHomeDir)?;
-    Ok(PathBuf::from(home).join(".icebox"))
-}
-
 fn write_new_file(
     path: &Path,
     bytes: &[u8],
@@ -313,6 +304,7 @@ fn persist_identity_public_key(
 fn persist_agent_registry_entry(
     config_home: &Path,
     config_path: &Path,
+    config: &mut crate::config::RuntimeConfig,
     name: &IdentityName,
     public_key_bytes: &[u8; 32],
 ) -> Result<(), RegisterAgentError> {
@@ -321,9 +313,11 @@ fn persist_agent_registry_entry(
         name: name.as_str().to_owned(),
         did: crate::did::did_from_public_key(public_key_bytes),
     };
-    crate::config::append_agent_and_set_active(config_home, agent_record).map_err(|err| {
-        RegisterAgentError::from_config_error("failed to persist config.json", err, config_path)
-    })
+    crate::config::append_agent_and_set_active_in_memory(config_home, config, agent_record).map_err(
+        |err| {
+            RegisterAgentError::from_config_error("failed to persist config.json", err, config_path)
+        },
+    )
 }
 
 /// Registers an agent by generating a new Ed25519 keypair and writing identity artifacts.
@@ -332,12 +326,17 @@ fn persist_agent_registry_entry(
 /// `~/.icebox/identities/<name>/` (or `$ICEBOX_HOME/identities/<name>/`).
 pub fn register_agent(raw_name: &str) -> Result<(), RegisterAgentError> {
     let name = IdentityName::parse(raw_name).map_err(RegisterAgentError::InvalidName)?;
-    let home = resolve_icebox_home()?;
+    let home =
+        crate::util::resolve_icebox_home().map_err(|_| RegisterAgentError::MissingHomeDir)?;
     let config_home = home.clone();
     let config_path = config_home.join("config.json");
-    let exists = crate::config::has_agent_name(&config_home, name.as_str()).map_err(|err| {
+    let mut config = crate::config::load_or_default_with_repair(&config_home).map_err(|err| {
         RegisterAgentError::from_config_error("failed to load config.json", err, &config_path)
     })?;
+    let exists =
+        crate::config::has_agent_name_in_config(&config, name.as_str()).map_err(|err| {
+            RegisterAgentError::from_config_error("failed to load config.json", err, &config_path)
+        })?;
     if exists {
         return Err(RegisterAgentError::DuplicateName {
             name: name.as_str().to_owned(),
@@ -360,7 +359,13 @@ pub fn register_agent(raw_name: &str) -> Result<(), RegisterAgentError> {
         let (signing_key, wrapped_private_key) = create_wrapped_private_key(&wrapping_key_ref)?;
         persist_wrapped_private_key(&wrapped_private_key, &mut cleanup)?;
         let public_key_bytes = persist_identity_public_key(&signing_key, &mut cleanup)?;
-        persist_agent_registry_entry(&config_home, &config_path, &name, &public_key_bytes)?;
+        persist_agent_registry_entry(
+            &config_home,
+            &config_path,
+            &mut config,
+            &name,
+            &public_key_bytes,
+        )?;
         Ok(())
     })();
 

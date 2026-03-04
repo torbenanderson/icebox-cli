@@ -170,14 +170,6 @@ fn errno_to_io(err: rustix::io::Errno) -> std::io::Error {
     std::io::Error::from_raw_os_error(err.raw_os_error())
 }
 
-fn resolve_icebox_home() -> Result<PathBuf, VaultError> {
-    if let Ok(override_home) = std::env::var("ICEBOX_HOME") {
-        return Ok(PathBuf::from(override_home));
-    }
-    let home = std::env::var_os("HOME").ok_or(VaultError::MissingHomeDir)?;
-    Ok(PathBuf::from(home).join(".icebox"))
-}
-
 fn load_active_agent(home: &Path) -> Result<crate::config::AgentRecord, VaultError> {
     let config =
         crate::config::load_or_default_with_repair(home).map_err(|source| VaultError::Io {
@@ -300,11 +292,27 @@ where
     maybe_hold_vault_lock_for_test();
 
     let result = action();
+    let unlock_result = if std::env::var("ICEBOX_TEST_FORCE_VAULT_UNLOCK_ERROR")
+        .ok()
+        .as_deref()
+        == Some("1")
+    {
+        Err(io_err(
+            "failed to unlock vault.enc.lock",
+            std::io::Error::other("forced unlock failure"),
+        ))
+    } else {
+        flock(&lock_file, FlockOperation::Unlock)
+            .map_err(|err| io_err("failed to unlock vault.enc.lock", errno_to_io(err)))
+    };
 
-    flock(&lock_file, FlockOperation::Unlock)
-        .map_err(|err| io_err("failed to unlock vault.enc.lock", errno_to_io(err)))?;
-
-    result
+    match result {
+        Err(err) => Err(err),
+        Ok(value) => {
+            unlock_result?;
+            Ok(value)
+        }
+    }
 }
 
 pub fn add_secret_to_active_agent(service: &str, secret_value: &str) -> Result<(), VaultError> {
@@ -316,7 +324,7 @@ pub fn add_secret_to_active_agent(service: &str, secret_value: &str) -> Result<(
         return Err(VaultError::SecretValueEmpty);
     }
 
-    let home = resolve_icebox_home()?;
+    let home = crate::util::resolve_icebox_home().map_err(|_| VaultError::MissingHomeDir)?;
     let active_agent = load_active_agent(&home)?;
     let agent_dir = home.join("identities").join(active_agent.name);
     let identity_pub_path = agent_dir.join("identity.pub");

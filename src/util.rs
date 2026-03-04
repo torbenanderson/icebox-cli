@@ -1,6 +1,9 @@
 //! Shared utility helpers for deterministic formatting/id generation.
 
 use rand_core::{OsRng, RngCore};
+use std::error::Error;
+use std::fmt::{Display, Formatter};
+use std::path::PathBuf;
 
 /// Encodes bytes to lowercase hexadecimal.
 pub fn bytes_to_hex(bytes: &[u8]) -> String {
@@ -25,4 +28,31 @@ pub fn generate_agent_id() -> String {
         bytes_to_hex(&random[8..10]),
         bytes_to_hex(&random[10..16]),
     )
+}
+
+/// Home-path resolution failures for ICEBOX_HOME.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ResolveIceboxHomeError {
+    /// HOME is unavailable and ICEBOX_HOME was not provided.
+    MissingHomeDir,
+}
+
+impl Display for ResolveIceboxHomeError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::MissingHomeDir => f.write_str("could not resolve home directory"),
+        }
+    }
+}
+
+impl Error for ResolveIceboxHomeError {}
+
+/// Resolves the effective Icebox home path.
+pub fn resolve_icebox_home() -> Result<PathBuf, ResolveIceboxHomeError> {
+    if let Ok(override_home) = std::env::var("ICEBOX_HOME") {
+        return Ok(PathBuf::from(override_home));
+    }
+
+    let home = std::env::var_os("HOME").ok_or(ResolveIceboxHomeError::MissingHomeDir)?;
+    Ok(PathBuf::from(home).join(".icebox"))
 }
