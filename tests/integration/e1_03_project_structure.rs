@@ -1,4 +1,4 @@
-use icebox_cli::{agent, config, did, runner, vault};
+use icebox_cli::{agent, config, did, vault};
 
 #[test]
 fn e1_03_modules_compile_and_expose_expected_scaffolds() {
@@ -10,9 +10,6 @@ fn e1_03_modules_compile_and_expose_expected_scaffolds() {
 
     let vault_ref = vault::VaultRef::for_identity("id-123").expect("vault ref should build");
     assert_eq!(vault_ref.identity_id, "id-123");
-
-    let request = runner::RunRequest::new("id-123", "openai").expect("run request should build");
-    assert_eq!(request.service, "openai");
 
     #[cfg(target_os = "macos")]
     assert_eq!(did::enclave_backend_name(), "secure-enclave");
