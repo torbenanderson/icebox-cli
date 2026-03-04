@@ -77,6 +77,13 @@ This gives per-entry cryptographic isolation while keeping operational key manag
 - File lock during read-modify-write cycles.
 - Atomic write via temp + rename.
 
+### Advisory Lock Limitations
+
+- **Advisory only** — Lock coordinates cooperating Icebox processes; non-cooperative writers can bypass it (see T-SEC-12).
+- **NFS/network FS** — `flock` is unreliable on NFS/SMB; E3-14 and `--require-local-fs` address this.
+- **Lock-file removal** — If `vault.enc.lock` is deleted while held, another process could acquire a new lock; low risk for local owner-only dirs.
+- **Multi-lock deadlock** — Future flows that lock multiple files (e.g. vault + config) must use a strict lock order.
+
 ## Validation Pipeline
 
 - Load-time checks: parse, schema, entry structure, integrity checks, rollback detection.
@@ -119,4 +126,4 @@ Implement one canonical function for load validation and keep checks centralized
 
 ---
 
-*Last updated: 2026-03-03*
+*Last updated: 2026-03-04*

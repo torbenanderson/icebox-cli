@@ -239,7 +239,7 @@ These tests are public-release blockers and must pass on macOS CI before shippin
 | T-E3-09 | E3-09 | No temp files exist in `$TMPDIR` or agent directory during or after vault operations |
 | T-E3-10 | E3-10 | `vault.enc` with valid `version: 1` loads successfully; parser rejects vault with missing version and rejects unknown version values |
 | T-E3-11 | E3-11 | Vault write creates `vault.enc.tmp` first and atomically replaces `vault.enc`; success leaves no temp file, and temp-create failure path preserves existing vault bytes |
-| T-E3-12 | E3-12 | Concurrent Icebox processes acquire flock and do not corrupt vault during simultaneous writes |
+| T-E3-12 | E3-12 | Concurrent `add` operations are serialized by advisory `flock` on `vault.enc.lock` and do not corrupt vault; lock-path open failure returns deterministic vault error |
 | T-E3-13a | E3-13 | Manually corrupt `vault.enc` JSON (truncate, add garbage); verify vault load returns `ICE-201` (parse failure) |
 | T-E3-13b | E3-13 | Remove required top-level fields (`version`, `seq`, `entries`) from `vault.enc`; verify `ICE-202` error |
 | T-E3-13c | E3-13 | Replace a vault entry's `sealedBlob` with a different base64 blob; verify AEAD rejection on unseal |

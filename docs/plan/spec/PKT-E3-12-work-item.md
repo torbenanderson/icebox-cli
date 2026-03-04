@@ -59,7 +59,7 @@
 ## Docs Impact
 
 - [x] docs/plan/spec/PKT-E3-12-work-item.md
-- [ ] docs/plan/TESTING.md (if test mappings are added/changed)
+- [x] docs/plan/TESTING.md (if test mappings are added/changed)
 - [ ] docs/architecture/decisions/ADR-*.md (if ADR required)
 - [ ] docs/README.md (if user-facing behavior changed)
 
@@ -72,6 +72,7 @@
 ## Execution Notes
 
 - Commit split plan will be finalized in the issue `Execution Plan` comment during `execute`.
+- Runtime note: `add` now acquires exclusive advisory lock on `vault.enc.lock` across read-modify-write cycle; test coverage includes concurrent serialization and deterministic lock-open failure path.
 
 ---
 *Last updated: 2026-03-03*

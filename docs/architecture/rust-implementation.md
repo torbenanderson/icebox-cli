@@ -338,7 +338,7 @@ struct Cli {
 
 - **`#[cfg(target_os = "macos")]`** for enclave code; stub on other platforms
 - **Feature flags:** `enclave` (default on macOS), `did` (Phase 1.5)
-- **`fs4`** for `flock` on vault files
+- **`rustix` (`rustix::fs::flock`)** for advisory file locking on vault files
 - **`nix`** for `statfs` (filesystem check) and `RLIMIT_CORE`
 
 ---
@@ -356,7 +356,7 @@ struct Cli {
 | `bs58` | Base58btc for did:key |
 | `zeroize`, `secrecy` | Secret handling |
 | `tempfile` | Test temp dirs |
-| `fs4` | File locking |
+| `rustix` | File locking (`flock`) |
 | `nix` | statfs, RLIMIT_CORE |
 
 Security dependency policy:
