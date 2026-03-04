@@ -15,7 +15,7 @@
   - `~/.icebox/identities/<name>/vault.enc` is created on first use as a versioned JSON envelope.
   - Envelope baseline for MVP create path:
     - top-level `version: 1`
-    - top-level `secrets: []` (empty array on first create)
+    - top-level `entries: []` (empty array on first create)
   - Keep envelope minimal for MVP: do not add optional identity self-description fields yet (for example `identity_pubkey`).
 - Out of scope:
   - Unrelated backlog items outside E3-01
@@ -23,7 +23,7 @@
 
 ## Acceptance Criteria
 
-- AC1: E3-01 behavior matches backlog description with versioned envelope baseline: first create writes `vault.enc` JSON containing `version: 1` and `secrets: []`.
+- AC1: E3-01 behavior matches backlog description with versioned envelope baseline: first create writes `vault.enc` JSON containing `version: 1` and `entries: []`.
 - AC2: CLI output/errors are deterministic and user-safe.
 - AC3: Changes are validated with mapped tests.
 

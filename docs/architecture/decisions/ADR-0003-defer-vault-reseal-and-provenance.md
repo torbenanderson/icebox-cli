@@ -21,7 +21,7 @@
 
 - For MVP, do **not** implement automatic vault reseal on key rotation.
 - For MVP, do **not** add authenticated write provenance/signature layer to sealed entries.
-- Keep the vault envelope minimal and versioned (`version: 1` + `secrets`) and defer optional identity self-description metadata.
+- Keep the vault envelope minimal and versioned (`version: 1` + `entries`) and defer optional identity self-description metadata.
 - Track follow-up work explicitly in backlog:
   - key rotation/reseal remains post-MVP (`E2-22`),
   - envelope metadata/provenance tracked in deferred vault backlog (`E3-22`, `E3-23`).

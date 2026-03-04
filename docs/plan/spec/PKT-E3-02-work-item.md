@@ -13,7 +13,7 @@
 
 - In scope:
   - Each secret is individually sealed via `crypto_box_seal` (Ed25519→X25519 + XSalsa20-Poly1305); wire-format compatible with libsodium.
-  - Persist sealed entries inside the versioned vault envelope established in E3-01 (`version: 1`, `secrets: [...]`).
+  - Persist sealed entries inside the versioned vault envelope established in E3-01 (`version: 1`, `entries: [...]`).
   - Keep anonymous-sender sealed-box semantics in MVP; do not add sender-authenticated provenance/signature layer in this packet.
 - Out of scope:
   - Unrelated backlog items outside E3-02
