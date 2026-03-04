@@ -20,6 +20,7 @@
 ## Acceptance Criteria
 
 - AC1: E3-05 behavior matches backlog description: New vault with no secrets returns a clean state, not an error
+- AC1a: Missing `vault.enc` loads as default clean state (`format` + `version` + empty `entries`) without raising parse/runtime error.
 - AC2: CLI output/errors are deterministic and user-safe.
 - AC3: Changes are validated with mapped tests.
 
@@ -72,6 +73,7 @@
 ## Execution Notes
 
 - Commit split plan will be finalized in the issue `Execution Plan` comment during `execute`.
+- Runtime test strategy for this packet focuses on canonical vault load behavior: missing file => clean default; invalid JSON fixture => deterministic parse error.
 
 ---
 *Last updated: 2026-03-03*

@@ -232,7 +232,7 @@ These tests are public-release blockers and must pass on macOS CI before shippin
 | T-E3-02 | E3-02 | Seal/unseal round-trip: encrypt a secret, decrypt it, verify plaintext matches; include interop check that Ed25519→X25519 conversion used by runtime remains libsodium-compatible; tampered on-disk sealed blob fails decryption |
 | T-E3-03 | E3-03 | Two secrets sealed independently; decrypting one does not require or affect the other; each entry has unique immutable `entryId` |
 | T-E3-04 | E3-04 | Tampered vault blob (flipped bit) is detected and rejected with an AEAD error |
-| T-E3-05 | E3-05 | Empty vault returns clean state (empty list, no error) |
+| T-E3-05 | E3-05 | Vault load path returns clean default state for missing `vault.enc` (empty entries, no error) and returns deterministic parse failure for invalid JSON fixture |
 | T-E3-06 | E3-06 | Decryption fails gracefully when the wrong agent's key is used |
 | T-E3-07 | E3-07 | Secret buffers are wrapped in `secrecy::Secret` with `Zeroize`; verify zeroization on drop (test helper) |
 | T-E3-08 | E3-08 | Secret buffers are `mlock`'d (verify via `libc::mlock` on key buffers) |
