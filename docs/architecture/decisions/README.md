@@ -23,8 +23,9 @@ Lightweight ADR log for new architecture decisions going forward.
 
 - [ADR-0001 Brokered Secret Execution Boundary](ADR-0001-brokered-secret-execution.md)
 - [ADR-0002 Dual-Branch Identity And Device Model](ADR-0002-dual-branch-identity-device-model.md)
+- [ADR-0003 Defer Automatic Vault Reseal And Write Provenance In MVP](ADR-0003-defer-vault-reseal-and-provenance.md)
 
 
 ---
 
-*Last updated: 2026-02-24*
+*Last updated: 2026-03-03*
