@@ -288,6 +288,16 @@ mod tests {
     use super::*;
     use crypto_box::SecretKey as X25519SecretKey;
     use ed25519_dalek::SigningKey;
+    use std::fs;
+    use std::time::{SystemTime, UNIX_EPOCH};
+
+    fn temp_path(prefix: &str) -> std::path::PathBuf {
+        let nanos = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .expect("system time should be after unix epoch")
+            .as_nanos();
+        std::env::temp_dir().join(format!("{prefix}-{}-{nanos}", std::process::id()))
+    }
 
     fn open_sealed_blob_for_test(
         identity_signing_key: &SigningKey,
@@ -330,6 +340,31 @@ mod tests {
             err.to_string().contains("failed to open sealed blob"),
             "unexpected error: {err}"
         );
+    }
+
+    #[test]
+    fn e3_05_missing_vault_returns_empty_clean_state() {
+        let vault_path = temp_path("icebox-e3-05-empty").join("vault.enc");
+        let loaded = load_or_create_vault(&vault_path).expect("missing vault should load as default");
+        assert_eq!(loaded.format, VAULT_FORMAT);
+        assert_eq!(loaded.version, 1);
+        assert!(loaded.entries.is_empty());
+    }
+
+    #[test]
+    fn e3_05_invalid_vault_json_returns_deterministic_error() {
+        let root = temp_path("icebox-e3-05-invalid");
+        fs::create_dir_all(&root).expect("temp root should be creatable");
+        let vault_path = root.join("vault.enc");
+        fs::write(&vault_path, b"{not-json").expect("fixture vault should be writable");
+
+        let err = load_or_create_vault(&vault_path).expect_err("invalid json should fail");
+        match err {
+            VaultError::InvalidVaultJson { path, .. } => assert_eq!(path, vault_path),
+            other => panic!("expected InvalidVaultJson, got: {other}"),
+        }
+
+        fs::remove_dir_all(&root).expect("temp cleanup should succeed");
     }
 
     #[test]
