@@ -85,6 +85,10 @@ pub enum VaultError {
         path: PathBuf,
         source: serde_json::Error,
     },
+    InvalidVaultVersion {
+        path: PathBuf,
+        version: u16,
+    },
     Serialize {
         op: &'static str,
         source: serde_json::Error,
@@ -122,6 +126,11 @@ impl Display for VaultError {
             Self::InvalidVaultJson { path, source } => {
                 write!(f, "failed to parse {}: {source}", path.display())
             }
+            Self::InvalidVaultVersion { path, version } => write!(
+                f,
+                "unsupported vault version ({version}) in {}",
+                path.display()
+            ),
             Self::Serialize { op, source } => write!(f, "{op}: {source}"),
             Self::Io { op, source } => write!(f, "{op}: {source}"),
             Self::Crypto { op, source } => write!(f, "{op}: {source}"),
@@ -218,12 +227,21 @@ fn seal_secret_for_identity(
 
 fn load_or_create_vault(path: &Path) -> Result<VaultFile, VaultError> {
     match fs::read(path) {
-        Ok(bytes) => serde_json::from_slice::<VaultFile>(&bytes).map_err(|source| {
-            VaultError::InvalidVaultJson {
-                path: path.to_path_buf(),
-                source,
+        Ok(bytes) => {
+            let vault = serde_json::from_slice::<VaultFile>(&bytes).map_err(|source| {
+                VaultError::InvalidVaultJson {
+                    path: path.to_path_buf(),
+                    source,
+                }
+            })?;
+            if vault.version != VAULT_VERSION {
+                return Err(VaultError::InvalidVaultVersion {
+                    path: path.to_path_buf(),
+                    version: vault.version,
+                });
             }
-        }),
+            Ok(vault)
+        }
         Err(err) if err.kind() == std::io::ErrorKind::NotFound => Ok(VaultFile::default()),
         Err(err) => Err(io_err("failed to read vault.enc", err)),
     }
@@ -364,6 +382,68 @@ mod tests {
             VaultError::InvalidVaultJson { path, .. } => assert_eq!(path, vault_path),
             other => panic!("expected InvalidVaultJson, got: {other}"),
         }
+
+        fs::remove_dir_all(&root).expect("temp cleanup should succeed");
+    }
+
+    #[test]
+    fn e3_10_missing_version_field_is_rejected() {
+        let root = temp_path("icebox-e3-10-missing-version");
+        fs::create_dir_all(&root).expect("temp root should be creatable");
+        let vault_path = root.join("vault.enc");
+        fs::write(
+            &vault_path,
+            br#"{"format":"icebox.vault.legacy-v1","entries":[]}"#,
+        )
+        .expect("fixture vault should be writable");
+
+        let err = load_or_create_vault(&vault_path).expect_err("missing version should fail");
+        match err {
+            VaultError::InvalidVaultJson { path, .. } => assert_eq!(path, vault_path),
+            other => panic!("expected InvalidVaultJson, got: {other}"),
+        }
+
+        fs::remove_dir_all(&root).expect("temp cleanup should succeed");
+    }
+
+    #[test]
+    fn e3_10_unknown_version_is_rejected() {
+        let root = temp_path("icebox-e3-10-unknown-version");
+        fs::create_dir_all(&root).expect("temp root should be creatable");
+        let vault_path = root.join("vault.enc");
+        fs::write(
+            &vault_path,
+            br#"{"format":"icebox.vault.legacy-v1","version":99,"entries":[]}"#,
+        )
+        .expect("fixture vault should be writable");
+
+        let err = load_or_create_vault(&vault_path).expect_err("unknown version should fail");
+        match err {
+            VaultError::InvalidVaultVersion { path, version } => {
+                assert_eq!(path, vault_path);
+                assert_eq!(version, 99);
+            }
+            other => panic!("expected InvalidVaultVersion, got: {other}"),
+        }
+
+        fs::remove_dir_all(&root).expect("temp cleanup should succeed");
+    }
+
+    #[test]
+    fn e3_10_valid_version_loads_successfully() {
+        let root = temp_path("icebox-e3-10-valid-version");
+        fs::create_dir_all(&root).expect("temp root should be creatable");
+        let vault_path = root.join("vault.enc");
+        fs::write(
+            &vault_path,
+            br#"{"format":"icebox.vault.legacy-v1","version":1,"entries":[]}"#,
+        )
+        .expect("fixture vault should be writable");
+
+        let loaded = load_or_create_vault(&vault_path).expect("valid version should load");
+        assert_eq!(loaded.format, "icebox.vault.legacy-v1");
+        assert_eq!(loaded.version, 1);
+        assert!(loaded.entries.is_empty());
 
         fs::remove_dir_all(&root).expect("temp cleanup should succeed");
     }
