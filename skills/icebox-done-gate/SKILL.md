@@ -77,15 +77,19 @@ Use on requests like:
    - `skills/icebox-load/scripts/issue_packet.sh validate-closeout --issue <id>`
 7. If validation passes, transition:
    - `skills/icebox-load/scripts/issue_packet.sh transition --issue <id> --to done`
-8. Preferred one-shot command:
+8. Close the GitHub issue to set actual issue status:
+   - `gh issue close <id> --comment "<closeout summary>"`
+   - If already closed, report that explicitly.
+9. Preferred one-shot command:
    - `skills/icebox-load/scripts/issue_packet.sh done --issue <id> [--file-path <path>]... [--doc-path <path>]...`
-9. If validation fails, return a short blocker list and do not transition.
+10. If validation fails, return a short blocker list and do not transition.
 
 ## Hard Gate
 
 Never transition to `done` when closeout evidence is incomplete.
 Never transition to `done` when internal/external docs impact is not explicitly accounted for.
 Never transition to `done` if docs changed and mdBook/rustdoc validation was not run.
+Never report completion unless the issue is also closed in GitHub (actual issue status).
 
 ## Output Requirements
 
@@ -99,3 +103,5 @@ Return:
    - mdBook sync: `pass`/`fail`/`n/a`
 4. Transition line on success:
    - `Transition: in-progress -> done`
+5. Issue closure line on success:
+   - `Issue status: closed`
