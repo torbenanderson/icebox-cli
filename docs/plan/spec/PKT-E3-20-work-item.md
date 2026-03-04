@@ -74,6 +74,7 @@
 ## Execution Notes
 
 - Commit split plan will be finalized in the issue `Execution Plan` comment during `execute`.
+- Migration planning note: current MVP envelope includes `format: "icebox.vault.legacy-v1"` + `version` + `entries`; migration implementation should treat missing-`format` files as legacy-pre-marker input and normalize deterministically before full-schema upgrades.
 
 ---
 *Last updated: 2026-03-03*

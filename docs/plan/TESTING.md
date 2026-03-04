@@ -228,8 +228,8 @@ These tests are public-release blockers and must pass on macOS CI before shippin
 | T-E3-21a | E3-21 | DID backend naming refactor keeps runtime behavior unchanged: backend resolution still returns deterministic identifiers and all existing E2/E3 tests continue to pass without command/output regressions |
 | T-E3-21b | E3-21 | Invalid/corrupt `config.json` paths map to dedicated runtime error code (not generic identity setup); duplicate/validation/parse failures remain distinguishable and deterministic |
 | T-E3-21c | E3-21 | `register-agent` refactor preserves cleanup invariants: failure in any artifact step leaves no partial unsafe state and does not write plaintext private key material |
-| T-E3-01 | E3-01 | First `add` creates `vault.enc` as valid JSON containing a sealed blob |
-| T-E3-02 | E3-02 | Seal/unseal round-trip: encrypt a secret, decrypt it, verify plaintext matches |
+| T-E3-01 | E3-01 | First `add` creates `vault.enc` as valid JSON containing format/version/encrypted entry; failure paths include missing `identity.pub` and missing active agent (`ICE-201` in MVP mapping) |
+| T-E3-02 | E3-02 | Seal/unseal round-trip: encrypt a secret, decrypt it, verify plaintext matches; include interop check that Ed25519→X25519 conversion used by runtime remains libsodium-compatible; tampered on-disk sealed blob fails decryption |
 | T-E3-03 | E3-03 | Two secrets sealed independently; decrypting one does not require or affect the other; each entry has unique immutable `entryId` |
 | T-E3-04 | E3-04 | Tampered vault blob (flipped bit) is detected and rejected with an AEAD error |
 | T-E3-05 | E3-05 | Empty vault returns clean state (empty list, no error) |

@@ -157,6 +157,8 @@
 | E3-24 | Sealed-entry associated-data envelope (post-MVP) | Evaluate and add explicit associated-data contract for sealed entries when structured metadata binding is required; include migration and compatibility rules. |
 | E3-25 | Vault backup/recovery UX guardrails (post-MVP) | Add explicit UX/docs/runtime warnings and guidance for backup and key-rotation consequences (vault unreadable without matching identity private key). |
 | E3-26 | Cipher-suite re-evaluation (post-MVP) | Re-evaluate vault sealing cipher choices (including XChaCha20-Poly1305 paths) after MVP stability; keep current libsodium sealed-box compatibility until an explicit migration plan exists. |
+| E3-27 | Vault error-code split + typed validation mapping (post-MVP) | Replace MVP broad `ICE-201` vault mapping with granular typed-path mapping at runtime boundary: `ICE-201` parse/corruption, `ICE-202` schema/version, `ICE-205` entry structure/uniqueness, planned `ICE-206` precondition/missing-dependency failures; include fixture-based tests for each code path. |
+| E3-28 | Ed25519->X25519 interop contract verification (post-MVP) | Add explicit fixture/vector tests comparing runtime Ed25519->X25519 conversion assumptions (`to_scalar_bytes` + `to_montgomery`) against libsodium-compatible behavior to lock portability expectations across implementations. |
 
 ## E4 -- Secret Management
 

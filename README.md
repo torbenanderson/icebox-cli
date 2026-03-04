@@ -68,7 +68,7 @@ scripts/verify_secure_enclave_prereqs.sh target/release/icebox-cli
 | **Recovery Model (MVP)** | If a device is lost, regenerate provider API keys/tokens and re-add them to a new agent. Seed-based recovery is deferred. | MVP |
 | **Seed Backup (Optional)** | `icebox register-agent claw --seed` -- 24-word recovery phrase for portability/cross-device recovery ([guide](docs/guides/BACKUP.md)) | Phase 1.5 |
 | **Secure Vault** | Per-agent encrypted vault (`~/.icebox/identities/<name>/vault.enc`) using `crypto_box_seal` (libsodium-compatible) | Planned |
-| **Add Secret** | `icebox add openai sk-...` -- encrypted to the agent's public key | Planned |
+| **Add Secret** | `icebox add openai sk-...` -- encrypted to the agent's public key | Implemented (MVP slice) |
 | **List Secrets** | `icebox list` -- shows service names (no values) | Planned |
 | **Service Inventory** | `icebox list --services` outputs service names only (no secret values) for regeneration checklists | Planned |
 | **Remove Secret** | `icebox remove openai` -- deletes a stored secret | Planned |
@@ -99,7 +99,7 @@ Notes:
 - `identity.pub` is raw 32-byte Ed25519 in current MVP sequencing; multicodec-prefixed encoding is planned in E2-05.
 - `key.enc` is intentionally treated as opaque storage bytes. Its exact production encoding is backend-defined and not a stable public format contract.
 
-Credential storage and execution are not available yet. You cannot `add` or `run`, and secrets are not yet stored or injected.
+Credential execution is not available yet (`run` pending), but credential storage is now available via `add`.
 
 Current implementation lane: `local-enclave` bootstrap path only.
 

@@ -42,6 +42,8 @@
 - Keep secret-handling boundaries unchanged unless explicitly in scope.
 - Preserve direct-exec/no-shell guarantees where relevant.
 - Preserve user-safe default errors (no sensitive internals in normal mode).
+- MVP mapping note: current runtime may collapse several early vault/precondition failures into `ICE-201` for stability.
+- Post-MVP split note: align with granular vault taxonomy (`ICE-201` parse/corruption, `ICE-202` schema/version, `ICE-205` entry validation, planned `ICE-206` precondition/missing dependencies) as part of hardening follow-up.
 
 ## Test Mapping
 
@@ -77,6 +79,7 @@
 ## Execution Notes
 
 - Commit split plan will be finalized in the issue `Execution Plan` comment during `execute`.
+- Implement validation through typed vault errors and map to `ICE-2xx` codes at application boundary to keep future split low-risk and testable.
 
 ---
 *Last updated: 2026-03-03*

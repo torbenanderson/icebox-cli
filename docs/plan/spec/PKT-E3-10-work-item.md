@@ -13,6 +13,7 @@
 
 - In scope:
   - Every `vault.enc` includes `"version": 1` at top level for forward-compatible format upgrades
+  - Include an explicit MVP envelope marker field (`format`) so migration code can distinguish legacy/minimal vault files from future full-schema vaults.
 - Out of scope:
   - Unrelated backlog items outside E3-10
   - Cross-epic behavior changes not requested by E3-10
@@ -20,6 +21,7 @@
 ## Acceptance Criteria
 
 - AC1: E3-10 behavior matches backlog description: Every `vault.enc` includes `"version": 1` at top level for forward-compatible format upgrades
+- AC1a: `vault.enc` write path includes `format: "icebox.vault.legacy-v1"` and load path backfills this marker for pre-marker legacy files during deserialize/save cycles.
 - AC2: CLI output/errors are deterministic and user-safe.
 - AC3: Changes are validated with mapped tests.
 

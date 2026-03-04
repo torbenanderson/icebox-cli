@@ -72,6 +72,7 @@
 ## Execution Notes
 
 - Commit split plan will be finalized in the issue `Execution Plan` comment during `execute`.
+- Status note: Core atomic-write behavior has already been implemented in `src/vault.rs` during E3-01/E3-02 execution (`vault.enc.tmp` write + `std::fs::rename` replace). When executing E3-11 formally, focus is to validate/expand dedicated E3-11 test coverage and closeout evidence rather than re-implementing the write path.
 
 ---
 *Last updated: 2026-03-03*

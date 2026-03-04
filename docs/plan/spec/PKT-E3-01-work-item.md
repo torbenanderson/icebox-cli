@@ -14,6 +14,7 @@
 - In scope:
   - `~/.icebox/identities/<name>/vault.enc` is created on first use as a versioned JSON envelope.
   - Envelope baseline for MVP create path:
+    - top-level `format: "icebox.vault.legacy-v1"` (legacy marker for migration routing)
     - top-level `version: 1`
     - top-level `entries: []` (empty array on first create)
   - Keep envelope minimal for MVP: do not add optional identity self-description fields yet (for example `identity_pubkey`).
@@ -23,7 +24,8 @@
 
 ## Acceptance Criteria
 
-- AC1: E3-01 behavior matches backlog description with versioned envelope baseline: first create writes `vault.enc` JSON containing `version: 1` and `entries: []`.
+- AC1: E3-01 behavior matches backlog description with versioned envelope baseline: first create writes `vault.enc` JSON containing `format`, `version: 1`, and `entries: []`.
+- AC1a: `add` fails closed when no active agent is configured (`ICE-201` in current MVP mapping) and does not create vault artifacts.
 - AC2: CLI output/errors are deterministic and user-safe.
 - AC3: Changes are validated with mapped tests.
 
@@ -77,6 +79,8 @@
 ## Execution Notes
 
 - Commit split plan will be finalized in the issue `Execution Plan` comment during `execute`.
+- Runtime implementation note: `save_vault` uses temp-file + rename (`vault.enc.tmp` -> `vault.enc`) to preserve atomic writes. This is intentionally carried forward from E3-11 into the E3-01/E3-02 execution unit to reduce corruption risk in the first shipped vault path.
+- Test evidence note: E3-01 e2e coverage includes both missing `identity.pub` and missing `activeAgentId` failure paths.
 
 ---
 *Last updated: 2026-03-03*
