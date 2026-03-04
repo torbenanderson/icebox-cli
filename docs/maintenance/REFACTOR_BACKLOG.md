@@ -14,6 +14,15 @@ Target: ~60–70 lines (~4–5% of current ~1,570). Trade-offs: added dependency
 | **cleanup_file_if_created** | ~3 lines | Tighter `or_else` / match instead of explicit match arms. |
 | **Config save chain** | ~3 lines | Extract small helper for write/flush/rename to reduce repetition. |
 
+## E3 Maintenance Queue
+
+Refactors intentionally deferred from execution packets to keep scope tight.
+
+| ID | Refactor | Notes |
+|---|---|---|
+| E3-30 | Vault module split maintenance | Split `src/vault.rs` into focused modules (`mod.rs`, `crypto.rs`, `io.rs`, `paths.rs`) to isolate concerns (types/errors/crypto/locking/I/O) without changing runtime behavior. |
+| E3-31 | Error-helper + conversion consolidation maintenance | Consolidate repeated helper/error-mapping patterns (for example `io_err`/`serialize_err` boilerplate and config->register conversion ownership) while preserving existing runtime error codes/messages. |
+
 ### Not recommended
 
 - **Stripping doc comments** — Saves lines but hurts clarity and rustdoc.
@@ -28,4 +37,4 @@ Target: ~60–70 lines (~4–5% of current ~1,570). Trade-offs: added dependency
 
 ---
 
-*Last updated: 2026-03-02*
+*Last updated: 2026-03-04*
