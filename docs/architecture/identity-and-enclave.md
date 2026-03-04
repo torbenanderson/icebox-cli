@@ -78,6 +78,14 @@
 - Future strict policy can require explicit identity-level second factor for selected operations.
 - Expired/locked sessions must produce deterministic pending/denied outcomes.
 
+## Future Backend Expansion
+
+Reserved for post-MVP; no implementation commitment.
+
+- **Passkeys/WebAuthn** — Viable as identity-level approval second factor. User authenticates with passkey before unwrap; passkey signs assertion, Icebox verifies. The Ed25519 sealing key remains unchanged — passkeys cannot replace it (no raw key material). Fits approval/attestation layer only.
+- **FIDO2 / hardware tokens** — Device-backend option for platforms without Secure Enclave (e.g. Linux). Protocol differs from enclave wrap (signing vs arbitrary encrypt); would require new backend class.
+- **Reserved manifest fields** — `approvalBackend` (and related) reserved for future approval-backend metadata (`null` in MVP). See [data-models-and-layout.md](data-models-and-layout.md).
+
 ## Registration-Time Integrity Material
 
 - During `register-agent`, Icebox also generates a random HMAC key for vault integrity checks.
@@ -99,4 +107,4 @@
 
 ---
 
-*Last updated: 2026-02-24*
+*Last updated: 2026-03-02*

@@ -16,6 +16,7 @@
 - Out of scope:
   - Unrelated backlog items outside E3-06
   - Cross-epic behavior changes not requested by E3-06
+  - Future approval gating (e.g. E2-36 passkey) — identity-level second factor may gate unwrap in post-MVP; design should not preclude inserting an approval step before enclave unwrap.
 
 ## Acceptance Criteria
 

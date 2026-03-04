@@ -125,6 +125,7 @@
 | E2-33 | Identity lane metadata | Persist explicit identity operation lane metadata (`local-enclave`, `paired-remote-signer`) with fail-safe behavior for unknown lanes |
 | E2-34 | Device enrollment bindings | Track per-device backend bindings for an identity without changing identity primary keys (`agentId`) |
 | E2-35 | Approval/session states | Broker/CLI contract returns deterministic approval states (`ok`, `pending_approval`, `denied`, `expired`) for protected operations |
+| E2-36 | Passkey/WebAuthn approval (post-MVP) | Identity-level second factor: user authenticates with passkey before enclave unwrap; passkey signs assertion, Icebox verifies. Sealing key remains Ed25519. Reserved `approvalBackend` in manifest. |
 
 ## E3 -- Encrypted Vault
 
