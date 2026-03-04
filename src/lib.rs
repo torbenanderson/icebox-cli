@@ -23,6 +23,13 @@ pub enum Commands {
         /// Agent name to register.
         name: String,
     },
+    /// Adds or updates a secret in the active agent vault.
+    Add {
+        /// Service name (for example: openai).
+        service: String,
+        /// Secret value to seal into vault.
+        value: String,
+    },
 }
 
 /// Top-level CLI parser scaffold for Icebox.
@@ -69,21 +76,23 @@ fn run_from_args(args: Vec<std::ffi::OsString>) -> i32 {
             Ok(()) => 0,
             Err(err) => {
                 let (code, detail) = match &err {
-                    agent::RegisterAgentError::InvalidName(_) => {
+                    CommandError::Register(agent::RegisterAgentError::InvalidName(_)) => {
                         (error::IceErrorCode::InvalidAgentName, Some(err.to_string()))
                     }
-                    agent::RegisterAgentError::DuplicateName { .. } => (
+                    CommandError::Register(agent::RegisterAgentError::DuplicateName { .. }) => (
                         error::IceErrorCode::DuplicateAgentName,
                         Some(err.to_string()),
                     ),
-                    agent::RegisterAgentError::DuplicateRegistryNames { .. } => (
+                    CommandError::Register(agent::RegisterAgentError::DuplicateRegistryNames {
+                        ..
+                    }) => (
                         error::IceErrorCode::DuplicateConfigAgentNames,
                         Some(err.to_string()),
                     ),
-                    agent::RegisterAgentError::InvalidConfig { .. } => {
+                    CommandError::Register(agent::RegisterAgentError::InvalidConfig { .. }) => {
                         (error::IceErrorCode::InvalidConfig, Some(err.to_string()))
                     }
-                    agent::RegisterAgentError::Enclave { .. } => (
+                    CommandError::Register(agent::RegisterAgentError::Enclave { .. }) => (
                         error::IceErrorCode::EnclaveFailure,
                         if debug_enabled {
                             Some(err.to_string())
@@ -94,6 +103,9 @@ fn run_from_args(args: Vec<std::ffi::OsString>) -> i32 {
                             )
                         },
                     ),
+                    CommandError::Vault(_) => {
+                        (error::IceErrorCode::VaultOperation, Some(err.to_string()))
+                    }
                     _ => (error::IceErrorCode::IdentitySetup, Some(err.to_string())),
                 };
                 eprintln!(
@@ -126,9 +138,29 @@ fn run_from_args(args: Vec<std::ffi::OsString>) -> i32 {
     }
 }
 
-fn run_command(cli: Cli) -> Result<(), agent::RegisterAgentError> {
+#[derive(Debug)]
+enum CommandError {
+    Register(agent::RegisterAgentError),
+    Vault(vault::VaultError),
+}
+
+impl std::fmt::Display for CommandError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Register(err) => write!(f, "{err}"),
+            Self::Vault(err) => write!(f, "{err}"),
+        }
+    }
+}
+
+fn run_command(cli: Cli) -> Result<(), CommandError> {
     match cli.command {
-        Some(Commands::RegisterAgent { name }) => agent::register_agent(&name),
+        Some(Commands::RegisterAgent { name }) => {
+            agent::register_agent(&name).map_err(CommandError::Register)
+        }
+        Some(Commands::Add { service, value }) => {
+            vault::add_secret_to_active_agent(&service, &value).map_err(CommandError::Vault)
+        }
         None => Ok(()),
     }
 }
@@ -158,6 +190,19 @@ mod tests {
         match result.command {
             Some(Commands::RegisterAgent { name }) => assert_eq!(name, "claw"),
             _ => panic!("expected register-agent command"),
+        }
+    }
+
+    #[test]
+    fn parse_add_command_succeeds() {
+        let result = parse_cli_from(["icebox-cli", "add", "openai", "sk-test"])
+            .expect("expected add parse success");
+        match result.command {
+            Some(Commands::Add { service, value }) => {
+                assert_eq!(service, "openai");
+                assert_eq!(value, "sk-test");
+            }
+            _ => panic!("expected add command"),
         }
     }
 }
