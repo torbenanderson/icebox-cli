@@ -11,6 +11,8 @@ Primary security-sensitive scope includes:
 - `icebox run` secret injection and environment sanitization,
 - file permissions and local-filesystem safety checks.
 
+For architecture details, trust boundaries, and diagrams, see [Security Model](docs/architecture/security-model.md).
+
 ## Reporting a Vulnerability
 
 Please report vulnerabilities privately.
