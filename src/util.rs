@@ -3,6 +3,7 @@
 use rand_core::{OsRng, RngCore};
 use std::error::Error;
 use std::fmt::{Display, Formatter};
+use std::path::Path;
 use std::path::PathBuf;
 
 /// Encodes bytes to lowercase hexadecimal.
@@ -55,4 +56,19 @@ pub fn resolve_icebox_home() -> Result<PathBuf, ResolveIceboxHomeError> {
 
     let home = std::env::var_os("HOME").ok_or(ResolveIceboxHomeError::MissingHomeDir)?;
     Ok(PathBuf::from(home).join(".icebox"))
+}
+
+/// Builds an identity directory path under ICEBOX_HOME.
+pub fn agent_dir(home: &Path, name: &str) -> PathBuf {
+    home.join("identities").join(name)
+}
+
+/// Builds the identity public-key path.
+pub fn identity_pub_path(agent_dir: &Path) -> PathBuf {
+    agent_dir.join("identity.pub")
+}
+
+/// Builds the identity vault path.
+pub fn vault_path(agent_dir: &Path) -> PathBuf {
+    agent_dir.join("vault.enc")
 }

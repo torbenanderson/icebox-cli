@@ -23,6 +23,10 @@ impl Display for EnclaveError {
 
 impl Error for EnclaveError {}
 
+fn is_fake_enclave_enabled() -> bool {
+    std::env::var("ICEBOX_TEST_FAKE_ENCLAVE").ok().as_deref() == Some("1")
+}
+
 fn maybe_force_failure() -> Result<(), EnclaveError> {
     if std::env::var("ICEBOX_TEST_FORCE_ENCLAVE_ERROR")
         .ok()
@@ -49,7 +53,7 @@ fn maybe_force_wrap_failure() -> Result<(), EnclaveError> {
 pub(crate) fn create_wrapping_key(agent_name: &str) -> Result<String, EnclaveError> {
     maybe_force_failure()?;
     let key_ref = format!("com.icebox.identity.{agent_name}.wrapping-key");
-    if std::env::var("ICEBOX_TEST_FAKE_ENCLAVE").ok().as_deref() == Some("1") {
+    if is_fake_enclave_enabled() {
         return Ok(key_ref);
     }
     platform::create_wrapping_key(&key_ref)?;
@@ -62,7 +66,7 @@ pub(crate) fn wrap_private_key(
     raw_private_key: &[u8],
 ) -> Result<Vec<u8>, EnclaveError> {
     maybe_force_wrap_failure()?;
-    if std::env::var("ICEBOX_TEST_FAKE_ENCLAVE").ok().as_deref() == Some("1") {
+    if is_fake_enclave_enabled() {
         let mut out = b"fake-enclave-wrap-v1:".to_vec();
         out.extend(raw_private_key.iter().map(|byte| byte ^ 0xAA));
         return Ok(out);

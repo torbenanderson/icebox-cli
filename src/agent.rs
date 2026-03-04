@@ -343,7 +343,7 @@ pub fn register_agent(raw_name: &str) -> Result<(), RegisterAgentError> {
         });
     }
 
-    let agent_dir = home.join("identities").join(name.as_str());
+    let agent_dir = crate::util::agent_dir(&home, name.as_str());
 
     let mut cleanup = RegistrationCleanup::new(
         agent_dir.join("enclave.keyref"),

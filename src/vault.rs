@@ -326,14 +326,14 @@ pub fn add_secret_to_active_agent(service: &str, secret_value: &str) -> Result<(
 
     let home = crate::util::resolve_icebox_home().map_err(|_| VaultError::MissingHomeDir)?;
     let active_agent = load_active_agent(&home)?;
-    let agent_dir = home.join("identities").join(active_agent.name);
-    let identity_pub_path = agent_dir.join("identity.pub");
+    let agent_dir = crate::util::agent_dir(&home, &active_agent.name);
+    let identity_pub_path = crate::util::identity_pub_path(&agent_dir);
     let identity_public_key = read_identity_public_key(&identity_pub_path)?;
 
     let sealed = seal_secret_for_identity(&identity_public_key, secret_value.as_bytes())?;
     let sealed_blob = BASE64_STANDARD.encode(sealed);
 
-    let vault_path = agent_dir.join("vault.enc");
+    let vault_path = crate::util::vault_path(&agent_dir);
     with_vault_write_lock(&vault_path, || {
         let mut vault = load_or_create_vault(&vault_path)?;
         if let Some(existing) = vault

@@ -106,7 +106,9 @@ fn run_from_args(args: Vec<std::ffi::OsString>) -> i32 {
                     CommandError::Vault(_) => {
                         (error::IceErrorCode::VaultOperation, Some(err.to_string()))
                     }
-                    _ => (error::IceErrorCode::IdentitySetup, Some(err.to_string())),
+                    CommandError::Register(_) => {
+                        (error::IceErrorCode::IdentitySetup, Some(err.to_string()))
+                    }
                 };
                 eprintln!(
                     "{}",
