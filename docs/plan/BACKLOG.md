@@ -151,6 +151,8 @@
 | E3-18 | HMAC key recovery | Phase 1.5. `recover-agent` generates a new `hmac.enc` (new random HMAC key, encrypted by the new enclave key). First vault write after recovery establishes HMAC baseline. |
 | E3-19 | Strict list integrity mode | `icebox list --strict` performs HMAC verification before output; default `list` remains non-enclave/non-strict |
 | E3-20 | Schema migration contract | Implement explicit vault schema migrators (`from_version` -> `to_version`) with atomic writeback, unsupported-version fail (`ICE-202`), idempotency guarantees, and fixture-based migration tests |
+| E3-22 | Vault envelope identity metadata (post-MVP) | Add optional self-description metadata fields in vault envelope (for example identity public-key reference) with explicit anti-drift rules and migration guards. Defer from MVP to keep envelope minimal. |
+| E3-23 | Vault write provenance (post-MVP) | Add optional authenticated provenance layer for vault writes (for example signature/attestation metadata) when auditability is required. Keep `crypto_box_seal` anonymous-sender semantics in MVP. |
 
 ## E4 -- Secret Management
 

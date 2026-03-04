@@ -12,14 +12,18 @@
 ## Scope
 
 - In scope:
-  - `~/.icebox/identities/<name>/vault.enc` is created on first use as a JSON file of sealed blobs
+  - `~/.icebox/identities/<name>/vault.enc` is created on first use as a versioned JSON envelope.
+  - Envelope baseline for MVP create path:
+    - top-level `version: 1`
+    - top-level `secrets: []` (empty array on first create)
+  - Keep envelope minimal for MVP: do not add optional identity self-description fields yet (for example `identity_pubkey`).
 - Out of scope:
   - Unrelated backlog items outside E3-01
   - Cross-epic behavior changes not requested by E3-01
 
 ## Acceptance Criteria
 
-- AC1: E3-01 behavior matches backlog description: `~/.icebox/identities/<name>/vault.enc` is created on first use as a JSON file of sealed blobs
+- AC1: E3-01 behavior matches backlog description with versioned envelope baseline: first create writes `vault.enc` JSON containing `version: 1` and `secrets: []`.
 - AC2: CLI output/errors are deterministic and user-safe.
 - AC3: Changes are validated with mapped tests.
 
@@ -42,6 +46,7 @@
 - Keep secret-handling boundaries unchanged unless explicitly in scope.
 - Preserve direct-exec/no-shell guarantees where relevant.
 - Preserve user-safe default errors (no sensitive internals in normal mode).
+- Recovery model note (MVP): losing both `~/.icebox` vault artifacts and the associated identity private key material means encrypted vault contents are non-recoverable by design.
 
 ## Test Mapping
 
