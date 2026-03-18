@@ -12,6 +12,7 @@
   - [Data Models And Layout](architecture/data-models-and-layout.md)
   - [Platform And Distribution](architecture/platform-and-distribution.md)
   - [Compatibility And Evolution](architecture/compatibility-and-evolution.md)
+  - [Mobile App (Early Architecture)](architecture/mobile-app-early-architecture.md)
   - [Technology Choices](architecture/technology-choices.md)
   - [Rust Implementation](architecture/rust-implementation.md)
   - [MVP Decision Lock](architecture/mvp-decision-lock.md)
