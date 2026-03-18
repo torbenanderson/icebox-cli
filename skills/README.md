@@ -30,31 +30,35 @@ flowchart LR
    - Path: `skills/icebox-docs-standards/SKILL.md`
    - Purpose: docs governance across mdBook + rustdoc, nav hygiene, footer policy, publish readiness, and rust source-doc standards.
    - Trigger: every task in this repository.
-2. `icebox-load`
+2. `icebox-rust-standards`
+   - Path: `skills/icebox-rust-standards/SKILL.md`
+   - Purpose: Rust code organization, visibility, crate-boundary, and module-layout conventions for Icebox.
+   - Trigger: Rust structure/style requests, `mod` vs `pub mod`, `main.rs`/`lib.rs`, naming/layout decisions.
+3. `icebox-load`
    - Path: `skills/icebox-load/SKILL.md`
    - Purpose: prepare backlog work into a reviewable execution packet with canonical issue reference and state machine controls.
    - Trigger: load/prep/stage-for-review requests before coding.
-3. `icebox-discussion-proposals`
+4. `icebox-discussion-proposals`
    - Path: `skills/icebox-discussion-proposals/SKILL.md`
    - Purpose: track external/community ideas as D-prefixed proposal issues with source links, status, and backlog mapping.
    - Trigger: `add discussion <link>`, log/track discussion proposal requests.
-4. `icebox-execute`
+5. `icebox-execute`
    - Path: `skills/icebox-execute/SKILL.md`
    - Purpose: enforce pre-coding alignment gates and execute refusal until packet is truly ready.
    - Trigger: `execute`, start-building, build-component, execute-backlog, kickoff alignment.
-5. `icebox-ai-harness`
+6. `icebox-ai-harness`
    - Path: `skills/icebox-ai-harness/SKILL.md`
    - Purpose: schema-contract propagation, workflow guardrails, governance hook, and concern-based commit split guidance.
    - Trigger: schema/examples changes, persisted artifact contract updates, `.github/workflows/*` edits, commit-splitting requests.
-6. `icebox-test`
+7. `icebox-test`
    - Path: `skills/icebox-test/SKILL.md`
    - Purpose: require runnable test artifacts during execute, with at least one happy-path and one failure-path test.
    - Trigger: loaded with `execute` and any request to implement backlog work; can also be invoked standalone via `build tests #<issue-id>` or `build tests E*`.
-7. `icebox-done-gate`
+8. `icebox-done-gate`
    - Path: `skills/icebox-done-gate/SKILL.md`
    - Purpose: hard closeout gate with evidence validation before `in-progress -> done`.
    - Trigger: done/closeout/ship/finish-packet requests.
-8. `icebox-commit-merge-hygiene`
+9. `icebox-commit-merge-hygiene`
    - Path: `skills/icebox-commit-merge-hygiene/SKILL.md`
    - Purpose: standardize commit, PR, and merge message quality with concern-aware structure and push policy.
    - Trigger: commit/PR/merge messaging requests.
@@ -63,30 +67,33 @@ flowchart LR
 
 1. `icebox-docs-standards`
    - `docs`, `SUMMARY.md`, `footer`, `rustdoc`, `api docs`
-2. `icebox-load`
+2. `icebox-rust-standards`
+   - `rust standards`, `code style`, `module layout`, `mod`, `pub mod`, `main.rs`, `lib.rs`
+3. `icebox-load`
    - `load backlog`, `prepare issue`, `stage for review`, `packetize`
-3. `icebox-discussion-proposals`
+4. `icebox-discussion-proposals`
    - `add discussion`, `log discussion`, `track discussion proposal`
-4. `icebox-execute`
+5. `icebox-execute`
    - `execute`, `start building`, `build component`, `kickoff`
-5. `icebox-ai-harness`
+6. `icebox-ai-harness`
    - `schema change`, `workflow change`, `contracts`, `split commits by concern`
-6. `icebox-test`
+7. `icebox-test`
    - `execute`, `build tests`, `write tests`, `add happy path and failure path tests`
-7. `icebox-done-gate`
+8. `icebox-done-gate`
    - `done`, `closeout`, `ship this`, `finish packet`
-8. `icebox-commit-merge-hygiene`
+9. `icebox-commit-merge-hygiene`
    - `commit`, `pr`, `pull request`, `merge`, `squash`
 ## Recommended Skill Order
 
 1. `icebox-docs-standards`
-2. `icebox-load`
-3. `icebox-discussion-proposals`
-4. `icebox-execute`
-5. `icebox-test`
-6. `icebox-ai-harness`
-7. `icebox-done-gate`
-8. `icebox-commit-merge-hygiene`
+2. `icebox-rust-standards`
+3. `icebox-load`
+4. `icebox-discussion-proposals`
+5. `icebox-execute`
+6. `icebox-test`
+7. `icebox-ai-harness`
+8. `icebox-done-gate`
+9. `icebox-commit-merge-hygiene`
 
 ## Canonical Execution Path
 
