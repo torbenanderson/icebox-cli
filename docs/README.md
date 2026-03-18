@@ -9,6 +9,7 @@ Use this file as the entrypoint for project docs.
 - [Architecture Decision Log](architecture/decisions/)
 - Identity lane model: see [Identity And Enclave](architecture/identity-and-enclave.md) and ADR-0002.
 - [Brokered Credential Execution](architecture/brokered-credential-execution.md)
+- [Mobile App (Early Architecture)](architecture/mobile-app-early-architecture.md)
 - [Rust Implementation Notes](architecture/rust-implementation.md)
 
 ## Planning

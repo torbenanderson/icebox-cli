@@ -27,11 +27,19 @@ Use this skill on every task in this repository.
    - Prefer stable Markdown and relative links suitable for wiki/site reuse.
    - Avoid one-off docs islands; integrate into existing indexes.
 7. Rust source documentation standards:
+   - Choose the narrowest correct comment level for the audience and scope:
+     - Use `//` when the note is only for maintainers reading the source and should not appear in generated docs.
+     - Use `///` when the note documents the item that follows and is part of the public API or user-facing contract.
+     - Use `//!` when the note describes the enclosing module or crate as a whole, including crate roots such as `src/main.rs` and `src/lib.rs`.
+   - Prefer comments that match the behavior they describe: item behavior on the item, module behavior at the module boundary, and local implementation notes next to the relevant code.
+   - Treat inclusion in `rustdoc` as an explicit decision: `///` and `//!` are for generated documentation; `//` is not.
    - Document stable public API items (`pub` structs, enums, traits, fns, type aliases, constants) with `///`.
    - Document module/crate boundaries with `//!` where they define external behavior or usage.
+   - Treat `src/main.rs` as the binary crate root; prefer `//!` there for crate-level entrypoint docs when documentation should be visible to `rustdoc`.
    - Use comment layering consistently:
      - `///` and `//!` for API/module contracts and user-facing behavior.
      - `//` for selective implementation notes on non-obvious lines or blocks.
+     - `//` stays source-only; `rustdoc` renders `///` and `//!` but ignores plain `//`.
      - Avoid line-by-line comments for obvious code.
    - Keep `src/main.rs` thin; treat `src/lib.rs` as the primary API documentation surface.
    - Prefer examples on high-impact public APIs; examples should compile when practical.

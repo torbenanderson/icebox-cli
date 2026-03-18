@@ -1,7 +1,7 @@
-//! Icebox CLI library surface.
-//!
-//! The binary entrypoint remains thin in `src/main.rs`; core parsing and module
-//! wiring live here so they are testable and reusable.
+ //! Icebox CLI library crate.
+  //!
+  //! `src/main.rs` stays thin; core parsing and orchestration live here so they
+  //! remain testable and reusable.
 
 pub mod agent;
 pub mod config;

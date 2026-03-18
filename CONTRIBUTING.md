@@ -54,6 +54,13 @@ Start here:
 
 If code does not exist yet for a planned area, contribute docs/tests/contracts first.
 
+## Rust Commenting
+
+- Use `//` for local implementation notes that should stay in source only.
+- Use `///` for item-level docs on public functions, structs, enums, traits, and other API items.
+- Use `//!` for module-level or crate-level docs that describe a file, module, or crate as a whole.
+- `rustdoc` uses `///` and `//!` when generating API documentation, but ignores plain `//` comments.
+
 ## PR Guidelines
 
 1. Use a clear title with subsystem scope, for example:
@@ -75,3 +82,6 @@ For changes affecting crypto, key handling, vault integrity, `run`, or permissio
 - include fail-closed behavior expectations.
 
 For vulnerability reports, do not open a public issue. See `SECURITY.md`.
+
+---
+*Last updated: 2026-03-18*

@@ -17,6 +17,7 @@ This folder contains the canonical architecture reference for Icebox.
 - [Brokered Credential Execution](brokered-credential-execution.md)
 - [Data Models & Layout](data-models-and-layout.md)
 - [Compatibility & Evolution](compatibility-and-evolution.md)
+- [Mobile App (Early Architecture)](mobile-app-early-architecture.md)
 - [Decision Log](decisions/)
 - [Security Model](security-model.md)
 - [Errors & Diagnostics](errors-and-diagnostics.md)
