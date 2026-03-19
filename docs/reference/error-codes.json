@@ -1,61 +1,11 @@
 {
   "version": 1,
-  "updated": "2026-03-03",
+  "updated": "2026-03-18",
   "codes": [
     {
-      "code": "ICE-101",
-      "category": "auth_crypto",
-      "message": "Authentication failed. Verify your agent identity."
-    },
-    {
       "code": "ICE-201",
-      "category": "vault_corruption",
-      "message": "Vault parse failed. The vault JSON is corrupted or unreadable."
-    },
-    {
-      "code": "ICE-202",
-      "category": "vault_version",
-      "message": "Unsupported vault format. Update Icebox or check vault integrity."
-    },
-    {
-      "code": "ICE-203",
-      "category": "vault_rollback",
-      "message": "Vault sequence counter is stale. Possible rollback detected."
-    },
-    {
-      "code": "ICE-204",
-      "category": "vault_integrity",
-      "message": "Vault integrity check failed. The vault may have been tampered with or rolled back externally."
-    },
-    {
-      "code": "ICE-205",
-      "category": "vault_entry_validation",
-      "message": "Vault entry validation failed. Entry structure or uniqueness constraints are invalid."
-    },
-    {
-      "code": "ICE-301",
-      "category": "agent_not_found",
-      "message": "Agent not found. Run `icebox list-agents` to see registered agents."
-    },
-    {
-      "code": "ICE-302",
-      "category": "capability_missing",
-      "message": "Operation not allowed for this identity capability set."
-    },
-    {
-      "code": "ICE-303",
-      "category": "policy_not_allowlisted",
-      "message": "Operation blocked by policy allowlist."
-    },
-    {
-      "code": "ICE-304",
-      "category": "backend_attestation",
-      "message": "Device/backend identity or attestation check failed."
-    },
-    {
-      "code": "ICE-305",
-      "category": "unsafe_mode_blocked",
-      "message": "Unsafe operation mode is blocked by policy."
+      "category": "vault_operation",
+      "message": "Vault operation failed."
     },
     {
       "code": "ICE-306",
@@ -64,13 +14,13 @@
     },
     {
       "code": "ICE-307",
-      "category": "approval_pending",
-      "message": "Operation is pending user approval."
+      "category": "duplicate_agent_name",
+      "message": "Agent already exists."
     },
     {
       "code": "ICE-308",
-      "category": "approval_expired",
-      "message": "Approval session expired. Re-approve to continue."
+      "category": "invalid_agent_name",
+      "message": "Invalid agent name."
     },
     {
       "code": "ICE-309",
@@ -78,19 +28,14 @@
       "message": "Config is invalid."
     },
     {
-      "code": "ICE-401",
-      "category": "secret_not_found",
-      "message": "No secret stored for this service."
+      "code": "ICE-310",
+      "category": "duplicate_config_agent_names",
+      "message": "Config has duplicate agent names."
     },
     {
-      "code": "ICE-501",
-      "category": "exec_command",
-      "message": "Command execution failed."
-    },
-    {
-      "code": "ICE-601",
-      "category": "enclave_access",
-      "message": "Cannot access Secure Enclave. Check macOS permissions or biometric settings."
+      "code": "ICE-311",
+      "category": "enclave_failure",
+      "message": "Secure Enclave operation failed."
     },
     {
       "code": "ICE-701",

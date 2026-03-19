@@ -9,8 +9,8 @@
 ## Phasing
 
 - MVP source of truth is runtime code mapping (typed errors/code map in `src/`).
-- `docs/reference/error-codes.json` is introduced later when external consumers (docs/support/tooling) need a machine-readable artifact.
-- When JSON is introduced, add a sync test between runtime code mapping and registry before any code generation step.
+- `docs/reference/error-codes.json` is the current machine-readable runtime registry for external consumers.
+- Planned post-MVP codes can be described here before they are added to the runtime registry.
 
 ## Key Codes
 
@@ -25,9 +25,11 @@
 - `ICE-304`: broker identity/attestation/authentication failure.
 - `ICE-305`: unsafe raw-secret mode blocked by policy.
 - `ICE-306`: identity setup failure.
-- `ICE-307`: approval pending.
-- `ICE-308`: approval session expired.
+- `ICE-307`: duplicate agent name.
+- `ICE-308`: invalid agent name.
 - `ICE-309`: invalid config.
+- `ICE-310`: duplicate config agent names.
+- `ICE-311`: Secure Enclave operation failure.
 
 ## MVP Concession (Vault Codes)
 
@@ -44,6 +46,7 @@
   - `ICE-205`: entry-level structure/uniqueness validation failures.
   - `ICE-206` (planned): vault preconditions/missing dependencies (for example no active agent, missing identity artifacts).
 - Implementation shape: typed vault validation/precondition errors in vault module(s), mapped to final `ICE-2xx` codes at CLI/runtime boundary.
+- Add new machine-readable codes to `docs/reference/error-codes.json` only when they exist in runtime.
 
 ## Debug Detail Policy
 
@@ -59,4 +62,4 @@
 
 ---
 
-*Last updated: 2026-03-03*
+*Last updated: 2026-03-18*

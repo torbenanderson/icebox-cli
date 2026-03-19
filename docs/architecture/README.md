@@ -23,6 +23,7 @@ This folder contains the canonical architecture reference for Icebox.
 - [Errors & Diagnostics](errors-and-diagnostics.md)
 - [Platform & Distribution](platform-and-distribution.md)
 - [Technology Choices](technology-choices.md)
+- [Architecture Contracts](contracts/README.md)
 
 ## Source Of Truth
 
@@ -31,4 +32,4 @@ This folder contains the canonical architecture reference for Icebox.
 
 ---
 
-*Last updated: 2026-02-20*
+*Last updated: 2026-03-18*

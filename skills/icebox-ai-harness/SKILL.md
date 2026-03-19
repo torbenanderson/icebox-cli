@@ -9,7 +9,8 @@ Use this skill for contract and automation integrity. Do not duplicate generic d
 
 1. Contract propagation for persisted artifact changes:
    - Update canonical architecture contract docs under `docs/architecture/` first.
-   - Update `docs/reference/schemas/*` and `docs/reference/schemas/examples/*`.
+   - Update target-state contract schemas under `docs/architecture/contracts/*` and `docs/architecture/contracts/examples/*`.
+   - Update current runtime machine-readable artifacts under `docs/reference/` when implementation-facing registries change.
    - Propagate to planning docs that track delivery/test impact: `docs/plan/BACKLOG.md`, `docs/plan/TESTING.md`, and `docs/plan/IMPLEMENTATION_BOOTSTRAP.md`.
 2. CI workflow guardrails:
    - When changing `.github/workflows/*`, preserve build/test/docs coverage expectations.
@@ -18,5 +19,5 @@ Use this skill for contract and automation integrity. Do not duplicate generic d
    - Update `docs/reference/DOCS_GOVERNANCE.md` when process ownership/rules materially change.
 4. Commit splitting by concern (non-interactive):
    - infra: `.github/workflows/*`
-   - contracts: `docs/architecture/*`, `docs/reference/schemas/*`, `docs/reference/schemas/examples/*`
+   - contracts: `docs/architecture/*`, `docs/architecture/contracts/*`, `docs/architecture/contracts/examples/*`
    - process: `docs/plan/*`, governance updates

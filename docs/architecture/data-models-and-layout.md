@@ -78,8 +78,9 @@
 
 - `identity-and-enclave.md`
 - `vault-and-integrity.md`
+- `contracts/README.md`
 
 
 ---
 
-*Last updated: 2026-03-02*
+*Last updated: 2026-03-18*

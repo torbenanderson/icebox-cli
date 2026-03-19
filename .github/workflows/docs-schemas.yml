@@ -3,11 +3,11 @@ name: Docs Schemas
 on:
   push:
     paths:
-      - "docs/reference/schemas/**"
+      - "docs/architecture/contracts/**"
       - ".github/workflows/docs-schemas.yml"
   pull_request:
     paths:
-      - "docs/reference/schemas/**"
+      - "docs/architecture/contracts/**"
       - ".github/workflows/docs-schemas.yml"
 
 jobs:
@@ -27,14 +27,14 @@ jobs:
 
       - name: Validate schemas against metaschema
         run: |
-          check-jsonschema --check-metaschema docs/reference/schemas/manifest.schema.json
-          check-jsonschema --check-metaschema docs/reference/schemas/config.schema.json
-          check-jsonschema --check-metaschema docs/reference/schemas/vault.schema.json
-          check-jsonschema --check-metaschema docs/reference/schemas/bundle-manifest.schema.json
+          check-jsonschema --check-metaschema docs/architecture/contracts/manifest.schema.json
+          check-jsonschema --check-metaschema docs/architecture/contracts/config.schema.json
+          check-jsonschema --check-metaschema docs/architecture/contracts/vault.schema.json
+          check-jsonschema --check-metaschema docs/architecture/contracts/bundle-manifest.schema.json
 
       - name: Validate fixtures against schemas
         run: |
-          check-jsonschema --schemafile docs/reference/schemas/manifest.schema.json docs/reference/schemas/examples/manifest.example.json
-          check-jsonschema --schemafile docs/reference/schemas/config.schema.json docs/reference/schemas/examples/config.example.json
-          check-jsonschema --schemafile docs/reference/schemas/vault.schema.json docs/reference/schemas/examples/vault.example.json
-          check-jsonschema --schemafile docs/reference/schemas/bundle-manifest.schema.json docs/reference/schemas/examples/bundle-manifest.example.json
+          check-jsonschema --schemafile docs/architecture/contracts/manifest.schema.json docs/architecture/contracts/examples/manifest.example.json
+          check-jsonschema --schemafile docs/architecture/contracts/config.schema.json docs/architecture/contracts/examples/config.example.json
+          check-jsonschema --schemafile docs/architecture/contracts/vault.schema.json docs/architecture/contracts/examples/vault.example.json
+          check-jsonschema --schemafile docs/architecture/contracts/bundle-manifest.schema.json docs/architecture/contracts/examples/bundle-manifest.example.json

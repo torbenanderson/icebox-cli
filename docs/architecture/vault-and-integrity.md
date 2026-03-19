@@ -11,7 +11,7 @@
 
 ## Vault Envelope (v1)
 
-The envelope allows format evolution without breaking old vaults. Machine-readable schema: [vault.schema.json](../reference/schemas/vault.schema.json).
+The envelope allows format evolution without breaking old vaults. Target-state machine-readable schema: [vault.schema.json](contracts/vault.schema.json).
 
 MVP note:
 
@@ -127,4 +127,4 @@ Implement one canonical function for load validation and keep checks centralized
 
 ---
 
-*Last updated: 2026-03-04*
+*Last updated: 2026-03-18*

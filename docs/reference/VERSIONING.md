@@ -84,9 +84,10 @@ SemVer Decision:
 
 - `docs/plan/ROADMAP.md`
 - `docs/plan/BACKLOG.md`
-- `docs/plan/IMPLEMENTATION_BOOTSTRAP.md`
+- `docs/plan/STATUS_MODEL.md`
+- `docs/plan/CURRENT_STATE.md`
 
 
 ---
 
-*Last updated: 2026-03-03*
+*Last updated: 2026-03-18*

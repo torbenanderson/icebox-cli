@@ -13,6 +13,8 @@ Use this skill on every task in this repository.
 2. Keep docs navigation current:
    - Update `docs/SUMMARY.md` when adding/removing docs pages.
    - Keep `docs/README.md` aligned with canonical sections.
+   - Treat `docs/SUMMARY.md` as the mdBook navigation source and `docs/README.md` as the human-facing docs index; they may differ in tone, but not in section coverage.
+   - When one adds or removes major sections or pages, review the other in the same change so navigation and index content do not drift.
 3. Preserve source-of-truth boundaries:
    - Architecture contracts in `docs/architecture/`.
    - Planning/execution docs in `docs/plan/`.

@@ -19,9 +19,9 @@ This file defines documentation ownership and hygiene rules.
 - `docs/guides/`:
   User/operator guides.
 - `docs/reference/`:
-  Machine-readable artifacts and policy references.
-- `docs/reference/schemas/`:
-  JSON Schema contracts and fixtures for persisted artifacts.
+  Current machine-readable runtime artifacts and policy references.
+- `docs/architecture/contracts/`:
+  Planned and target-state machine-readable contracts for persisted artifacts.
 
 ## Size And Duplication Guardrails
 
@@ -67,7 +67,8 @@ When a PR changes docs, include:
 - [ ] Links resolve after file moves.
 - [ ] Decision-impacting changes update `docs/architecture/mvp-decision-lock.md` when needed.
 - [ ] Decision-impacting changes add/update ADRs under `docs/architecture/decisions/` when applicable.
-- [ ] Persisted-artifact changes update `docs/reference/schemas/` + fixtures.
+- [ ] Persisted-artifact contract design changes update `docs/architecture/contracts/` + fixtures.
+- [ ] Current runtime machine-readable artifacts under `docs/reference/` match implementation.
 - [ ] Planning/process changes keep `docs/plan/STATUS_MODEL.md`, `docs/plan/CURRENT_STATE.md`, and `docs/plan/task-status.json` aligned.
 - [ ] mdBook references use `book.toml` at repo root and `mdbook build`.
 - [ ] No duplicate policy blocks copied across multiple docs without need.

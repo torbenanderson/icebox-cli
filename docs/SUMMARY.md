@@ -12,6 +12,7 @@
   - [Data Models And Layout](architecture/data-models-and-layout.md)
   - [Platform And Distribution](architecture/platform-and-distribution.md)
   - [Compatibility And Evolution](architecture/compatibility-and-evolution.md)
+  - [Architecture Contracts](architecture/contracts/README.md)
   - [Mobile App (Early Architecture)](architecture/mobile-app-early-architecture.md)
   - [Technology Choices](architecture/technology-choices.md)
   - [Rust Implementation](architecture/rust-implementation.md)
@@ -39,4 +40,3 @@
 - [Reference](reference/VERSIONING.md)
   - [Docs Governance](reference/DOCS_GOVERNANCE.md)
   - [API Documentation](reference/API_DOCS.md)
-  - [Schemas](reference/schemas/README.md)
