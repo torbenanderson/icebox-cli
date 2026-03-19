@@ -1,14 +1,14 @@
 //! Icebox CLI library crate.
-  //!
-  //! `src/main.rs` stays thin; core parsing and orchestration live here so they
-  //! remain testable and reusable.
-  //!
-  //! Main modules:
-  //! - `agent`: agent-facing command flows
-  //! - `config`: configuration loading and validation
-  //! - `did`: device identity handling
-  //! - `runner`: CLI execution flow
-  //! - `vault`: secure storage operations
+//!
+//! `src/main.rs` stays thin; core parsing and orchestration live here so they
+//! remain testable and reusable.
+//!
+//! Main modules:
+//! - `agent`: agent-facing command flows
+//! - `config`: configuration loading and validation
+//! - `did`: device identity handling
+//! - `runner`: CLI execution flow
+//! - `vault`: secure storage operations
 
 pub mod agent;
 pub mod config;
