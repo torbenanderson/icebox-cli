@@ -50,6 +50,7 @@ Use on requests like:
      - `PR link:` (auto-created/reused PR URL)
      - `Tests run (commands + result):`
      - `Docs updated (paths):`
+     - `Architecture docs updated:`
      - `Files added/changed (paths):`
      - `ADR link:` (default `n/a`, must be real if ADR required is yes)
    - Packet-scope override:
@@ -66,27 +67,33 @@ Use on requests like:
      - user-facing docs pages under `docs/`
    - mdBook surface sync checks:
      - `docs/SUMMARY.md` reflects added/removed/moved pages
-     - `docs/book.toml` remains aligned with docs structure and build metadata
+     - `book.toml` remains aligned with docs structure and build metadata
    - Evidence comment must include:
+     - `Architecture docs updated:` paths or `none (not impacted)`
      - `Internal docs updated:` paths or `none (not impacted)`
      - `External docs updated:` paths or `none (not impacted)`
 5. Validate docs build/readiness when docs changed:
-   - `mdbook build docs`
+   - `mdbook build`
    - `cargo doc --workspace --all-features --no-deps`
 6. Run hard validation:
    - `skills/icebox-load/scripts/issue_packet.sh validate-closeout --issue <id>`
-7. If validation passes, transition:
+7. If validation passes, done flow must also update the planning status surfaces:
+   - update `docs/plan/task-status.json`
+   - archive the packet under `docs/plan/spec/archive/pkt-<epic>/`
+   - regenerate `docs/plan/CURRENT_STATE.md`
+8. If validation passes, transition:
    - `skills/icebox-load/scripts/issue_packet.sh transition --issue <id> --to done`
-8. Close the GitHub issue to set actual issue status:
+9. Close the GitHub issue to set actual issue status:
    - `gh issue close <id> --comment "<closeout summary>"`
    - If already closed, report that explicitly.
-9. Preferred one-shot command:
+10. Preferred one-shot command:
    - `skills/icebox-load/scripts/issue_packet.sh done --issue <id> [--file-path <path>]... [--doc-path <path>]...`
-10. If validation fails, return a short blocker list and do not transition.
+11. If validation fails, return a short blocker list and do not transition.
 
 ## Hard Gate
 
 Never transition to `done` when closeout evidence is incomplete.
+Never transition to `done` when architecture docs impact is not explicitly accounted for.
 Never transition to `done` when internal/external docs impact is not explicitly accounted for.
 Never transition to `done` if docs changed and mdBook/rustdoc validation was not run.
 Never report completion unless the issue is also closed in GitHub (actual issue status).
@@ -98,6 +105,7 @@ Return:
 1. Closeout status: `passed` or `blocked`
 2. Any missing evidence fields (if blocked)
 3. Docs checklist status:
+   - architecture docs: `updated` or `none (not impacted)`
    - internal docs: `updated` or `none (not impacted)`
    - external docs: `updated` or `none (not impacted)`
    - mdBook sync: `pass`/`fail`/`n/a`

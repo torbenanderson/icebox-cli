@@ -1,0 +1,706 @@
+{
+  "version": 1,
+  "updated_at": "2026-03-18",
+  "items": [
+    {
+      "packet_id": "PKT-E1-01",
+      "backlog_id": "E1-01",
+      "title": "Cargo init",
+      "status": "done",
+      "issue": {
+        "number": null,
+        "url": null
+      },
+      "pr_url": null,
+      "spec_path": "docs/plan/spec/archive/pkt-e1/PKT-E1-01-work-item.md",
+      "archive_path": "docs/plan/spec/archive/pkt-e1/PKT-E1-01-work-item.md",
+      "validated_at": "2026-03-18",
+      "validation": [],
+      "docs": {
+        "architecture": [],
+        "internal": [],
+        "external": []
+      }
+    },
+    {
+      "packet_id": "PKT-E1-02",
+      "backlog_id": "E1-02",
+      "title": "CLI scaffolding",
+      "status": "done",
+      "issue": {
+        "number": null,
+        "url": null
+      },
+      "pr_url": null,
+      "spec_path": "docs/plan/spec/archive/pkt-e1/PKT-E1-02-work-item.md",
+      "archive_path": "docs/plan/spec/archive/pkt-e1/PKT-E1-02-work-item.md",
+      "validated_at": "2026-03-18",
+      "validation": [],
+      "docs": {
+        "architecture": [],
+        "internal": [],
+        "external": []
+      }
+    },
+    {
+      "packet_id": "PKT-E1-03",
+      "backlog_id": "E1-03",
+      "title": "Project structure",
+      "status": "done",
+      "issue": {
+        "number": null,
+        "url": null
+      },
+      "pr_url": null,
+      "spec_path": "docs/plan/spec/archive/pkt-e1/PKT-E1-03-work-item.md",
+      "archive_path": "docs/plan/spec/archive/pkt-e1/PKT-E1-03-work-item.md",
+      "validated_at": "2026-03-18",
+      "validation": [],
+      "docs": {
+        "architecture": [],
+        "internal": [],
+        "external": []
+      }
+    },
+    {
+      "packet_id": "PKT-E1-04",
+      "backlog_id": "E1-04",
+      "title": "CI pipeline",
+      "status": "done",
+      "issue": {
+        "number": null,
+        "url": null
+      },
+      "pr_url": null,
+      "spec_path": "docs/plan/spec/archive/pkt-e1/PKT-E1-04-work-item.md",
+      "archive_path": "docs/plan/spec/archive/pkt-e1/PKT-E1-04-work-item.md",
+      "validated_at": "2026-03-18",
+      "validation": [],
+      "docs": {
+        "architecture": [],
+        "internal": [],
+        "external": []
+      }
+    },
+    {
+      "packet_id": "PKT-E1-07",
+      "backlog_id": "E1-07",
+      "title": "Disable core dumps",
+      "status": "done",
+      "issue": {
+        "number": null,
+        "url": null
+      },
+      "pr_url": null,
+      "spec_path": "docs/plan/spec/archive/pkt-e1/PKT-E1-07-work-item.md",
+      "archive_path": "docs/plan/spec/archive/pkt-e1/PKT-E1-07-work-item.md",
+      "validated_at": "2026-03-18",
+      "validation": [],
+      "docs": {
+        "architecture": [],
+        "internal": [],
+        "external": []
+      }
+    },
+    {
+      "packet_id": "PKT-E1-13",
+      "backlog_id": "E1-13",
+      "title": "Structured error codes",
+      "status": "done",
+      "issue": {
+        "number": null,
+        "url": null
+      },
+      "pr_url": null,
+      "spec_path": "docs/plan/spec/archive/pkt-e1/PKT-E1-13-work-item.md",
+      "archive_path": "docs/plan/spec/archive/pkt-e1/PKT-E1-13-work-item.md",
+      "validated_at": "2026-03-18",
+      "validation": [],
+      "docs": {
+        "architecture": [],
+        "internal": [],
+        "external": []
+      }
+    },
+    {
+      "packet_id": "PKT-E2-01",
+      "backlog_id": "E2-01",
+      "title": "Generate keypair",
+      "status": "done",
+      "issue": {
+        "number": null,
+        "url": null
+      },
+      "pr_url": null,
+      "spec_path": "docs/plan/spec/archive/pkt-e2/PKT-E2-01-work-item.md",
+      "archive_path": "docs/plan/spec/archive/pkt-e2/PKT-E2-01-work-item.md",
+      "validated_at": "2026-03-18",
+      "validation": [],
+      "docs": {
+        "architecture": [],
+        "internal": [],
+        "external": []
+      }
+    },
+    {
+      "packet_id": "PKT-E2-02",
+      "backlog_id": "E2-02",
+      "title": "Enclave wrapping key",
+      "status": "done",
+      "issue": {
+        "number": null,
+        "url": null
+      },
+      "pr_url": null,
+      "spec_path": "docs/plan/spec/archive/pkt-e2/PKT-E2-02-work-item.md",
+      "archive_path": "docs/plan/spec/archive/pkt-e2/PKT-E2-02-work-item.md",
+      "validated_at": "2026-03-18",
+      "validation": [],
+      "docs": {
+        "architecture": [],
+        "internal": [],
+        "external": []
+      }
+    },
+    {
+      "packet_id": "PKT-E2-03",
+      "backlog_id": "E2-03",
+      "title": "Wrap Ed25519 key",
+      "status": "done",
+      "issue": {
+        "number": null,
+        "url": null
+      },
+      "pr_url": null,
+      "spec_path": "docs/plan/spec/archive/pkt-e2/PKT-E2-03-work-item.md",
+      "archive_path": "docs/plan/spec/archive/pkt-e2/PKT-E2-03-work-item.md",
+      "validated_at": "2026-03-18",
+      "validation": [],
+      "docs": {
+        "architecture": [],
+        "internal": [],
+        "external": []
+      }
+    },
+    {
+      "packet_id": "PKT-E2-04",
+      "backlog_id": "E2-04",
+      "title": "No plaintext key on disk",
+      "status": "done",
+      "issue": {
+        "number": null,
+        "url": null
+      },
+      "pr_url": null,
+      "spec_path": "docs/plan/spec/archive/pkt-e2/PKT-E2-04-work-item.md",
+      "archive_path": "docs/plan/spec/archive/pkt-e2/PKT-E2-04-work-item.md",
+      "validated_at": "2026-03-18",
+      "validation": [],
+      "docs": {
+        "architecture": [],
+        "internal": [],
+        "external": []
+      }
+    },
+    {
+      "packet_id": "PKT-E2-09",
+      "backlog_id": "E2-09",
+      "title": "Duplicate guard",
+      "status": "done",
+      "issue": {
+        "number": null,
+        "url": null
+      },
+      "pr_url": null,
+      "spec_path": "docs/plan/spec/archive/pkt-e2/PKT-E2-09-work-item.md",
+      "archive_path": "docs/plan/spec/archive/pkt-e2/PKT-E2-09-work-item.md",
+      "validated_at": "2026-03-18",
+      "validation": [],
+      "docs": {
+        "architecture": [],
+        "internal": [],
+        "external": []
+      }
+    },
+    {
+      "packet_id": "PKT-E2-11",
+      "backlog_id": "E2-11",
+      "title": "Active agent tracking",
+      "status": "done",
+      "issue": {
+        "number": null,
+        "url": null
+      },
+      "pr_url": null,
+      "spec_path": "docs/plan/spec/archive/pkt-e2/PKT-E2-11-work-item.md",
+      "archive_path": "docs/plan/spec/archive/pkt-e2/PKT-E2-11-work-item.md",
+      "validated_at": "2026-03-18",
+      "validation": [],
+      "docs": {
+        "architecture": [],
+        "internal": [],
+        "external": []
+      }
+    },
+    {
+      "packet_id": "PKT-E2-18",
+      "backlog_id": "E2-18",
+      "title": "Agent name validation",
+      "status": "done",
+      "issue": {
+        "number": null,
+        "url": null
+      },
+      "pr_url": null,
+      "spec_path": "docs/plan/spec/archive/pkt-e2/PKT-E2-18-work-item.md",
+      "archive_path": "docs/plan/spec/archive/pkt-e2/PKT-E2-18-work-item.md",
+      "validated_at": "2026-03-18",
+      "validation": [],
+      "docs": {
+        "architecture": [],
+        "internal": [],
+        "external": []
+      }
+    },
+    {
+      "packet_id": "PKT-E3-01",
+      "backlog_id": "E3-01",
+      "title": "Vault creation",
+      "status": "done",
+      "issue": {
+        "number": null,
+        "url": null
+      },
+      "pr_url": null,
+      "spec_path": "docs/plan/spec/archive/pkt-e3/PKT-E3-01-work-item.md",
+      "archive_path": "docs/plan/spec/archive/pkt-e3/PKT-E3-01-work-item.md",
+      "validated_at": "2026-03-18",
+      "validation": [],
+      "docs": {
+        "architecture": [],
+        "internal": [],
+        "external": []
+      }
+    },
+    {
+      "packet_id": "PKT-E3-02",
+      "backlog_id": "E3-02",
+      "title": "Sealed-box encryption",
+      "status": "done",
+      "issue": {
+        "number": null,
+        "url": null
+      },
+      "pr_url": null,
+      "spec_path": "docs/plan/spec/archive/pkt-e3/PKT-E3-02-work-item.md",
+      "archive_path": "docs/plan/spec/archive/pkt-e3/PKT-E3-02-work-item.md",
+      "validated_at": "2026-03-18",
+      "validation": [],
+      "docs": {
+        "architecture": [],
+        "internal": [],
+        "external": []
+      }
+    },
+    {
+      "packet_id": "PKT-E3-03",
+      "backlog_id": "E3-03",
+      "title": "Per-secret isolation",
+      "status": "planned",
+      "issue": {
+        "number": null,
+        "url": null
+      },
+      "pr_url": null,
+      "spec_path": "docs/plan/spec/PKT-E3-03-work-item.md",
+      "archive_path": null,
+      "validated_at": null,
+      "validation": [],
+      "docs": {
+        "architecture": [],
+        "internal": [],
+        "external": []
+      }
+    },
+    {
+      "packet_id": "PKT-E3-04",
+      "backlog_id": "E3-04",
+      "title": "Vault integrity",
+      "status": "planned",
+      "issue": {
+        "number": null,
+        "url": null
+      },
+      "pr_url": null,
+      "spec_path": "docs/plan/spec/PKT-E3-04-work-item.md",
+      "archive_path": null,
+      "validated_at": null,
+      "validation": [],
+      "docs": {
+        "architecture": [],
+        "internal": [],
+        "external": []
+      }
+    },
+    {
+      "packet_id": "PKT-E3-05",
+      "backlog_id": "E3-05",
+      "title": "Empty vault",
+      "status": "done",
+      "issue": {
+        "number": null,
+        "url": null
+      },
+      "pr_url": null,
+      "spec_path": "docs/plan/spec/archive/pkt-e3/PKT-E3-05-work-item.md",
+      "archive_path": "docs/plan/spec/archive/pkt-e3/PKT-E3-05-work-item.md",
+      "validated_at": "2026-03-18",
+      "validation": [],
+      "docs": {
+        "architecture": [],
+        "internal": [],
+        "external": []
+      }
+    },
+    {
+      "packet_id": "PKT-E3-06",
+      "backlog_id": "E3-06",
+      "title": "Unseal via enclave",
+      "status": "planned",
+      "issue": {
+        "number": null,
+        "url": null
+      },
+      "pr_url": null,
+      "spec_path": "docs/plan/spec/PKT-E3-06-work-item.md",
+      "archive_path": null,
+      "validated_at": null,
+      "validation": [],
+      "docs": {
+        "architecture": [],
+        "internal": [],
+        "external": []
+      }
+    },
+    {
+      "packet_id": "PKT-E3-07",
+      "backlog_id": "E3-07",
+      "title": "`secrecy` + `Zeroize`",
+      "status": "planned",
+      "issue": {
+        "number": null,
+        "url": null
+      },
+      "pr_url": null,
+      "spec_path": "docs/plan/spec/PKT-E3-07-work-item.md",
+      "archive_path": null,
+      "validated_at": null,
+      "validation": [],
+      "docs": {
+        "architecture": [],
+        "internal": [],
+        "external": []
+      }
+    },
+    {
+      "packet_id": "PKT-E3-08",
+      "backlog_id": "E3-08",
+      "title": "`mlock` pinning",
+      "status": "planned",
+      "issue": {
+        "number": null,
+        "url": null
+      },
+      "pr_url": null,
+      "spec_path": "docs/plan/spec/PKT-E3-08-work-item.md",
+      "archive_path": null,
+      "validated_at": null,
+      "validation": [],
+      "docs": {
+        "architecture": [],
+        "internal": [],
+        "external": []
+      }
+    },
+    {
+      "packet_id": "PKT-E3-09",
+      "backlog_id": "E3-09",
+      "title": "No secure temp",
+      "status": "planned",
+      "issue": {
+        "number": null,
+        "url": null
+      },
+      "pr_url": null,
+      "spec_path": "docs/plan/spec/PKT-E3-09-work-item.md",
+      "archive_path": null,
+      "validated_at": null,
+      "validation": [],
+      "docs": {
+        "architecture": [],
+        "internal": [],
+        "external": []
+      }
+    },
+    {
+      "packet_id": "PKT-E3-10",
+      "backlog_id": "E3-10",
+      "title": "Vault version field",
+      "status": "done",
+      "issue": {
+        "number": null,
+        "url": null
+      },
+      "pr_url": null,
+      "spec_path": "docs/plan/spec/archive/pkt-e3/PKT-E3-10-work-item.md",
+      "archive_path": "docs/plan/spec/archive/pkt-e3/PKT-E3-10-work-item.md",
+      "validated_at": "2026-03-18",
+      "validation": [],
+      "docs": {
+        "architecture": [],
+        "internal": [],
+        "external": []
+      }
+    },
+    {
+      "packet_id": "PKT-E3-11",
+      "backlog_id": "E3-11",
+      "title": "Atomic vault writes",
+      "status": "done",
+      "issue": {
+        "number": null,
+        "url": null
+      },
+      "pr_url": null,
+      "spec_path": "docs/plan/spec/archive/pkt-e3/PKT-E3-11-work-item.md",
+      "archive_path": "docs/plan/spec/archive/pkt-e3/PKT-E3-11-work-item.md",
+      "validated_at": "2026-03-18",
+      "validation": [],
+      "docs": {
+        "architecture": [],
+        "internal": [],
+        "external": []
+      }
+    },
+    {
+      "packet_id": "PKT-E3-12",
+      "backlog_id": "E3-12",
+      "title": "File locking",
+      "status": "done",
+      "issue": {
+        "number": null,
+        "url": null
+      },
+      "pr_url": null,
+      "spec_path": "docs/plan/spec/archive/pkt-e3/PKT-E3-12-work-item.md",
+      "archive_path": "docs/plan/spec/archive/pkt-e3/PKT-E3-12-work-item.md",
+      "validated_at": "2026-03-18",
+      "validation": [],
+      "docs": {
+        "architecture": [],
+        "internal": [],
+        "external": []
+      }
+    },
+    {
+      "packet_id": "PKT-E3-13",
+      "backlog_id": "E3-13",
+      "title": "Vault load validation",
+      "status": "planned",
+      "issue": {
+        "number": null,
+        "url": null
+      },
+      "pr_url": null,
+      "spec_path": "docs/plan/spec/PKT-E3-13-work-item.md",
+      "archive_path": null,
+      "validated_at": null,
+      "validation": [],
+      "docs": {
+        "architecture": [],
+        "internal": [],
+        "external": []
+      }
+    },
+    {
+      "packet_id": "PKT-E3-14",
+      "backlog_id": "E3-14",
+      "title": "Filesystem check",
+      "status": "planned",
+      "issue": {
+        "number": null,
+        "url": null
+      },
+      "pr_url": null,
+      "spec_path": "docs/plan/spec/PKT-E3-14-work-item.md",
+      "archive_path": null,
+      "validated_at": null,
+      "validation": [],
+      "docs": {
+        "architecture": [],
+        "internal": [],
+        "external": []
+      }
+    },
+    {
+      "packet_id": "PKT-E3-15",
+      "backlog_id": "E3-15",
+      "title": "HMAC key generation",
+      "status": "planned",
+      "issue": {
+        "number": null,
+        "url": null
+      },
+      "pr_url": null,
+      "spec_path": "docs/plan/spec/PKT-E3-15-work-item.md",
+      "archive_path": null,
+      "validated_at": null,
+      "validation": [],
+      "docs": {
+        "architecture": [],
+        "internal": [],
+        "external": []
+      }
+    },
+    {
+      "packet_id": "PKT-E3-16",
+      "backlog_id": "E3-16",
+      "title": "Vault HMAC on write",
+      "status": "planned",
+      "issue": {
+        "number": null,
+        "url": null
+      },
+      "pr_url": null,
+      "spec_path": "docs/plan/spec/PKT-E3-16-work-item.md",
+      "archive_path": null,
+      "validated_at": null,
+      "validation": [],
+      "docs": {
+        "architecture": [],
+        "internal": [],
+        "external": []
+      }
+    },
+    {
+      "packet_id": "PKT-E3-17",
+      "backlog_id": "E3-17",
+      "title": "Vault HMAC verification on load",
+      "status": "planned",
+      "issue": {
+        "number": null,
+        "url": null
+      },
+      "pr_url": null,
+      "spec_path": "docs/plan/spec/PKT-E3-17-work-item.md",
+      "archive_path": null,
+      "validated_at": null,
+      "validation": [],
+      "docs": {
+        "architecture": [],
+        "internal": [],
+        "external": []
+      }
+    },
+    {
+      "packet_id": "PKT-E3-18",
+      "backlog_id": "E3-18",
+      "title": "HMAC key recovery",
+      "status": "planned",
+      "issue": {
+        "number": null,
+        "url": null
+      },
+      "pr_url": null,
+      "spec_path": "docs/plan/spec/PKT-E3-18-work-item.md",
+      "archive_path": null,
+      "validated_at": null,
+      "validation": [],
+      "docs": {
+        "architecture": [],
+        "internal": [],
+        "external": []
+      }
+    },
+    {
+      "packet_id": "PKT-E3-19",
+      "backlog_id": "E3-19",
+      "title": "Strict list integrity mode",
+      "status": "planned",
+      "issue": {
+        "number": null,
+        "url": null
+      },
+      "pr_url": null,
+      "spec_path": "docs/plan/spec/PKT-E3-19-work-item.md",
+      "archive_path": null,
+      "validated_at": null,
+      "validation": [],
+      "docs": {
+        "architecture": [],
+        "internal": [],
+        "external": []
+      }
+    },
+    {
+      "packet_id": "PKT-E3-20",
+      "backlog_id": "E3-20",
+      "title": "Schema migration contract",
+      "status": "planned",
+      "issue": {
+        "number": null,
+        "url": null
+      },
+      "pr_url": null,
+      "spec_path": "docs/plan/spec/PKT-E3-20-work-item.md",
+      "archive_path": null,
+      "validated_at": null,
+      "validation": [],
+      "docs": {
+        "architecture": [],
+        "internal": [],
+        "external": []
+      }
+    },
+    {
+      "packet_id": "PKT-E3-21",
+      "backlog_id": "E3-21",
+      "title": "Identity/config refactor baseline",
+      "status": "done",
+      "issue": {
+        "number": null,
+        "url": null
+      },
+      "pr_url": null,
+      "spec_path": "docs/plan/spec/archive/pkt-e3/PKT-E3-21-work-item.md",
+      "archive_path": "docs/plan/spec/archive/pkt-e3/PKT-E3-21-work-item.md",
+      "validated_at": "2026-03-18",
+      "validation": [],
+      "docs": {
+        "architecture": [],
+        "internal": [],
+        "external": []
+      }
+    },
+    {
+      "packet_id": "PKT-E3-29",
+      "backlog_id": "E3-29",
+      "title": "Vault locking/error-path refactor cleanup",
+      "status": "planned",
+      "issue": {
+        "number": null,
+        "url": null
+      },
+      "pr_url": null,
+      "spec_path": "docs/plan/spec/PKT-E3-29-work-item.md",
+      "archive_path": null,
+      "validated_at": null,
+      "validation": [],
+      "docs": {
+        "architecture": [],
+        "internal": [],
+        "external": []
+      }
+    }
+  ]
+}

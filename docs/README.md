@@ -15,6 +15,8 @@ Use this file as the entrypoint for project docs.
 ## Planning
 
 - [Planning Index](plan/)
+- [Current State](plan/CURRENT_STATE.md)
+- [Status Model](plan/STATUS_MODEL.md)
 - [Roadmap](plan/ROADMAP.md)
 - [Backlog](plan/BACKLOG.md)
 - [Implementation Bootstrap](plan/IMPLEMENTATION_BOOTSTRAP.md)
@@ -33,7 +35,6 @@ Use this file as the entrypoint for project docs.
 
 - [Discussion Proposals](process/DISCUSSION_PROPOSALS.md)
 - [Discussion Log](process/DISCUSSION_LOG.md)
-- [Merge Message Template](process/MERGE_MESSAGE_TEMPLATE.md)
 
 ## Reference
 
@@ -67,4 +68,4 @@ cargo doc --workspace --all-features --no-deps
 
 ---
 
-*Last updated: 2026-03-03*
+*Last updated: 2026-03-18*

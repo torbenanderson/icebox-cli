@@ -75,7 +75,7 @@ Next:
 - Group changes by concern (code/test/docs/infra/contracts/process).
 - Include concrete validation commands actually run.
 - Call out deferred work explicitly; do not hide it in narrative text.
-
----
-
-*Last updated: 2026-02-19*
+- When merge scope changes packet lifecycle/process behavior, reference:
+  - `docs/plan/STATUS_MODEL.md`
+  - `docs/plan/CURRENT_STATE.md`
+  - `docs/plan/task-status.json`

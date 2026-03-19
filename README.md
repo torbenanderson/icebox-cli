@@ -81,6 +81,12 @@ scripts/verify_secure_enclave_prereqs.sh target/release/icebox-cli
 
 **v0.1.0-alpha** -- E1 foundation + initial E2 identity bootstrap (`register-agent`).
 
+Status tracking split:
+
+- Short project snapshot lives here.
+- Detailed execution status lives in [docs/plan/CURRENT_STATE.md](docs/plan/CURRENT_STATE.md).
+- Packet lifecycle source of truth lives in [docs/plan/task-status.json](docs/plan/task-status.json).
+
 The CLI runs and supports `--help`, `--version`, and `--debug`.
 
 `register-agent` is available for initial identity bootstrap (creates identity directory + `identity.pub`, `enclave.keyref`, wrapped `key.enc`, and updates `config.json`). Agent names must match `[a-z0-9-]{3,32}` (lowercase, 3–32 chars).
@@ -188,7 +194,8 @@ cargo doc --workspace --all-features --no-deps
 ## Start Coding
 
 - Planning index: [docs/plan/README.md](docs/plan/README.md)
-- Pre-coding checklist: [docs/plan/START_CODING_CHECKLIST.md](docs/plan/START_CODING_CHECKLIST.md)
+- Current state: [docs/plan/CURRENT_STATE.md](docs/plan/CURRENT_STATE.md)
+- Status model: [docs/plan/STATUS_MODEL.md](docs/plan/STATUS_MODEL.md)
 - Issue drafts for MVP Core: [docs/plan/BOOTSTRAP_ISSUES.md](docs/plan/BOOTSTRAP_ISSUES.md)
 
 

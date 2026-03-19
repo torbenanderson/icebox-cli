@@ -2,7 +2,7 @@
 
 > Use cases and tasks mapped to [ROADMAP.md](ROADMAP.md) epics.
 >
-> All items are pending unless marked otherwise. Track progress in issues/PRs.
+> This file defines backlog scope, not live implementation status. For current packet state use [CURRENT_STATE.md](CURRENT_STATE.md) and [task-status.json](task-status.json).
 
 ## Phase 1 Vertical Slice Milestone (Sequencing Only)
 

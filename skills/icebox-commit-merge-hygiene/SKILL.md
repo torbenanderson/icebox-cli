@@ -35,7 +35,7 @@ Follow these repository rules when generating commit/PR outputs:
 2. `CONTRIBUTING.md` PR guidelines (what/why/affected docs/tests).
 3. `.github/OPENCLAW_COMMUNITY_ONRAMP.md` PR expectations (backlog IDs, concrete validation).
 4. `docs/reference/DOCS_GOVERNANCE.md` PR hygiene for docs changes.
-5. `docs/process/MERGE_MESSAGE_TEMPLATE.md` merge/squash title + body structure.
+5. `skills/icebox-commit-merge-hygiene/references/merge-message-template.md` merge/squash title + body structure.
 
 ## Commit Message Standard
 

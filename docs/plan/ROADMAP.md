@@ -6,7 +6,20 @@
 
 ## Current Progress
 
-**Pre-MVP** — E1 foundation complete. E2 `register-agent` bootstrap in progress: E2-01 (keypair), E2-02 (enclave wrapping), E2-03 (wrap key), E2-04 (no plaintext on disk), E2-09 (duplicate guard), E2-11 (active agent tracking, `config.json`), E2-18 (agent name validation). E3–E5 (vault, secrets, run) not yet implemented.
+Roadmap status here is sequencing-oriented, not the canonical implementation tracker.
+
+For current code-truth status use:
+
+- [CURRENT_STATE.md](CURRENT_STATE.md)
+- [task-status.json](task-status.json)
+
+Current sequencing summary:
+
+- E1 bootstrap packet set is complete.
+- E2 identity bootstrap foundation is complete for the currently archived packet set.
+- E3 vault core slice is complete for the currently archived packet set.
+- The broader MVP runnable slice (`register-agent -> add -> run -> remove`) is still incomplete.
+- E4 and E5 remain partially or not yet implemented at the command-surface level.
 
 ---
 
@@ -20,8 +33,8 @@ gantt
 
     section Phase 1 (MVP)
     E1 Project Bootstrap             :done, e1, 2026-02, 2026-03
-    E2 Agent Identity               :active, e2, after e1, 2026-04
-    E3 Encrypted Vault              :e3, after e2, 2026-05
+    E2 Agent Identity               :done, e2, after e1, 2026-04
+    E3 Encrypted Vault              :active, e3, after e2, 2026-05
     E4 Secret Management            :e4, after e3, 2026-06
     E5 Secure Run                   :e5, after e4, 2026-07
 
@@ -36,6 +49,12 @@ gantt
     section Phase 3
     E10 Browser Extension           :e10, after e9, 2026-12
 ```
+
+Timeline marker intent:
+
+- `done`: epic foundation or currently tracked packet set is complete
+- `active`: epic is partially implemented or is the current execution frontier
+- unlabeled future bars: planned sequencing only
 
 ## Epics
 
@@ -82,4 +101,4 @@ gantt
 
 ---
 
-*Last updated: 2026-03-03*
+*Last updated: 2026-03-18*

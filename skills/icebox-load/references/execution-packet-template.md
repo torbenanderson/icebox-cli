@@ -89,6 +89,7 @@
 - PR link:
 - Tests run (commands + result):
 - Docs updated (paths):
+- Architecture docs updated:
 - Internal docs updated:
 - External docs updated:
 - Docs sync checks (mdBook/SUMMARY/book.toml):

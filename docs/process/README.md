@@ -96,6 +96,23 @@ The operating model describes how Icebox delivers work: gate-driven, evidence-fi
 - Evidence-first closeout so "done" means validated, reviewable, and auditable.
 - Documentation as a contract surface for both humans and automation.
 
+## Planning Status Surfaces
+
+Icebox now separates scope, sequencing, and live status explicitly:
+
+- [ROADMAP.md](../plan/ROADMAP.md):
+  sequencing and release intent
+- [BACKLOG.md](../plan/BACKLOG.md):
+  canonical epic/backlog requirement definitions
+- [STATUS_MODEL.md](../plan/STATUS_MODEL.md):
+  packet lifecycle rules and naming conventions
+- [CURRENT_STATE.md](../plan/CURRENT_STATE.md):
+  human-readable implementation snapshot
+- [task-status.json](../plan/task-status.json):
+  machine-readable packet lifecycle registry
+
+This means roadmap/backlog docs are not the live completion database. Packet completion is owned by the done gate and reflected in the status registry/current-state surfaces.
+
 ## Gate and Step Map
 
 The gate-step map is the reference table for the lifecycle diagram above. Each step (S1–S6) and gate (G1–G5) has a diagram ID, purpose, and exit signal. These steps and gates correspond to **actual skills**—executable checklists and workflows in the [skills](../../skills/) folder that guide load, execute, test, and closeout flows. Use this table to interpret the flowchart and to verify that work has met the criteria before moving to the next stage.
@@ -110,8 +127,8 @@ The gate-step map is the reference table for the lifecycle diagram above. Each s
 | `G3` | Gate | Test and Behavior Verified | Validate expected behavior and regressions before hardening. | Test evidence passes for target scope. |
 | `S4` | Step | Workflow and AI Harness Controls | Apply workflow, schema, and automation guardrails. | Control checks complete. |
 | `G4` | Gate | Operational Guardrails Passed | Confirm hardened automation and policy compliance. | Guardrail evidence accepted. |
-| `S5` | Step | Done Gate Evidence Review | Assemble closeout evidence for traceable completion. | Evidence packet assembled. |
-| `G5` | Gate | Closeout Criteria Met | Approve transition to done based on hard evidence. | Item state can move to done. |
+| `S5` | Step | Done Gate Evidence Review | Assemble closeout evidence for traceable completion and status-surface updates. | Evidence packet assembled. |
+| `G5` | Gate | Closeout Criteria Met | Approve transition to done based on hard evidence. | Item state can move to done and status registry can be updated. |
 | `S6` | Step | Merge Hygiene and Release | Enforce merge/commit hygiene and release discipline. | Change is merged and releasable. |
 | `O1` | Outcome | Production Feedback Loop | Feed production learnings back into intake. | New cycle begins with updated context. |
 
@@ -146,11 +163,17 @@ Icebox implements this process on GitHub; the links below are real artifacts fro
 
 This repository primarily uses issue comment trails for gate evidence. PR review discussion anchors (`#discussion_r...`) should also be linked when present. Every gate transition should link to at least one immutable artifact (commit, PR, issue comment, workflow run, or release tag) so the delivery chain is independently auditable.
 
+Closeout additionally updates the repository-local status surfaces:
+
+- packet archive path under `docs/plan/spec/archive/`
+- [CURRENT_STATE.md](../plan/CURRENT_STATE.md)
+- [task-status.json](../plan/task-status.json)
+
 ## Process Artifacts
 
 - [Discussion Proposals](DISCUSSION_PROPOSALS.md)
 - [Discussion Log](DISCUSSION_LOG.md)
-- [Merge Message Template](MERGE_MESSAGE_TEMPLATE.md)
+- [Planning Status Model](../plan/STATUS_MODEL.md)
 
 ## Learn More
 
@@ -173,4 +196,4 @@ For AI/CD implementation support, agentic pipeline setup, or questions about thi
 
 ---
 
-*Last updated: 2026-02-26*
+*Last updated: 2026-03-18*

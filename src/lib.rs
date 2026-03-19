@@ -1,17 +1,25 @@
- //! Icebox CLI library crate.
+//! Icebox CLI library crate.
   //!
   //! `src/main.rs` stays thin; core parsing and orchestration live here so they
   //! remain testable and reusable.
+  //!
+  //! Main modules:
+  //! - `agent`: agent-facing command flows
+  //! - `config`: configuration loading and validation
+  //! - `did`: device identity handling
+  //! - `runner`: CLI execution flow
+  //! - `vault`: secure storage operations
 
 pub mod agent;
 pub mod config;
 pub mod did;
+pub mod runner;
+pub mod vault;
+
 mod enclave;
 mod error;
 mod hardening;
-pub mod runner;
 mod util;
-pub mod vault;
 
 use clap::{Parser, error::ErrorKind};
 use std::ffi::OsStr;
