@@ -13,7 +13,7 @@ This page is the human-readable project status snapshot.
 
 - Registry updated: 2026-03-18
 - Done packets: 20
-- Active packets: 15
+- Open packets: 15
 - Planned packets: 15
 - In-progress packets: 0
 - Implemented-not-closed packets: 0
@@ -56,7 +56,7 @@ This page is the human-readable project status snapshot.
 - E3-12 -- File locking (docs/plan/spec/archive/pkt-e3/PKT-E3-12-work-item.md)
 - E3-21 -- Identity/config refactor baseline (docs/plan/spec/archive/pkt-e3/PKT-E3-21-work-item.md)
 
-## Active Packets
+## Open Packets
 
 - E3-03 -- Per-secret isolation [planned] (docs/plan/spec/PKT-E3-03-work-item.md)
 - E3-04 -- Vault integrity [planned] (docs/plan/spec/PKT-E3-04-work-item.md)

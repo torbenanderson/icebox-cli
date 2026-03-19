@@ -18,6 +18,8 @@ This file defines documentation ownership and hygiene rules.
   - Machine-readable status: `docs/plan/task-status.json`
 - `docs/guides/`:
   User/operator guides.
+- `docs/process/`:
+  Process governance, lifecycle gates, and discussion-proposal workflow (D-issues).
 - `docs/reference/`:
   Current machine-readable runtime artifacts and policy references.
 - `docs/architecture/contracts/`:

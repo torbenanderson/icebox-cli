@@ -82,9 +82,9 @@
 ## As-Built (Delivered)
 
 - `src/error.rs`: `IceErrorCode` enum (InputValidation → ICE-701, IdentitySetup → ICE-306); `format_cli_error`, `format_runtime_error` with debug-toggle detail; `map_clap_error`. Default mode hides internal detail; `--debug` exposes it.
-- `docs/reference/error-codes.json`: extended registry (not yet all used at runtime).
+- `docs/reference/error-codes.json`: machine-readable runtime registry aligned with the implemented `IceErrorCode` set.
 - Tests: `tests/e2e/e1_13_structured_error_codes.rs` (default emits ICE-701 without detail; debug emits code + detail).
 
 ---
 
-*Last updated: 2026-03-03*
+*Last updated: 2026-03-18*

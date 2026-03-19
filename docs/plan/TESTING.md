@@ -148,7 +148,7 @@ These tests are public-release blockers and must pass on macOS CI before shippin
 | T-E1-09 | E1-09 | No clipboard interaction during any operation (pasteboard unchanged before/after) |
 | T-E1-17 | E1-17 | Release binary contains embedded entitlements: `com.apple.security.smartcard`, `com.apple.keychain-access-groups`, hardened runtime enabled. Verified via `codesign -d --entitlements -` |
 | T-E1-18 | E1-18 | Release binary passes `spctl --assess --type execute` (Gatekeeper) and `stapler validate` (notarization staple) |
-| T-E1-19 | E1-19 | `docs/reference/error-codes.json` exists, is valid JSON, and includes all documented `ICE-XXX` codes without duplicates |
+| T-E1-19 | E1-19 | `docs/reference/error-codes.json` exists, is valid JSON, contains no duplicate `ICE-XXX` codes, and stays synchronized with the runtime code mapping |
 | T-E1-20 | E1-20 | Runtime paths are owner-only: `~/.icebox/` and agent dirs are `0700`; sensitive files are `0600`; unsafe modes fail closed on security-critical commands |
 | T-E1-21 | E1-21 | Persisted artifacts include correct `format` + `schemaVersion`; missing or mismatched markers are rejected |
 | T-E1-22 | E1-22 | Canonical serialization checks pass (UTC RFC3339 timestamps, lowercase hex, fixed base64 variant, deterministic export ordering) |
